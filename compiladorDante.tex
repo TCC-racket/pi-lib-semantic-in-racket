@@ -1,0 +1,184 @@
+\documentclass{beamer}
+
+\usetheme[
+  outer/progressbar=frametitle
+]{metropolis}
+
+\usepackage[portuguese]{babel}
+\usepackage[utf8]{inputenc}
+
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue,citecolor=blue}
+
+\title[Compiladores 2018.1]{1$^{a.}$ apresentação do compilador Dante}
+\author[Abrev.]{Autores: João Pedro Abreu, Luis Freitas e Raphael Leardini} 
+
+\institute[UFF]{Universidade Federal Fluminense}
+
+\date{Data: 21/03/2018} 
+
+\begin{document}
+
+% ---
+
+\begin{frame}[plain]
+
+\titlepage
+
+\end{frame}
+
+% ---
+
+\begin{frame}{Linguagem escolhida: Racket}
+A linguagem Racket é uma linguagem derivada de LISP(List processer) criada em 1994 com o nome de PLT SCHEME e mudou de nome em 2010.
+\end{frame}
+
+% ---
+
+\begin{frame}{Paradigmas}
+A linguagem Racket é multiparadigmada.
+
+Seus paradigmas são: Funcional, Procedural, Modular, Orientada a Objeto, Lógica, Reflexiva e Meta
+
+\end{frame}
+
+% ---
+
+\begin{frame}{Instalação}
+A instalaçao da linguagem é bem simples em sistemas UNIX, só se deve ir no site da linguagem RACKET, baixar o arquivo em shell script que lá se encontra e mandar executar.
+
+Com isso se instala o compilador da linguagem, a linguagem em si e a IDE Dr Racket que é a IDE recomendada pelos criadores
+
+\end{frame}
+
+%---
+\begin{frame}{Exemplo de codigos}
+Nessa parte vamos mostrar exemplo de códigos e explicaremos como a maioria deles funciona
+Todas os códigos foram feitos na IDE recomendada pelos criadores da linguagem o Dr Racket
+\end{frame}
+% ---
+
+\begin{frame}{Hello World}
+\#lang racket
+
+"Hello, World!"
+\end{frame}
+
+% ---
+
+\begin{frame}{Triangulo de Sierpinski}
+\#lang racket
+
+(require 2htdp/image)
+
+(let sierpinski ([n 8])
+
+  (if (zero? n)
+  
+    (triangle 2 'solid 'red)
+    
+    (let ([t (sierpinski (- n 1))])
+    
+      (freeze (above t (beside t t))))))
+
+
+\end{frame}
+
+% ---
+
+\begin{frame}{Criação de Lista}
+\#lang racket
+
+(cons 1 2)
+
+(car (cons 1 2))
+
+(cdr(cons 1 2))
+        
+\end{frame}
+
+%---
+
+\begin{frame}{Definição de Structs}
+
+\#lang racket
+
+(struct dog (name breed age))
+
+(define my-pet
+
+  (dog "lassie" " "collie" 5))
+  
+resultado de (dog? my-pet) é true que é escrito como \#t
+
+resultado de (dog-name my-pet) é lassie
+  
+
+\end{frame}
+% ---
+\begin{frame}{Vetores}
+\#lang racket
+
+\#(1 2 3) cria o vetor (1 2 3)
+
+(vector-append \#(1 2 3) \#(4 5 6)) concatena vetores formando assim (1 2 3 4 5 6)
+
+(list->set '(1 2 3 1 2 3 3 2 1 3 2 1)) resulta num vetor de todos os elementos desse conjunto logo (1 2 3)
+
+
+\end{frame}
+%---
+\begin{frame}{Repetição}
+
+\#lang racket
+
+(for ([i 10])
+
+  Codigo desejado )
+  
+(for ([i (in-range 5 10)])
+
+  codigo desejado)
+    
+(loop 5)
+
+\end{frame}
+% ---
+
+
+\begin{frame}{Orientação a Objeto}
+(define fish\%
+
+  (class object\%
+  
+    (init size) 
+    
+    (super-new) Essa aqui é a Super classe
+    
+    (define current-size size)
+    
+    (define/public (get-size)
+    
+      current-size)
+      
+    (define/public (grow amt)
+    
+      (set! current-size (+ amt current-size)))
+      
+    (define/public (eat other-fish)
+    
+      (grow (send other-fish get-size)))))
+
+
+\end{frame}
+\begin{frame}{Suporte à construção de compiladores}
+
+\end{frame}
+
+% ---
+
+\begin{frame}{Prós e contras}
+
+\end{frame}
+
+\end{document}
+
