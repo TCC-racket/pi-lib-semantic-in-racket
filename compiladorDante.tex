@@ -183,16 +183,28 @@ resultado de (dog-name my-pet) é lassie
 
 % ---
 
-\begin{frame}{Pattern Matching}
-(match '(1 2 3) 
+\begin{frame}[fragile]{Pattern Matching}
+%\begin{verbatim}
+(match '(1 2 3)
+ 
       [(list a a a) (list a)]
+      
       [(list a b b) (list b a a)]
+      
       [(list "abc") (list "cba")]
+      
       [(list a b c) "ola"]) retorna "ola"
- (match "algumaConstrucao" ["algumaConstrucao" "b"] ["algumaConstrucao" "a"]) retorna "b"
+      
+ (match "algumaConstrucao" ["algumaConstrucao" "b"] ["algumaConstrucao" 
+ 
+ "a"]) retorna "b"
+ 
  (struct tree (val right left))
- (match (tree (10 'right 'left)) [(tree a _ _) (+ 1 a)]) retorna 11
- (match "apple" [(regexp #rx"p+") #t] [_ #f])  retorna #t
+ 
+ (match (tree (10 'right 'left)) [(tree a \_ \_) (+ 1 a)]) retorna 11
+ 
+ (match "apple" [(regexp \#rx"p+") \#t] [\_ \#f])  retorna \#t
+%\end{verbatim}
 \end{frame}
 
 % --- possivelmente falar de regex, provavelmente não
@@ -200,7 +212,8 @@ resultado de (dog-name my-pet) é lassie
 
 % ---
 
-\begin{frame}{Suporte à construção de compiladores}
+\begin{frame}[fragile]{Suporte à construção de compiladores}
+\begin{verbatim}
 PEG
 (require peg/peg)
 (define-peg number
@@ -213,12 +226,14 @@ PEG
             (and (name term1 prod) (? (and #\+ (name term2 expr))) )
             (if term2 (+ term1 term2) term1))
  (peg expr "2+4*7+6*5")     retorna 60
+\end{verbatim}
 \end{frame}
 
 % ---
 
 
-\begin{frame}{Suporte à construção de compiladores}
+\begin{frame}[fragile]{Suporte à construção de compiladores}
+\begin{verbatim}
 PEG
 (require peg/peg)
 (define-peg number
@@ -230,12 +245,14 @@ PEG
 (define-peg atribuicao
             (and (name variable var) "=" (name value number)) value)
 (peg atribuicao "umInteiro=345") retorna 345
+\end{verbatim}
 \end{frame}
 
 % ---
 
 
-\begin{frame}{Suporte à construção de compiladores}
+\begin{frame}[fragile]{Suporte à construção de compiladores}
+\begin{verbatim}
 PEG
 (require peg/peg)
 (struct soma (a b))
@@ -254,6 +271,7 @@ PEG
  (soma-b (peg expr "2+4*7+6*5"))    retorna #<soma>
  (soma-a (soma-b (peg expr "2+4*7+6*5"))) retorna #<prod>
  (prod-c (soma-a (soma-b (peg expr "2+4*7+6*5"))))  retorna 4
+\end{verbatim}
 \end{frame}
 
 % ---
