@@ -180,6 +180,9 @@ resultado de (dog-name my-pet) é lassie
 
 
 \end{frame}
+
+% ---
+
 \begin{frame}{Suporte à construção de compiladores}
 Pattern Matching
 (match '(1 2 3) 
@@ -190,13 +193,26 @@ Pattern Matching
  (match "algumaConstrucao" ["algumaConstrucao" "b"] ["algumaConstrucao" "a"]) retorna "b"
  (struct tree (val right left))
  (match (tree (10 'right 'left)) [(tree a _ _) (+ 1 a)]) retorna 11
+ (match "apple" [(regexp #rx"p+") #t] [_ #f])  retorna #t
 \end{frame}
+
+% --- possivelmente falar de regex, provavelmente não
+
 
 % ---
 
 \begin{frame}{Suporte à construção de compiladores}
 PEG
-
+(require peg/peg)
+(define-peg number
+            (name value (+ (range #\0 #\9)))
+            (string->number value))
+(define-peg prod
+            (and (name v1 number) (? (and #\* (name v2 prod))))
+            (if v2 (* v1 v2) v1))
+(define-peg expr
+            (and (name term1 prod) (? (and #\+ (name term2 expr))) )
+            (if term2 (+ term1 term2) term1))
 \end{frame}
 
 % ---
