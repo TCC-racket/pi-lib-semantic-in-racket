@@ -29,13 +29,13 @@
 % ---
 
 \begin{frame}{Linguagem escolhida: Racket}
-A linguagem \textit{Racket} é uma linguagem derivada de \textit{LISP(List Processer)} criada em 1994 com o nome de \textit{PLT SCHEME} e mudou de nome em 2010.
+A linguagem Racket é uma linguagem derivada de LISP(List Processer) criada em 1994 com o nome de PLT SCHEME e mudou de nome em 2010.
 \end{frame}
 
 % ---
 
 \begin{frame}{Paradigmas}
-A linguagem \textit{Racket} é multiparadigmada.
+A linguagem Racket é multiparadigmada.
 
 Seus paradigmas são: Funcional, Procedural, Modular, Orientada a Objeto, Lógica, Reflexiva e Meta.
 
@@ -43,10 +43,10 @@ Seus paradigmas são: Funcional, Procedural, Modular, Orientada a Objeto, Lógic
 
 % ---
 
-\begin{frame}{Instalação}
-A instalação da linguagem é bem simples em sistemas \textit{UNIX}, só se deve ir no site da linguagem \textit{Racket}, baixar o arquivo em \textit{shell script} que lá se encontra e mandar executar.
+\begin{frame}{Instalação - Sistemas UNIX}
+A instalação da linguagem é bem simples em sistemas UNIX, só se deve ir no site da linguagem Racket, baixar o arquivo em shell script que lá se encontra e mandar executar.
 
-Com isso se instala o compilador da linguagem, a linguagem em si e a IDE \textit{DrRacket} que é a IDE recomendada pelos criadores.
+Com isso se instala o compilador da linguagem, a linguagem em si e a IDE DrRacket que é a IDE recomendada pelos criadores.
 
 
 
@@ -54,16 +54,16 @@ Com isso se instala o compilador da linguagem, a linguagem em si e a IDE \textit
 
 %---
 
-\begin{frame}{Instalação}
-Para sistemas \textit{Windows} a instalação funciona da mesma forma, inclusive também possui o \textit{DrRacket} embutido. Vale ressaltar que o próprio site detecta, na hora do download, o tipo de Sistema Operacional que está acessando a página.
+\begin{frame}{Instalação - Sistemas Windows}
+Para sistemas Windows a instalação funciona da mesma forma, inclusive possui o DrRacket embutido da mesma forma. Vale ressaltar que o próprio site detecta, na hora do download, o tipo de Sistema Operacional que está acessando a página.
 
 \end{frame}
 
 % ---
 
 \begin{frame}{Exemplo de códigos}
-Nessa parte vamos mostrar exemplo de códigos e explicaremos como a maioria deles funciona
-Todas os códigos foram feitos na IDE recomendada pelos criadores da linguagem o \textit{DrRacket}.
+Nessa parte vamos mostrar exemplo de códigos e explicaremos como a maioria deles funciona.
+Todos os códigos foram feitos na IDE recomendada pelos criadores da linguagem o \textit{DrRacket}.
 \end{frame}
 % ---
 
@@ -183,6 +183,48 @@ resultado de (dog-name my-pet) é lassie
 
 % ---
 
+\begin{frame}[fragile]{Suporte à construção de compiladores}
+
+O Racket é uma linguagem de programação de uso geral com um grande foco na criação de outras linguagens, dessa forma, possuindo vários mecanismos que favorecem e facilitam o uso dele como um compilador. 
+Além de possuir um site muito bem estruturado e com ótimo auxilio a novos usuários.
+
+\end{frame}
+
+% ---
+
+\begin{frame}[fragile]{Suporte à construção de compiladores}
+
+Ele também possui:
+ 
+- Documentação detalhada, de fácil acesso.
+
+- Diversos exemplos de código e de linguagens criadas a partir dele.
+
+- Uma biblioteca própria para PEG.
+
+- Portabilidade: programas desenvolvidos em Windows, Linux ou macOS funcionarão nos três tipos de Sistema sem problemas.
+
+- Fácil de instalar.
+
+- DrRacket: uma IDE própria, que vem junto com o compilador base, altamente recomendada pelos criadores da linguagem.
+
+
+\end{frame}
+
+% ---
+
+\begin{frame}{PEG}
+
+\end{frame}
+
+% ---
+
+\begin{frame}{Exemplo de uso de PEG}
+Nessa parte iremos mostrar alguns usos da biblioteca PEG e explicaremos um pouco sobre a maioria.
+Todos os códigos foram feitos na IDE recomendada pelos criadores da linguagem o \textit{DrRacket}.
+\end{frame}
+% ---
+
 \begin{frame}[fragile]{Pattern Matching}
 %\begin{verbatim}
 (match '(1 2 3)
@@ -285,23 +327,21 @@ PEG
 
 % ---
 
-\begin{frame}{Prós e Contras}
-Prós: 
+\begin{frame}{Prós}
 
-1) Ela tenta ser familiar com pessoas que já utilizaram LISP utilizando comandos familiares e até o mesmo comando para compilação.
+1) Ela tende a ser inteligível para usuários que já tem conhecimento sobre LISP, além de utilizar comandos familiares (ou até mesmo iguais) para compilação.
 
 2) Ela é de fácil instalação, vindo com IDE inclusa.
 
-3) É uma linguagem livre e por isso facilmente modificavel.
+3) É uma linguagem livre e por isso facilmente modificável.
 
-4) Tem amplo suporte dos Desenvolvedores e do site que é bem estruturado.
+4) Tem amplo suporte dos Desenvolvedores e do site, que é muito bem estruturado.
 
-5) Ótima para desenvolvimento de outras linguagens e compiladores por ter um PARSE embutido e muitos outros motivos.
+5) Ótima para desenvolvimento de outras linguagens e compiladores por ter uma biblioteca PEG embutida.
 
 
 \end{frame}
-\begin{frame}{Prós e Contras}
-Contras:
+\begin{frame}{Contras}
 
 1) A falta de chaves pode deixar o código confuso.
 
