@@ -181,6 +181,21 @@ resultado de (dog-name my-pet) é lassie
 
 \end{frame}
 \begin{frame}{Suporte à construção de compiladores}
+Pattern Matching
+(match '(1 2 3) 
+      [(list a a a) (list a)]
+      [(list a b b) (list b a a)]
+      [(list "abc") (list "cba")]
+      [(list a b c) "ola"]) retorna "ola"
+ (match "algumaConstrucao" ["algumaConstrucao" "b"] ["algumaConstrucao" "a"]) retorna "b"
+ (struct tree (val right left))
+ (match (tree (10 'right 'left)) [(tree a _ _) (+ 1 a)]) retorna 11
+\end{frame}
+
+% ---
+
+\begin{frame}{Suporte à construção de compiladores}
+PEG
 
 \end{frame}
 
