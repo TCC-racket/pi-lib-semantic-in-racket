@@ -212,6 +212,48 @@ PEG
 (define-peg expr
             (and (name term1 prod) (? (and #\+ (name term2 expr))) )
             (if term2 (+ term1 term2) term1))
+ (peg expr "2+4*7+6*5")     retorna 60
+\end{frame}
+
+% ---
+
+
+\begin{frame}{Suporte à construção de compiladores}
+PEG
+(require peg/peg)
+(define-peg number
+            (name value (+ (range #\0 #\9)))
+            (string->number value))
+(define-peg var
+            (and (or (range #\a #\z) (range #\A #\Z)) (* (any-char))))
+
+(define-peg atribuicao
+            (and (name variable var) "=" (name value number)) value)
+(peg atribuicao "umInteiro=345") retorna 345
+\end{frame}
+
+% ---
+
+
+\begin{frame}{Suporte à construção de compiladores}
+PEG
+(require peg/peg)
+(struct soma (a b))
+(struct prod (c d))
+(define-peg number
+            (name value (+ (range #\0 #\9)))
+            (string->number value))
+(define-peg prod
+            (and (name v1 number) (? (and #\* (name v2 prod))))
+            (if v2 (prod v1 v2) v1))
+(define-peg expr
+            (and (name term1 prod) (? (and #\+ (name term2 expr))) )
+            (if term2 (soma term1 term2) term1))
+ (soma? (peg expr "2+4*7+6*5"))     retorna #t
+ (soma-a (peg expr "2+4*7+6*5"))    retorna 2
+ (soma-b (peg expr "2+4*7+6*5"))    retorna #<soma>
+ (soma-a (soma-b (peg expr "2+4*7+6*5"))) retorna #<prod>
+ (prod-c (soma-a (soma-b (peg expr "2+4*7+6*5"))))  retorna 4
 \end{frame}
 
 % ---
