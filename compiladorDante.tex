@@ -324,12 +324,22 @@ PEG
 (if v2 (prod v1 v2) v1))
 (define-peg expr
 (and (name term1 prod) (? (and #\+ (name term2 expr))) )
+
+\end{verbatim}
+\end{frame}
+
+% ---
+
+\begin{frame}[fragile]{PEG}
+\begin{verbatim}
+
+
 (if term2 (soma term1 term2) term1))
- (soma? (peg expr "2+4*7+6*5"))     retorna #t
- (soma-a (peg expr "2+4*7+6*5"))    retorna 2
- (soma-b (peg expr "2+4*7+6*5"))    retorna #<soma>
- (soma-a (soma-b (peg expr "2+4*7+6*5"))) retorna #<prod>
- (prod-c (soma-a (soma-b (peg expr "2+4*7+6*5"))))  retorna 4
+(soma? (peg expr "2+4*7+6*5"))     retorna #t
+(soma-a (peg expr "2+4*7+6*5"))    retorna 2
+(soma-b (peg expr "2+4*7+6*5"))    retorna #<soma>
+(soma-a (soma-b (peg expr "2+4*7+6*5"))) retorna #<prod>
+(prod-c (soma-a (soma-b (peg expr "2+4*7+6*5"))))  retorna 4
 \end{verbatim}
 \end{frame}
 
