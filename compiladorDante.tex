@@ -63,7 +63,7 @@ Para sistemas Windows a instalação funciona da mesma forma, inclusive possui o
 
 \begin{frame}{Exemplo de códigos}
 Nessa parte vamos mostrar exemplo de códigos e explicaremos como a maioria deles funciona.
-Todos os códigos foram feitos na IDE recomendada pelos criadores da linguagem o \textit{DrRacket}.
+Todos os códigos foram feitos na IDE recomendada pelos criadores da linguagem o DrRacket.
 \end{frame}
 % ---
 
@@ -239,11 +239,12 @@ Pattern Matching
 
 
 \begin{frame}{PEG}
-PEG é suportado nativamente pelo racket, requerendo apenas o uso de (require peg/peg) no começo do arquivo.
-PEG pode ser visto como um avanço das regex, permitindo atribuir nomes a partes da string casada com a PEG
-para posterior tratamento.
+PEG é suportado nativamente pelo Racket, requerendo apenas o uso de (require peg/peg) no começo do arquivo.
 
-define-se uma regra peg da seguinte forma :
+PEG pode ser visto como um avanço das regex, permitindo atribuir nomes a partes da string casada com a PEG para posterior tratamento.
+
+Define-se uma regra peg da seguinte forma :
+
 (define-peg nomeDaRegra padrão ação)
 
 \end{frame}
@@ -252,7 +253,7 @@ define-se uma regra peg da seguinte forma :
 
 \begin{frame}{Exemplo de uso de PEG}
 Nessa parte iremos mostrar alguns usos da biblioteca PEG e explicaremos um pouco sobre a maioria.
-Todos os códigos foram feitos na IDE recomendada pelos criadores da linguagem o \textit{DrRacket}.
+Todos os códigos foram feitos na IDE recomendada pelos criadores da linguagem o DrRacket.
 \end{frame}
 % ---
 
@@ -301,9 +302,9 @@ PEG
 
 (define-peg atribuicao
 
-            (and (name variable var) \"=\" (name value number)) value)
+            (and (name variable var) "=" (name value number)) value)
             
-(peg atribuicao \"umInteiro=345\") retorna 345
+(peg atribuicao "umInteiro=345") retorna 345
 
 \end{frame}
 
@@ -339,7 +340,7 @@ PEG
 (soma-a (peg expr "2+4*7+6*5"))    retorna 2
 (soma-b (peg expr "2+4*7+6*5"))    retorna #<soma>
 (soma-a (soma-b (peg expr "2+4*7+6*5"))) retorna #<prod>
-(prod-c (soma-a (soma-b (peg expr "2+4*7+6*5"))))  retorna 4
+(prod-c (soma-a (soma-b (peg expr "2+4*7+6*5"))))retorna 4
 \end{verbatim}
 \end{frame}
 
