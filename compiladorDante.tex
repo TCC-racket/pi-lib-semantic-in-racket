@@ -212,21 +212,9 @@ Ele também possui:
 \end{frame}
 
 % ---
-
-\begin{frame}{PEG}
-
-\end{frame}
-
-% ---
-
-\begin{frame}{Exemplo de uso de PEG}
-Nessa parte iremos mostrar alguns usos da biblioteca PEG e explicaremos um pouco sobre a maioria.
-Todos os códigos foram feitos na IDE recomendada pelos criadores da linguagem o \textit{DrRacket}.
-\end{frame}
-% ---
-
-\begin{frame}[fragile]{Pattern Matching}
+\begin{frame}[fragile]{Suporte a construção de compiladores}
 %\begin{verbatim}
+Pattern Matching
 (match '(1 2 3)
  
       [(list a a a) (list a)]
@@ -249,14 +237,34 @@ Todos os códigos foram feitos na IDE recomendada pelos criadores da linguagem o
 %\end{verbatim}
 \end{frame}
 
+
+\begin{frame}{PEG}
+PEG é suportado nativamente pelo racket, requerendo apenas o uso de (require peg/peg) no começo do arquivo.
+PEG pode ser visto como um avanço das regex, permitindo atribuir nomes a partes da string casada com a PEG
+para posterior tratamento.
+
+define-se uma regra peg da seguinte forma :
+(define-peg nomeDaRegra padrão ação)
+
+\end{frame}
+
+% ---
+
+\begin{frame}{Exemplo de uso de PEG}
+Nessa parte iremos mostrar alguns usos da biblioteca PEG e explicaremos um pouco sobre a maioria.
+Todos os códigos foram feitos na IDE recomendada pelos criadores da linguagem o \textit{DrRacket}.
+\end{frame}
+% ---
+
+
 % --- possivelmente falar de regex, provavelmente não
 
 
 % ---
 
-\begin{frame}[fragile]{Suporte à construção de compiladores}
+\begin{frame}[fragile]{PEG}
 \begin{verbatim}
-PEG
+
 (require peg/peg)
 (define-peg number
 (name value (+ (range #\0 #\9)))
@@ -274,7 +282,7 @@ PEG
 % ---
 
 
-\begin{frame}[fragile]{Suporte à construção de compiladores}
+\begin{frame}[fragile]{PEG}
 
 PEG
 
@@ -284,7 +292,7 @@ PEG
 
             (name value (+ (range \# $\backslash$0 \#$\backslash$9)))
             
-            (string-\textgreater number value))
+            (string->number value))
             
 (define-peg var
 
@@ -302,9 +310,9 @@ PEG
 % ---
 
 
-\begin{frame}[fragile]{Suporte à construção de compiladores}
+\begin{frame}[fragile]{PEG}
 \begin{verbatim}
-PEG
+
 (require peg/peg)
 (struct soma (a b))
 (struct prod (c d))
