@@ -239,13 +239,17 @@ Pattern Matching
 
 
 \begin{frame}{PEG}
+PEG é uma solução para reconhecimento de linguagens, situada entre o poder das regex(expressões regulares) e a complexidade das GLC(gramaticas livre de 
+contexto). Ela, ao invés de não-determinismo, se utiliza de noções de precedência nas regras para escolher uma derivação.
 PEG é suportado nativamente pelo Racket, requerendo apenas o uso de (require peg/peg) no começo do arquivo.
 
-PEG pode ser visto como um avanço das regex, permitindo atribuir nomes a partes da string casada com a PEG para posterior tratamento.
+PEG no racket pode ser visto como um avanço das regex, permitindo atribuir nomes a partes da string casada com a PEG para posterior tratamento.
 
 Define-se uma regra peg da seguinte forma :
 
 (define-peg nomeDaRegra padrão ação)
+
+onde padrão é uma pega, representada como uma S-expressão apropriada e ação é qualquer expressão valida em racket, podendo ser um valor inteiro, uma lista, uma função aplicada a algum argumento, etc
 
 \end{frame}
 
