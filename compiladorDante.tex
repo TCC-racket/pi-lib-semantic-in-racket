@@ -181,7 +181,34 @@ resultado de (dog-name my-pet) é lassie
 
 \end{frame}
 
-% ---
+%---
+
+\begin{frame}[fragile]{Pattern Matching}
+%\begin{verbatim}
+Pattern Matching
+(match '(1 2 3)
+
+[(list a a a) (list a)]
+
+[(list a b b) (list b a a)]
+
+[(list "abc") (list "cba")]
+
+[(list a b c) "ola"]) retorna "ola"
+
+(match "algumaConstrucao" ["algumaConstrucao" "b"] ["algumaConstrucao" 
+
+"a"]) retorna "b"
+
+(struct tree (val right left))
+
+(match (tree (10 'right 'left)) [(tree a \_ \_) (+ 1 a)]) retorna 11
+
+(match "apple" [(regexp \#rx"p+") \#t] [\_ \#f])  retorna \#t
+%\end{verbatim}
+\end{frame}
+
+%---
 
 \begin{frame}[fragile]{Suporte à construção de compiladores}
 
@@ -211,31 +238,6 @@ Ele também possui:
 
 \end{frame}
 
-% ---
-\begin{frame}[fragile]{Suporte a construção de compiladores}
-%\begin{verbatim}
-Pattern Matching
-(match '(1 2 3)
- 
-      [(list a a a) (list a)]
-      
-      [(list a b b) (list b a a)]
-      
-      [(list "abc") (list "cba")]
-      
-      [(list a b c) "ola"]) retorna "ola"
-      
- (match "algumaConstrucao" ["algumaConstrucao" "b"] ["algumaConstrucao" 
- 
- "a"]) retorna "b"
- 
- (struct tree (val right left))
- 
- (match (tree (10 'right 'left)) [(tree a \_ \_) (+ 1 a)]) retorna 11
- 
- (match "apple" [(regexp \#rx"p+") \#t] [\_ \#f])  retorna \#t
-%\end{verbatim}
-\end{frame}
 
 
 \begin{frame}{PEG}
@@ -263,7 +265,7 @@ Onde  \textbf{padrão} é uma Peg, representada como uma S-expressão apropriada
 
 % ---
 
-\begin{frame}{Exemplo de uso de PEG}
+\begin{frame}{PEG}
 Nessa parte iremos mostrar alguns usos da biblioteca PEG e explicaremos um pouco sobre a maioria.
 Todos os códigos foram feitos na IDE recomendada pelos criadores da linguagem o DrRacket.
 \end{frame}
