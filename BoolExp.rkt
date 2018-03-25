@@ -22,7 +22,7 @@
                   (eq eq1 eq2))
                   
 ;aritExp or number? v
-;(define-peg ncOp (and (name t1 number) (? (and (name op (or "==" "<=" ">=" ">" "<" )) (name t2 number))))
+;(define-peg ncOp (and (name t1 (or number variable)) (? (and (name op (or "==" "<=" ">=" ">" "<" )) (name t2 aritExp))))
 ;                  (if t2 (if (equal? op "==") (eq t1 t2) (if (equal? op "<=") (le t1 t2) (if (equal? op ">=") 
 ;                  (be t1 t2) (if (equal? op ">") (more t1 t2) (less t1 t2)))) t1 )) ;ncOp - stands for number condition op
 ;aritExp or number? ^
