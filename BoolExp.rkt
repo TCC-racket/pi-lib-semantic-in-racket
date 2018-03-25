@@ -13,19 +13,50 @@
 
 (struct boolExp (U andOp orOp neg eq le be less))
 
-
 (define-peg boolean (or "true" "false"))
+
 (define-peg equal (and 
-                      (name eq1 (or boolean)) ; aritExp))
+                      (name eq1 (or boolean)) ;aritExp))
                       "=="
                       (name eq2 (or boolean))) ;aritExp)))
                   (eq eq1 eq2))
+                  
+;(define-peg lessEqual (and 
+;                      (name le1 (or aritExp))
+;                      "<="
+;                      (name le2 (or aritExp)))
+;                  (le le1 le2)) ;<=
+                  
+;(define-peg moreEqual (and 
+;                      (name be1 (or aritExp))
+;                      ">="
+;                      (name be2 (or aritExp)))
+;                  (be be1 be2)) ;>=
+
+;(define-peg onlyMore (and 
+;                      (name more1 (or aritExp))
+;                      ">"
+;                      (name more2 (or aritExp)))
+;                  (more more1 more2)) ;>
+
+;(define-peg onlyLess (and 
+;                      (name less1 (or aritExp))
+;                      "<"
+;                      (name less2 (or aritExp)))
+;                  (less less1 less2)) ;<
+
 (define-peg relacional (or equal))
+
 (define-peg parenteses (and "(" (name value boolExp) ")") value)
+
 (define-peg negation (and "~" (name n boolExp)) (neg n))
+
 (define-peg terceiroNivel (or negation parenteses relacional boolean))
+
 (define-peg conjuncao (and (name con1 terceiroNivel) (? (and "/\" (name con2 conjucao))))   (if con2 (andOp con1 con2) con1))
+
 (define-peg disjuncao (and (name dis1 conjucao) (? (and "\/" (name dis2 disjuncao))))   (if dis2 (orOp dis1 dis2) dis1))
+
 (define-peg boolExp disjuncao)
 
 ;boolExp -> ~boolExp | equal | boolean
