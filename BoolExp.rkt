@@ -14,36 +14,18 @@
 (struct boolExp (U andOp orOp neg eq le be less))
 
 (define-peg boolean (or "true" "false"))
-
+                 
 (define-peg equal (and 
                       (name eq1 (or boolean)) ;aritExp))
                       "=="
                       (name eq2 (or boolean))) ;aritExp)))
                   (eq eq1 eq2))
                   
-;(define-peg lessEqual (and 
-;                      (name le1 aritExp)
-;                      "<="
-;                      (name le2 aritExp))
-;                  (le le1 le2)) ;<=
-                  
-;(define-peg moreEqual (and 
-;                      (name be1 aritExp)
-;                      ">="
-;                      (name be2 aritExp))
-;                  (be be1 be2)) ;>=
-
-;(define-peg onlyMore (and 
-;                      (name more1 aritExp)
-;                      ">"
-;                      (name more2 aritExp))
-;                  (more more1 more2)) ;>
-
-;(define-peg onlyLess (and 
-;                      (name less1 aritExp)
-;                      "<"
-;                      (name less2 aritExp))
-;                  (less less1 less2)) ;<
+;aritExp or number? v
+;(define-peg ncOp (and (name t1 number) (? (and (name op (or "==" "<=" ">=" ">" "<" )) (name t2 number))))
+;                  (if t2 (if (equal? op "==") (eq t1 t2) (if (equal? op "<=") (le t1 t2) (if (equal? op ">=") 
+;                  (be t1 t2) (if (equal? op ">") (more t1 t2) (less t1 t2)))) t1 )) ;ncOp - stands for number condition op
+;aritExp or number? ^
 
 (define-peg relacional (or equal))
 
@@ -63,8 +45,33 @@
 ;equal -> boolean==boolExp
 ;
 ;
-;
+;Essa parte foi substituida por ncOp v
+;--------------------------------------------------------------------------------------------------------------------                  
+;(define-peg lessEqual (and 
+;                      (name le1 number)
+;                      "<="
+;                      (name le2 number))
+;                  (le le1 le2)) ;<=
+                  
+;(define-peg moreEqual (and 
+;                      (name be1 number)
+;                      ">="
+;                      (name be2 number))
+;                  (be be1 be2)) ;>=
 
+;(define-peg onlyMore (and 
+;                      (name more1 number)
+;                      ">"
+;                      (name more2 number))
+;                  (more more1 more2)) ;>
+
+;(define-peg onlyLess (and 
+;                      (name less1 number)
+;                      "<"
+;                      (name less2 number))
+;                  (less less1 less2)) ;<
+;-------------------------------------------------------------------------------------------------------------
+;Essa parte foi substituida por ncOp ^
 
 
 
