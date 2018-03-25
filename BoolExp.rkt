@@ -22,27 +22,27 @@
                   (eq eq1 eq2))
                   
 ;(define-peg lessEqual (and 
-;                      (name le1 (or aritExp))
+;                      (name le1 aritExp)
 ;                      "<="
-;                      (name le2 (or aritExp)))
+;                      (name le2 aritExp))
 ;                  (le le1 le2)) ;<=
                   
 ;(define-peg moreEqual (and 
-;                      (name be1 (or aritExp))
+;                      (name be1 aritExp)
 ;                      ">="
-;                      (name be2 (or aritExp)))
+;                      (name be2 aritExp))
 ;                  (be be1 be2)) ;>=
 
 ;(define-peg onlyMore (and 
-;                      (name more1 (or aritExp))
+;                      (name more1 aritExp)
 ;                      ">"
-;                      (name more2 (or aritExp)))
+;                      (name more2 aritExp))
 ;                  (more more1 more2)) ;>
 
 ;(define-peg onlyLess (and 
-;                      (name less1 (or aritExp))
+;                      (name less1 aritExp)
 ;                      "<"
-;                      (name less2 (or aritExp)))
+;                      (name less2 aritExp))
 ;                  (less less1 less2)) ;<
 
 (define-peg relacional (or equal))
