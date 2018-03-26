@@ -5,6 +5,7 @@
 (require "AritExp.rtk")
 (provide boolExp)
 
+(struct parenteses (a))
 (struct andOp (a b)) ;and
 (struct orOp (a b))  ;or
 (struct neg (a))     ;not
@@ -14,7 +15,7 @@
 (struct less (a b))  ;<
 (struct more (a b))  ;>
 
-(struct boolExp (U andOp orOp neg eq le be less))
+(struct boolExp (U andOp orOp neg eq le be less parenteses))
 
 (define-peg boolean (or "true" "false"))
                  
@@ -32,7 +33,7 @@
 
 (define-peg relacional (or equal))
 
-(define-peg parenteses (and "(" (name value boolExp) ")") value)
+(define-peg parenteses (and "(" (name value boolExp) ")") (parenteses value))
 
 (define-peg negation (and "~" (name n boolExp)) (neg n))
 
