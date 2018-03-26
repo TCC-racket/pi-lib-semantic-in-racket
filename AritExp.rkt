@@ -7,7 +7,7 @@
 (struct div (a b))
 (struct parenteses (a))
 
-
+(define-peg parenteses (and "(" (name value aritExp) ")") (parenteses value))
 (define-peg number (name value (+ (range #\0 #\9))) (string->number value))
 (define-peg variable (and 
                           (or (range #\a #\z) (range #\A #\Z))
@@ -19,7 +19,7 @@
                            [(div a (div b c)) (div (div a b) (norm c))]
                            [a a]))
  ;produto e divisão são operações definidas sobre campos
-(define-peg fieldOp (and (name t1 (or number variable)) (? (and (name op (or #\* #\/)) (name t2 fieldOp))))
+(define-peg fieldOp (and (name t1 (or parenteses number variable)) (? (and (name op (or #\* #\/)) (name t2 fieldOp))))
                   (if t2 (if (equal? op "*") (prod t1 t2) (norm (div t1 t2))) t1 ))
  
 ;soma e subtração são operações definidas sobre grupos
