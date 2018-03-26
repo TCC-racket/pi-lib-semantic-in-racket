@@ -35,9 +35,9 @@
 
 (define-peg terceiroNivel (or negation parenteses relacional boolean))
 
-(define-peg conjuncao (and (name con1 terceiroNivel) (? (and "/\\" (name con2 conjuncao))))   (if con2 (andOp con1 con2) con1))
+(define-peg conjuncao (and (name con1 terceiroNivel) (? (and "and" (name con2 conjuncao))))   (if con2 (andOp con1 con2) con1))
 
-(define-peg disjuncao (and (name dis1 conjuncao) (? (and "\\/" (name dis2 disjuncao))))   (if dis2 (orOp dis1 dis2) dis1))
+(define-peg disjuncao (and (name dis1 conjuncao) (? (and "or" (name dis2 disjuncao))))   (if dis2 (orOp dis1 dis2) dis1))
 
 (define-peg boolExp disjuncao)
 
