@@ -24,12 +24,14 @@
                       "=="
                       (name eq2 (or boolean))) ;aritExp)))
                   (eq eq1 eq2))
-                  
-;aritExp or number? v
-;(define-peg ncOp (and (name t1 (or number variable)) (? (and (name op (or "==" "<=" ">=" ">" "<" )) (name t2 aritExp))))
-;                  (if t2 (if (equal? op "==") (eq t1 t2) (if (equal? op "<=") (le t1 t2) (if (equal? op ">=") 
-;                  (be t1 t2) (if (equal? op ">") (more t1 t2) (less t1 t2)))) t1 )) ;ncOp - stands for number condition op
-;aritExp or number? ^
+
+(define-peg onlyLess (and (name less1 aritExp) (? (and " < " (name less2 onlyLess))))  (if less2 ( less less1 less2 ) less1))
+
+(define-peg onlyMore (and (name more1 onlyLess) (? (and " > " (name more2 onlyMore))))  (if more2 ( more more1 more2 ) more1))
+
+(define-peg lessEqual (and (name le1 onlyMore) (? (and " <= " (name le2 lessEqual))))  (if le2 ( le le1 le2 ) le1))
+
+(define-peg moreEqual (and (name be1 lessEqual) (? (and " >= " (name be2 moreEqual))))  (if be2 ( be be1 be2 ) be1))
 
 (define-peg relacional (or equal))
 
@@ -49,33 +51,7 @@
 ;equal -> boolean==boolExp
 ;
 ;
-;Essa parte foi substituida por ncOp v
-;--------------------------------------------------------------------------------------------------------------------                  
-;(define-peg lessEqual (and 
-;                      (name le1 number)
-;                      "<="
-;                      (name le2 number))
-;                  (le le1 le2)) ;<=
-                  
-;(define-peg moreEqual (and 
-;                      (name be1 number)
-;                      ">="
-;                      (name be2 number))
-;                  (be be1 be2)) ;>=
 
-;(define-peg onlyMore (and 
-;                      (name more1 number)
-;                      ">"
-;                      (name more2 number))
-;                  (more more1 more2)) ;>
-
-;(define-peg onlyLess (and 
-;                      (name less1 number)
-;                      "<"
-;                      (name less2 number))
-;                  (less less1 less2)) ;<
-;-------------------------------------------------------------------------------------------------------------
-;Essa parte foi substituida por ncOp ^
 
 
 
