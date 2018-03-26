@@ -5,7 +5,7 @@
 (struct sub (a b))
 (struct prod (a b))
 (struct div (a b))
-
+(struct parenteses (a))
 
 
 (define-peg number (name value (+ (range #\0 #\9))) (string->number value))
