@@ -2,6 +2,9 @@
 
 (require peg/peg)
 
+(require "AritExp.rtk")
+(provide boolExp)
+
 (struct andOp (a b)) ;and
 (struct orOp (a b))  ;or
 (struct neg (a))     ;not
