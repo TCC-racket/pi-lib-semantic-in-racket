@@ -3,7 +3,7 @@
 (require peg/peg)
 
 (require "AritExp.rtk")
-(provide boolExp)
+(provide peg-rule:boolExp)
 
 (struct parenteses (a))
 (struct andOp (a b)) ;and
