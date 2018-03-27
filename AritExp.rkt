@@ -6,6 +6,7 @@
 (struct prod (a b))
 (struct div (a b))
 (struct parenteses (a))
+(provide peg-rule:aritExp)
 
 (define-peg parenteses (and "(" (name value aritExp) ")") (parenteses value))
 (define-peg number (name value (+ (range #\0 #\9))) (string->number value))
