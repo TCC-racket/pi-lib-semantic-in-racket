@@ -25,15 +25,31 @@
                       (name eq2 (or boolean))) ;aritExp)))
                   (eq eq1 eq2))
 
-(define-peg onlyLess (and (name less1 aritExp) (? (and " < " (name less2 onlyLess))))  (if less2 ( less less1 less2 ) less1))
+;(define-peg lessEqual (and 
+                      (name le1 aritExp)
+                      "<="
+                      (name le2 aritExp))
+                  (le le1 le2)) ;<=
+                  
+(define-peg moreEqual (and 
+                      (name be1 aritExp)
+                      ">="
+                      (name be2 aritExp))
+                  (be be1 be2)) ;>=
 
-(define-peg onlyMore (and (name more1 onlyLess) (? (and " > " (name more2 onlyMore))))  (if more2 ( more more1 more2 ) more1))
+(define-peg onlyMore (and 
+                      (name more1 aritExp)
+                      ">"
+                      (name more2 aritExp))
+                  (more more1 more2)) ;>
 
-(define-peg lessEqual (and (name le1 onlyMore) (? (and " <= " (name le2 lessEqual))))  (if le2 ( le le1 le2 ) le1))
+(define-peg onlyLess (and 
+                      (name less1 aritExp)
+                      "<"
+                      (name less2 aritExp))
+                  (less less1 less2)) ;<
 
-(define-peg moreEqual (and (name be1 lessEqual) (? (and " >= " (name be2 moreEqual))))  (if be2 ( be be1 be2 ) be1))
-
-(define-peg relacional (or equal))
+(define-peg relacional (or equal moreEqual lessEqual onlyMore onlyLess))
 
 (define-peg parenteses (and "(" (name value boolExp) ")") (parenteses value))
 
