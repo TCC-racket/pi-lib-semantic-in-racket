@@ -2,7 +2,7 @@
 
 (require peg/peg)
 
-(require "AritExp.rtk")
+(require "AritExp.rkt")
 (provide peg-rule:boolExp)
 
 (struct parenteses (a))
