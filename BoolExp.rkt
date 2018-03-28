@@ -25,7 +25,7 @@
                       (name eq2 (or boolean))) ;aritExp)))
                   (eq eq1 eq2))
 
-;(define-peg lessEqual (and 
+(define-peg lessEqual (and 
                       (name le1 aritExp)
                       "<="
                       (name le2 aritExp))
