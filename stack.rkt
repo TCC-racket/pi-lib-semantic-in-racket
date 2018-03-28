@@ -1,0 +1,5 @@
+(provide (all-from-out))
+(define empty-stack '())
+(define (push a l) (cons a l))
+(define (stack? l) (list? l))
+(define (pop l) (car l))
