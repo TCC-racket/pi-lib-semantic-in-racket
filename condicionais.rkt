@@ -2,7 +2,7 @@
 
 (require "BoolExp.rkt")
 (require "Comando.rkt")
-(provide peg-rule:if)
+(provide peg-rule:condicional)
 
 (struct if (condicao corpo))
 (struct ifElse (condicao corpoIf corpoElse))
