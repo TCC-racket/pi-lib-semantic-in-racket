@@ -8,5 +8,9 @@
                       (or
                           #\n ; para sistemas de verdade
                           (and #\n #\f))) ; para o windows
-                          
-(define-peg separadoresDePalavras (* (or space tab newLine)))
+(define-peg spaces (* space))
+(define-peg tabs (* tab))
+(define-peg newLines (* newLine))
+
+
+(define-peg wordSeparator (* (or space tab newLine)))
