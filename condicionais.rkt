@@ -9,11 +9,11 @@
 (struct condicional (U if ifElse))
 
 (define-peg ifElse (and
-                  "if " (name condicao boolExp) " {\n" (name corpoIf comando) (* #\n) "}" (* #\n)
-                   "else" "{" (* #\n) (name corpoElse comando) "}" ) (ifElse condicao corpoIf corpoElse))
+                  "if " (name condicao boolExp) " {\n\t" (name corpoIf comando) (* #\n) "}" (* #\n)
+                   "else {" (* (or #\n #\t)) (name corpoElse comando) "}" ) (ifElse condicao corpoIf corpoElse))
 
 (define-peg if (and
-                  "if " (name condicao boolExp) " {\n" (name corpo comando) (* #\n) "}") (if condicao corpo))
+                  "if " (name condicao boolExp) " {\n\t" (name corpo comando) (* #\n) "}") (if condicao corpo))
 
 (define-peg condicional (or ifElse if))
                   
