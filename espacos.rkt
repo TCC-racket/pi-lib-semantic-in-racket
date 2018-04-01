@@ -12,5 +12,5 @@
 (define-peg tabs (* tab))
 (define-peg newLines (* newLine))
 
-
+(define-peg wordSeparatorWithoutNewLines (* (or space tab)))
 (define-peg wordSeparator (* (or space tab newLine)))
