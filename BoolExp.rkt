@@ -2,6 +2,7 @@
 
 (require peg/peg)
 
+(require "espacos.rkt")
 (require "AritExp.rkt")
 (provide peg-rule:boolExp)
 
@@ -21,7 +22,9 @@
                  
 (define-peg equal (and 
                       (name eq1 (or boolean)) ;aritExp))
-                      " == "
+                      spaces
+                      "=="
+                      spaces
                       (name eq2 (or boolean))) ;aritExp)))
                   (eq eq1 eq2))
 
@@ -40,7 +43,7 @@
 
 (define-peg conjuncao (and (name con1 terceiroNivel) (? (and " /\\ " (name con2 conjuncao))))   (if con2 (andOp con1 con2) con1))
 
-(define-peg disjuncao (and (name dis1 conjuncao) (? (and " \\/ " (name dis2 disjuncao))))   (if dis2 (orOp dis1 dis2) dis1))
+(define-peg disjuncao (and (name dis1 conjuncao) (? (and spaces "\\/" spaces (name dis2 disjuncao))))   (if dis2 (orOp dis1 dis2) dis1))
 
 (define-peg boolExp disjuncao)
 
