@@ -7,5 +7,5 @@
 		(or(range #\a #\z) (range#\A #\Z))
 		(* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9)))))
 
-(define-peg atribution (and ("var") (name t1 variable)  (":=") ("'") (name t2 variable)("'"))
+(define-peg atributionString (and ("var") (name t1 variable)  (":=") ("'") (name t2 variable)("'"))
 ;Confusão com as aspas, elas deveriam ser representadas assim?
