@@ -20,12 +20,12 @@
 
 (define-peg boolean (or "true" "false"))
                  
-(define-peg equal (and 
+(define-peg equal (and spaces
                       (name eq1 (or boolean)) ;aritExp))
                       spaces
                       "=="
                       spaces
-                      (name eq2 (or boolean))) ;aritExp)))
+                      (name eq2 (or boolean)) spaces) ;aritExp)))
                   (eq eq1 eq2))
 
 (define-peg ncOp (and (name nc1 aritExp) (? (and (name op (or " >= " " <= " " > " " < ")) (name nc2 relacional))))
