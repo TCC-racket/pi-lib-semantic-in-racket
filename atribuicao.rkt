@@ -5,7 +5,7 @@
 
 (provide (all-from-out))
 
-(struct atribution(var value))
+(struct atribution(value var))
 
 (define-peg string (and "\"" (* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9))) "\""))
 
