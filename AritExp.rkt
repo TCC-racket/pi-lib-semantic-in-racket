@@ -25,13 +25,23 @@
                            [(sub a (sub b c)) (sub (sub a b) (norm c))]
                            [a a]))
  ;produto e divisão são operações definidas sobre campos
-(define-peg fieldOp (and spaces (name t1 (or parenteses number variable)) (? (and spaces (name op (or #\* #\/)) spaces 
-                            (name t2 fieldOp))))
-                  (if t2 (if (equal? op "*") (prod t1 t2) (norm (div t1 t2))) t1 ))
+;(define-peg fieldOp (and spaces (name t1 (or parenteses number variable)) (? (and spaces (name op (or #\* #\/)) spaces 
+;                            (name t2 fieldOp))))
+;                  (if t2 (if (equal? op "*") (prod t1 t2) (norm (div t1 t2))) t1 ))
  
 ;soma e subtração são operações definidas sobre grupos
-(define-peg groupOp (and spaces (name t1 fieldOp) (? (and spaces (name op (or #\+ #\-)) spaces (name t2 groupOp))))
-                  (if t2 (if (equal? op "+") (soma t1 t2) (norm (sub t1 t2))) t1 ))
+;(define-peg groupOp (and spaces (name t1 fieldOp) (? (and spaces (name op (or #\+ #\-)) spaces (name t2 groupOp))))
+;                  (if t2 (if (equal? op "+") (soma t1 t2) (norm (sub t1 t2))) t1 ))
+(define-peg divisoes (and (name s1 (or parenteses number variable)) (? (and "/" (name s2 divisoes)))) (norm (div s1 s2)))
+(define-peg produtos (and (name s1 divisoes) (? (and "*" (name s2 produtos)))) (prod s1 s2))
+(define-peg subtracoes (and (name s1 produtos) (? (and "-" (name s2 subtracoes)))) (norm (sub s1 s2)))
+(define-peg somas (and (name s1 subtracoes) (? (and "+" (name s2 somas)))) (soma s1 s2))
+
+(define-peg aritExp somas)
+;(define-peg aritExp groupOp)
 
 
-(define-peg aritExp groupOp)
+
+
+
+
