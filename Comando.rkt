@@ -1,12 +1,4 @@
 #lang racket
 
-(require peg/peg)
-(require "atribuicao.rkt")
-(require "Reservadas.rkt")
-(require "condicionais.rkt")
-(require "Exp.rkt")
-(require "loop.rkt")
-
-(provide peg-rule:comando)
-
-(define-peg comando(or reserv atributions print condicional exp loop))
+(struct comando (U seq init atrib print exit))
+(struct seq (comando1 comando2)
