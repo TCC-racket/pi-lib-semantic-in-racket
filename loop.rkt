@@ -4,6 +4,8 @@
 (require "Comando.rkt")
 (require "espacos.rkt")
 
+(provide peg-rule:loop)
+
 (struct whileDo (condicao corpo))
 
 ;(define-peg loop (and 
