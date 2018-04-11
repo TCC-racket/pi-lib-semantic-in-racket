@@ -382,21 +382,24 @@ PEG
 
 \end{frame}
 
-\begin{frame}{normalização}
+\begin{frame}{Normalização}
 
 Como PEG não permite recursão a esquerda, a construção de operações não associativas
 a direita, como subtração e divisão, exigem uma normalização na estrutura.
 
-ex : Seja a expressão 2-3-1. Pela recursão a esquerda, a saber S -> ES, temos que ela seria interpretada
-como 2-(3-1) ou em termos de estrutura, sub 2 (sub 3 1).  Para não permitir esta construção, quando a subtração
-é encontrada, qualquer construção sub a (sub b c) é transformada em sub (sub a b) c, e a divisão igualmente.
-esse problema é resolvido em geradores como o bison pela indicação de associatividade dos operadores, mas
-como PEG não possui isso, essa normalização é necessaria. Ainda sim, esse metodo não permite corretude acima
-de três operandos. Uma possivel solução é o armazenamento dos operandos da subtração e divisão numa lista e depois
-construir a estrutura. 
 
 \end{frame}
 
+\begin{frame}{Normalização}
 
+Seja a expressão 2-3-1. Pela recursão a esquerda, a saber S $\longrightarrow$ ES, temos que ela seria interpretada
+como 2-(3-1) ou em termos de estrutura, sub 2 (sub 3 1).  Para não permitir esta construção, quando a subtração
+é encontrada, qualquer construção sub a (sub b c) é transformada em sub (sub a b) c, e a divisão igualmente.
+esse problema é resolvido em geradores como o bison pela indicação de associatividade dos operadores, mas
+como PEG não possui isso, essa normalização é necessária. Ainda sim, esse método não permite corretude acima
+de três operandos. Uma possível solução é o armazenamento dos operandos da subtração e divisão numa lista e depois
+construir a estrutura. 
+
+\end{frame}
 
 \end{document}
