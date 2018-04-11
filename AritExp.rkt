@@ -3,7 +3,6 @@
 (require peg/peg)
 
 (require "espacos.rkt")
-;(require "atribuicao.rkt")
 
 (struct soma (a b))
 (struct sub (a b))
