@@ -40,8 +40,10 @@
 (define-peg aritExp somas)
 ;(define-peg aritExp groupOp)
 
+(struct add (a b) #:transparent)
+(struct mult (a b) #:transparent)
 
-
-
-
-
+(define (aritConv exp)
+  (match exp [(soma a b) (add (aritConv a) (aritConv b))] [(sub a b) (sub (aritConv a) (aritConv b))]
+                                                           [(prod a b) (mult (aritConv a) (aritConv b))]
+                                                           [(div a b) (div (aritConv a) (aritConv b))] [a a]))
