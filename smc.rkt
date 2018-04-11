@@ -1,0 +1,6 @@
+(struct smc (val amb control))
+(require "Stack.rkt")
+(require "Contexto.rkt")
+(provide executeSMC)
+(define (executeSMC bplc)
+  (top (smc-val (smcEval (smc (emptyStack) novaListaDeContextos (push bplc (emptyStack)))))))
