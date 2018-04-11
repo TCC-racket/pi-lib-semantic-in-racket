@@ -1,6 +1,14 @@
 #lang racket
 
-(provide (all-from-out))
+(require peg/peg)
+(provide peg-rule:space)
+(provide peg-rule:tab)
+(provide peg-rule:newLine)
+(provide peg-rule:spaces)
+(provide peg-rule:tabs)
+(provide peg-rule:newLines)
+(provide peg-rule:wordSeparatorWithoutNewLines)
+(provide peg-rule:wordSeparator)
 
 (define-peg space #\space)
 (define-peg tab (or #\t #\v))
