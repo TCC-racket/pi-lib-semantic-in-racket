@@ -2,6 +2,14 @@
 
 (require peg/peg)
 (provide peg-rule:reserv)
+(provide peg-rule:var)
+(provide peg-rule:const)
+(provide peg-rule:bar)
+(provide peg-rule:init)
+(provide peg-rule:proc)
+(provide peg-rule:module)
+(provide peg-rule:end)
+(provide peg-rule:virg)
 
 (define-peg var "var")
 (define-peg const "const")
