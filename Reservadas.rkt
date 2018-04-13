@@ -1,6 +1,7 @@
 #lang racket
 
 (require peg/peg)
+(require "espacos.rkt")
 (provide peg-rule:reserv)
 (provide peg-rule:var)
 (provide peg-rule:const)
@@ -13,11 +14,11 @@
 
 (define-peg var "var")
 (define-peg const "const")
-(define-peg bar "|")
+(define-peg bar (and spaces "|" spaces))
 (define-peg init "init")
 (define-peg proc "proc")
 (define-peg module "Module")
 (define-peg end "end")
-(define-peg virg ",")
+(define-peg virg (and spaces "," spaces))
  
 (define-peg reserv (or module end proc var init bar const ))
