@@ -53,7 +53,12 @@
 ;
 
 
-
+(define (boolConv exp)
+  (match exp [(andOp a b) (and (boolConv a) (boolConv b))]
+             [(orOp a b) (or (boolConv a) (boolConv b))]
+             [(be a b) (ge (boolConv a) (boolConv b))]
+             [(more a b) (gt (boolConv a) (boolConv b))]
+             [(less a b) (lt (boolConv a) boolConv b))]
 
 
 
