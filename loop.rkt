@@ -6,8 +6,8 @@
 
 (provide peg-rule:loop)
 
-(struct whileDo (condicao corpo))
+(struct whileDo (condicao corpo)  #:transparent)
 
 (define-peg loop (and
-"while" spaces (name condicao boolExp) wordSeparator "do" spaces "{" newLines tabs (name corpo comando) newLines "}") (whileDo 
+"while" spaces (name condicao boolExp) wordSeparator "do" spaces "{" wordSeparator (name corpo seq) wordSeparator "}") (whileDo 
 condicao corpo))

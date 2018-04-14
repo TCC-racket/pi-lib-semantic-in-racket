@@ -7,16 +7,16 @@
 (require "espacos.rkt")
 (provide peg-rule:condicional)
 
-(struct if (condicao corpo))
-(struct ifElse (condicao corpoIf corpoElse))
-(struct condicional (U if ifElse))
+(struct if (condicao corpo) #:transparent)
+(struct ifElse (condicao corpoIf corpoElse) #:transparent)
+(struct condicional (U if ifElse) #:transparent)
 
 (define-peg ifElse (and
-                  "if " (name condicao boolExp) " {\n\t" (name corpoIf comando) (* #\n) "}" (* #\n)
-                   "else {" (* (or #\n #\t)) (name corpoElse comando) "}" ) (ifElse condicao corpoIf corpoElse))
+                  "if " (name condicao boolExp) " {\n\t" (name corpoIf seq) (* #\n) "}" (* #\n)
+                   "else {" (* (or #\n #\t)) (name corpoElse seq) "}" ) (ifElse condicao corpoIf corpoElse))
 
 (define-peg if (and
-                  "if" spaces (name condicao boolExp) spaces "{" newLines tabs (name corpo comando) newLines "}") (if condicao corpo))
+                  "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpo seq) wordSeparator "}") (if condicao corpo))
 
 (define-peg condicional (or ifElse if))
                   

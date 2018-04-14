@@ -6,17 +6,17 @@
 (require "AritExp.rkt")
 (provide peg-rule:boolExp)
 
-(struct parenteses (a))
-(struct andOp (a b)) ;and
-(struct orOp (a b))  ;or
-(struct neg (a))     ;not
-(struct eq (a b))    ;==
-(struct le (a b))    ;<=
-(struct be (a b))    ;>=
-(struct less (a b))  ;<
-(struct more (a b))  ;>
+(struct parenteses (a)  #:transparent)
+(struct andOp (a b)  #:transparent) ;and
+(struct orOp (a b)  #:transparent)  ;or
+(struct neg (a)  #:transparent)     ;not
+(struct eq (a b)  #:transparent)    ;==
+(struct le (a b)  #:transparent)    ;<=
+(struct be (a b)  #:transparent)    ;>=
+(struct less (a b)  #:transparent)  ;<
+(struct more (a b)  #:transparent)  ;>
 
-(struct boolExp (U andOp orOp neg eq le be less parenteses))
+(struct boolExp (U andOp orOp neg eq le be less parenteses) #:transparent)
 
 (define-peg boolean (or "true" "false"))
                  
@@ -28,10 +28,10 @@
                       (name eq2 (or boolean)) spaces) ;aritExp)))
                   (eq eq1 eq2))
 
-(define-peg ncOp (and (name nc1 aritExp) (? (and (name op (or " >= " " <= " " > " " < ")) (name nc2 relacional))))
-      (if nc2 (if (equal? op " >= ") (be nc1 nc2) 
-        (if (equal? op " <= ") (le nc1 nc2) 
-          (if (equal? op " > ") (more nc1 nc2) (less nc1 nc2)))) nc1))
+(define-peg ncOp (and (name nc1 aritExp) (? (and (name op (or " == " " >= " " <= " " > " " < ")) (name nc2 relacional))))
+      (if nc2 (if (equal? op " == ") (eq nc1 nc2) 
+        (if (equal? op " >= ") (be nc1 nc2) 
+          (if (equal? op " <= ") (le nc1 nc2) (if (equal? op " > ") (more nc1 nc2) (less nc1 nc2))))) nc1))
  
 (define-peg relacional (or equal ncOp))
 

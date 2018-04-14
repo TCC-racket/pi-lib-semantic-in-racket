@@ -11,6 +11,7 @@
 (provide peg-rule:module)
 (provide peg-rule:end)
 (provide peg-rule:virg)
+(provide peg-rule:pointvirg)
 
 (define-peg var "var")
 (define-peg const "const")
@@ -20,5 +21,6 @@
 (define-peg module "Module")
 (define-peg end "end")
 (define-peg virg (and spaces "," spaces))
+(define-peg pointvirg (and spaces ";" spaces))
  
 (define-peg reserv (or module end proc var init bar const ))
