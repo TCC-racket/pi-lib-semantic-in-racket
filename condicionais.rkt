@@ -12,8 +12,8 @@
 (struct condicional (U if ifElse) #:transparent)
 
 (define-peg ifElse (and
-                  "if " (name condicao boolExp) " {\n\t" (name corpoIf seq) (* #\n) "}" (* #\n)
-                   "else {" (* (or #\n #\t)) (name corpoElse seq) "}" ) (ifElse condicao corpoIf corpoElse))
+                  "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpoIf seq) wordSeparator "}" wordSeparator
+                   "else" spaces "{" wordSeparator (name corpoElse seq) wordSeparator "}" ) (ifElse condicao corpoIf corpoElse))
 
 (define-peg if (and
                   "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpo seq) wordSeparator "}") (if condicao corpo))
