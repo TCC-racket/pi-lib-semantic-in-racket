@@ -52,6 +52,12 @@
 ;
 ;
 
+(struct and (a b))
+(struct or (a b))
+(struct ge (a b))
+(struct gt (a b))
+(struct lt (a b))
+
 
 (define (boolConv exp)
   (match exp [(andOp a b) (and (boolConv a) (boolConv b))]
@@ -59,6 +65,10 @@
              [(be a b) (ge (boolConv a) (boolConv b))]
              [(more a b) (gt (boolConv a) (boolConv b))]
              [(less a b) (lt (boolConv a) boolConv b))]
+             [(neg a b) (neg (boolConv a) (boolConv b))]
+             [(eq a b) (eq (boolConv a) (boolConv b))]
+             [(le a b) (le (boolConv a) (boolConv b))]
+             
 
 
 
