@@ -10,6 +10,8 @@
 
 (provide peg-rule:seq)
 (provide peg-rule:choice)
+(provide peg-rule:comando)
+(provide peg-rule:cmdUnit)
 
 (struct comando (U seq init atrib print exit) #:transparent)
 (struct seq (comando1 comando2) #:transparent)
