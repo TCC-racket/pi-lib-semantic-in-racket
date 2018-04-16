@@ -3,7 +3,8 @@
 ;(require "Stack.rkt")
 ;(require "Contexto.rkt")
 (require "AritExp.rkt")
-(provide executeSMC)
+(require "BoolExp.rkt")
+(provide executeSMC smc)
 (define (executeSMC bplc)
   (car (smc-val (smcEval (smc '() (hash) (list bplc))))))
   
@@ -21,5 +22,7 @@
               [(smc (list (? number? a) (? number? b) c ...) d (list 'div e ...)) (smcEval (smc (cons (/ b a) c) d e))]
               
 ;              [(smc d e (list (? boolean? a) b ...)) (smcEval (smc )]
-              
+              [(smc d e (list (or a b) c ...)) (smcEval (smc d e (append (list a b 'or) c))) ]
               [a a]))
+
+(executeSMC (or 1 1))
