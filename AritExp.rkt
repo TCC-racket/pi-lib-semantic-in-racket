@@ -46,4 +46,6 @@
 (define (aritConv exp)
   (match exp [(soma a b) (add (aritConv a) (aritConv b))] [(sub a b) (sub (aritConv a) (aritConv b))]
                                                            [(prod a b) (mult (aritConv a) (aritConv b))]
-                                                           [(div a b) (div (aritConv a) (aritConv b))] [a a]))
+                                                           [(div a b) (div (aritConv a) (aritConv b))]
+                                                           [(parenteses a) (aritConv a)]
+                                                           [a a]))
