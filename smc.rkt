@@ -1,3 +1,4 @@
+#lang racket
 (struct smc (val amb control))
 ;(require "Stack.rkt")
 ;(require "Contexto.rkt")
@@ -19,6 +20,6 @@
               [(smc (list (? number? a) (? number? b) c ...) d (list 'mult e ...)) (smcEval (smc (cons (* a b) c) d e))]
               [(smc (list (? number? a) (? number? b) c ...) d (list 'div e ...)) (smcEval (smc (cons (/ b a) c) d e))]
               
-              [(smc d e (list (? boolean? a) b ...)) (smcEval (smc )]
+;              [(smc d e (list (? boolean? a) b ...)) (smcEval (smc )]
               
               [a a]))

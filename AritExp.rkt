@@ -10,6 +10,7 @@
 (struct div (a b) #:transparent)
 (struct parenteses (a) #:transparent)
 (provide peg-rule:aritExp)
+(provide add sub mult div)
 
 (define (reduce f l) (reduceAux f (car l) (cdr l)))
 (define (reduceAux f acc l) (if (null? l) acc (reduceAux f (f acc (car l)) (cdr l))))
