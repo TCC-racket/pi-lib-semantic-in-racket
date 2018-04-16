@@ -10,11 +10,9 @@
 (provide peg-rule:atributions)
 (provide peg-rule:variable)
 (provide peg-rule:inicializacao)
-(provide peg-rule:chce)
 
 (struct atribution(value var) #:transparent)
 (struct atribSeq(atrib1 atribSeq2) #:transparent)
-(struct choice(atrib1 atribSeq2) #:transparent)
 
 (define-peg string (and "\"" (* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9))) "\""))
 
@@ -25,4 +23,3 @@
 (define-peg atributions (and (name t1 variable) spaces (or ":=" "=") spaces (name t2 (or boolExp aritExp string))) (atribution t2 t1))
 (define-peg atribAux(and spaces (name t1 atributions) (? (name t2 atribAux))) (if t2 (atribSeq t1 t2) t1))
 (define-peg inicializacao(and init spaces (name t1 atributions) (? (name t2 atribAux))) (if t2 (atribSeq t1 t2) t1))
-(define-peg chce(and (name t1 atributions) bar (name t2(or chce atributions))) (choice t1 t2))
