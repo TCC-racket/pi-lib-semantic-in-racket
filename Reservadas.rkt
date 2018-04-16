@@ -20,6 +20,8 @@
 (define-peg proc "proc")
 (define-peg module "Module")
 (define-peg end "end")
+(define-peg print "print")
+(define-peg exit "exit")
 (define-peg virg (and spaces "," spaces))
 (define-peg pointvirg (and spaces ";" spaces))
  
