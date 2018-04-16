@@ -66,7 +66,7 @@
              [(orOp a b) (or (boolConv a) (boolConv b))]
              [(be a b) (ge (boolConv a) (boolConv b))]
              [(more a b) (gt (boolConv a) (boolConv b))]
-             [(less a b) (lt (boolConv a) boolConv b))]
+             [(less a b) (lt (boolConv a) (boolConv b))]
              [(neg a) (neg (boolConv a))]
              [(eq a b) (eq (boolConv a) (boolConv b))]
              [(le a b) (le (boolConv a) (boolConv b))]
