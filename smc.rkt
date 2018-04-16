@@ -33,10 +33,27 @@
 
 
 	      [(smc (list (? boolean? a) (? boolean? b) c ...) d (list 'or e ...))  (smcEval (smc (cons (if a #t b) c) d e)) ]
+	      [(smc (list (? boolean? a) (? boolean? b) c ...) d (list 'and e ...))  (smcEval (smc (cons (if a b #f) c) d e)) ]
+	      [(smc (list (? number? a) (? number? b) c ...) d (list 'ge e ...))  (smcEval (smc (cons (>= b a) c) d e)) ]
+	      [(smc (list (? number? a) (? number? b) c ...) d (list 'gt e ...))  (smcEval (smc (cons (> b a) c) d e)) ]
+
+	      [(smc (list (? number? a) (? number? b) c ...) d (list 'lt e ...))  (smcEval (smc (cons (< b a) c) d e)) ]
+	      [(smc (list (? number? a) (? number? b) c ...) d (list 'eq e ...))  (smcEval (smc (cons (= a b) c) d e)) ]
+	      [(smc (list (? number? a) (? number? b) c ...) d (list 'le e ...))  (smcEval (smc (cons (<= b a) c) d e)) ]
+	      [(smc (list (? boolean? a) c ...) d (list 'neg e ...))  (smcEval (smc (cons (not a) c) d e)) ]
+
+
+
+
+
+
+
+
+
 
 
 
 
               [a a]))
 
-(smcEval (smc '() (hash) (list (or #f #f))))
+(smcEval (smc '() (hash) (list (neg (or (eq 2 2) (ge 5 4))))))
