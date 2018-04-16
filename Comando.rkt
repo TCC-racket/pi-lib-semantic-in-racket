@@ -29,7 +29,7 @@
 (define-peg cmdUnit (or inicializacao atributions print exit))
 
 
-(define-peg comando(or seq choiceOp cmdUnit)
+(define-peg comando (or seq choiceOp cmdUnit))
 (define-peg choiceOp (and (name t1 cmdUnit) (? (and bar (name t2 choiceOp)))) (choice t1 t2))
 
 
