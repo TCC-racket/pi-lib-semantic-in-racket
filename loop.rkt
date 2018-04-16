@@ -9,5 +9,5 @@
 (struct whileDo (condicao corpo)  #:transparent)
 
 (define-peg loop (and
-"while" spaces (name condicao boolExp) wordSeparator "do" spaces "{" wordSeparator (name corpo seq) wordSeparator "}") (whileDo 
+"while" spaces (name condicao boolExp) wordSeparator "do" spaces "{" wordSeparator (name corpo comando) wordSeparator "}") (whileDo 
 condicao corpo))
