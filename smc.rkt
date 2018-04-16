@@ -7,6 +7,7 @@
   (car (smc-val (smcEval (smc '() (hash) (list bplc))))))
   
 (define (smcEval smcP)
+  (writeln smcP)
   (match smcP [(smc d e (list (add a b) c ...)) (smcEval (smc d e (append (list a b 'add) c)))]
               [(smc d e (list (sub a b) c ...)) (smcEval (smc d e (append (list a b 'sub) c)))]
               [(smc d e (list (mult a b) c ...)) (smcEval (smc d e (append (list a b 'mult) c)))]
@@ -18,6 +19,6 @@
               [(smc (list (? number? a) (? number? b) c ...) d (list 'mult e ...)) (smcEval (smc (cons (* a b) c) d e))]
               [(smc (list (? number? a) (? number? b) c ...) d (list 'div e ...)) (smcEval (smc (cons (/ b a) c) d e))]
               
-              (smc 
+              [(smc d e (list (? boolean? a) b ...)) (smcEval (smc )]
               
               [a a]))
