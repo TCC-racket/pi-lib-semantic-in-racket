@@ -26,13 +26,17 @@
 (define-peg print(and "print(" spaces (name t1 (or aritExp variable string boolExp)) spaces ")") (prnt t1))
 
 
-(define-peg cmdUnit (or inicializacao atributions print exit))
+(define-peg cmdUnit (or inicializacao atributions print exit)) ;condicionais e loop
 
 
 (define-peg comando (or seq choiceOp cmdUnit))
 (define-peg choiceOp (and (name t1 cmdUnit) (? (and bar (name t2 choiceOp)))) (choice t1 t2))
 
 
+;condicionais
 
+
+
+;loop
 
 
