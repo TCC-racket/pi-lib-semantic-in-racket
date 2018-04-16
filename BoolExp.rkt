@@ -6,6 +6,8 @@
 (require "AritExp.rkt")
 (provide peg-rule:boolExp)
 
+(define (string->boolean k) (if (equal? k "true") true false))
+
 (struct parenteses (a)  #:transparent)
 (struct andOp (a b)  #:transparent) ;and
 (struct orOp (a b)  #:transparent)  ;or
@@ -18,7 +20,7 @@
 
 (struct boolExp (U andOp orOp neg eq le be less parenteses) #:transparent)
 
-(define-peg boolean (or "true" "false"))
+(define-peg boolean (name str (or "true" "false")) (string->boolean str))
                  
 (define-peg equal (and spaces
                       (name eq1 (or boolean)) ;aritExp))
