@@ -17,7 +17,7 @@
 (struct seq (comando1 comando2) #:transparent)
 (struct prnt(a) #:transparent)
 (struct choice (comando1 comando2) #:transparent)
-
+(struct nop () #:transparent)
 
 (define-peg separador(or virg pointvirg newLines))
 
