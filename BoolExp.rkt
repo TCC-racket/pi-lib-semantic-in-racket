@@ -54,13 +54,13 @@
 ;
 ;
 
-(struct and (a b))
-(struct or (a b))
-(struct ge (a b))
-(struct gt (a b))
-(struct lt (a b))
+(struct and (a b) #:transparent)
+(struct or (a b) #:transparent)
+(struct ge (a b) #:transparent)
+(struct gt (a b) #:transparent)
+(struct lt (a b) #:transparent)
 
-(provide and or ge gt lt)
+(provide and or ge gt lt neg eq le or? or-a or-b and? and-a and-b)
 
 
 (define (boolConv exp)

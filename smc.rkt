@@ -1,5 +1,5 @@
 #lang racket
-(struct smc (val amb control))
+(struct smc (val amb control) #:transparent)
 ;(require "Stack.rkt")
 ;(require "Contexto.rkt")
 (require "AritExp.rkt")
@@ -21,9 +21,9 @@
               [(smc (list (? number? a) (? number? b) c ...) d (list 'mult e ...)) (smcEval (smc (cons (* a b) c) d e))]
               [(smc (list (? number? a) (? number? b) c ...) d (list 'div e ...)) (smcEval (smc (cons (/ b a) c) d e))]
               
-;              [(smc d e (list (? boolean? a) b ...)) (smcEval (smc )]
-              [(smc d e (list (? or? a) c ...)) (smcEval (smc d e (append (list (or-a a)  (or-b b) 'or) c))) ]
-	      [(smc d e (list (and a b) c ...)) (smcEval (smc d e (append (list a b 'and) c))) ]
+              [(smc d e (list (? boolean? a) b ...)) (smcEval (smc (cons a d) e b ))]
+              [(smc d e (list (? or? a) c ...)) (smcEval (smc d e (append (list (or-a a)  (or-b a) 'or) c))) ]
+	      [(smc d e (list (? and? a) c ...)) (smcEval (smc d e (append (list (and-a a) (and-b a) 'and) c))) ]
 	      [(smc d e (list (ge a b) c ...)) (smcEval (smc d e (append (list a b 'ge) c))) ]
 	      [(smc d e (list (gt a b) c ...)) (smcEval (smc d e (append (list a b 'gt) c))) ]
 	      [(smc d e (list (lt a b) c ...)) (smcEval (smc d e (append (list a b 'lt) c))) ]
@@ -32,11 +32,11 @@
 	      [(smc d e (list (le a b) c ...)) (smcEval (smc d e (append (list a b 'le) c))) ]
 
 
-
+	      [(smc (list (? boolean? a) (? boolean? b) c ...) d (list 'or e ...))  (smcEval (smc (cons (if a #t b) c) d e)) ]
 
 
 
 
               [a a]))
 
-;(executeSMC (add 1 1))
+(smcEval (smc '() (hash) (list (or #f #f))))
