@@ -4,7 +4,7 @@
 ;(require "Contexto.rkt")
 (require "AritExp.rkt")
 (require "BoolExp.rkt")
-(require "Comando.rkt")
+;(require "Comando.rkt")
 (provide executeSMC smc)
 (define (executeSMC bplc)
   (car (smc-val (smcEval (smc '() (hash) (list bplc))))))
