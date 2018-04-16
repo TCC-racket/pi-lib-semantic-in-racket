@@ -60,6 +60,8 @@
 (struct gt (a b))
 (struct lt (a b))
 
+(provide and or ge gt lt)
+
 
 (define (boolConv exp)
   (match exp [(andOp a b) (and (boolConv a) (boolConv b))]

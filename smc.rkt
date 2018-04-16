@@ -22,7 +22,7 @@
               [(smc (list (? number? a) (? number? b) c ...) d (list 'div e ...)) (smcEval (smc (cons (/ b a) c) d e))]
               
 ;              [(smc d e (list (? boolean? a) b ...)) (smcEval (smc )]
-              [(smc d e (list (or a b) c ...)) (smcEval (smc d e (append (list a b 'or) c))) ]
+              [(smc d e (list (? or? a) c ...)) (smcEval (smc d e (append (list (or-a a)  (or-b b) 'or) c))) ]
 	      [(smc d e (list (and a b) c ...)) (smcEval (smc d e (append (list a b 'and) c))) ]
 	      [(smc d e (list (ge a b) c ...)) (smcEval (smc d e (append (list a b 'ge) c))) ]
 	      [(smc d e (list (gt a b) c ...)) (smcEval (smc d e (append (list a b 'gt) c))) ]
@@ -39,4 +39,4 @@
 
               [a a]))
 
-(executeSMC (or 1 1))
+;(executeSMC (add 1 1))
