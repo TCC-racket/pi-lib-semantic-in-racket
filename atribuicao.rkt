@@ -5,7 +5,6 @@
 (require "AritExp.rkt")
 (require "Reservadas.rkt")
 (require "espacos.rkt")
-
 ;(provide peg-rule:string)
 (provide peg-rule:atributions)
 (provide peg-rule:variable)
