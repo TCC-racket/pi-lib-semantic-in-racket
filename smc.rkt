@@ -23,6 +23,20 @@
               
 ;              [(smc d e (list (? boolean? a) b ...)) (smcEval (smc )]
               [(smc d e (list (or a b) c ...)) (smcEval (smc d e (append (list a b 'or) c))) ]
+	      [(smc d e (list (and a b) c ...)) (smcEval (smc d e (append (list a b 'and) c))) ]
+	      [(smc d e (list (ge a b) c ...)) (smcEval (smc d e (append (list a b 'ge) c))) ]
+	      [(smc d e (list (gt a b) c ...)) (smcEval (smc d e (append (list a b 'gt) c))) ]
+	      [(smc d e (list (lt a b) c ...)) (smcEval (smc d e (append (list a b 'lt) c))) ]
+	      [(smc d e (list (neg a) c ...)) (smcEval (smc d e (append (list a 'neg) c))) ]
+	      [(smc d e (list (eq a b) c ...)) (smcEval (smc d e (append (list a b 'eq) c))) ]
+	      [(smc d e (list (le a b) c ...)) (smcEval (smc d e (append (list a b 'le) c))) ]
+
+
+
+
+
+
+
               [a a]))
 
 (executeSMC (or 1 1))
