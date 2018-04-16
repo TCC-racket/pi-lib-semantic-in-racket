@@ -12,11 +12,11 @@
 (struct condicional (U if ifElse) #:transparent)
 
 (define-peg ifElse (and
-                  "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpoIf seq) wordSeparator "}" wordSeparator
-                   "else" spaces "{" wordSeparator (name corpoElse seq) wordSeparator "}" ) (ifElse condicao corpoIf corpoElse))
+                  "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpoIf comando) wordSeparator "}" wordSeparator
+                   "else" spaces "{" wordSeparator (name corpoElse comando) wordSeparator "}" ) (ifElse condicao corpoIf corpoElse))
 
 (define-peg if (and
-                  "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpo seq) wordSeparator "}") (if condicao corpo))
+                  "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpo comando) wordSeparator "}") (if condicao corpo))
 
 (define-peg condicional (or ifElse if))
                   
