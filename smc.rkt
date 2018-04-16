@@ -14,8 +14,8 @@
               
               [(smc d e (list (? number? a) b ...)) (smcEval (smc (cons a d) e b))]
               [(smc (list (? number? a) (? number? b) c ...) d (list 'add e ...)) (smcEval (smc (cons (+ a b) c) d e))]
-              [(smc (list (? number? a) (? number? b) c ...) d (list 'sub e ...)) (smcEval (smc (cons (- a b) c) d e))]
+              [(smc (list (? number? a) (? number? b) c ...) d (list 'sub e ...)) (smcEval (smc (cons (- b a) c) d e))]
               [(smc (list (? number? a) (? number? b) c ...) d (list 'mult e ...)) (smcEval (smc (cons (* a b) c) d e))]
-              [(smc (list (? number? a) (? number? b) c ...) d (list 'div e ...)) (smcEval (smc (cons (/ a b) c) d e))]
+              [(smc (list (? number? a) (? number? b) c ...) d (list 'div e ...)) (smcEval (smc (cons (/ b a) c) d e))]
               
               [a a]))
