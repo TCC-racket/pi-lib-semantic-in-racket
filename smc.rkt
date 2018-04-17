@@ -3,8 +3,8 @@
 ;(require "Stack.rkt")
 ;(require "Contexto.rkt")
 (require "AritExp.rkt")
+(require "Comando.rkt")
 (require "BoolExp.rkt")
-;(require "Comando.rkt")
 (provide executeSMC smc)
 (define (executeSMC bplc)
   (car (smc-val (smcEval (smc '() (hash) (list bplc))))))
@@ -42,7 +42,7 @@
 	      [(smc (list (? number? a) (? number? b) c ...) d (list 'eq e ...))  (smcEval (smc (cons (= a b) c) d e)) ]
 	      [(smc (list (? number? a) (? number? b) c ...) d (list 'le e ...))  (smcEval (smc (cons (<= b a) c) d e)) ]
 	      [(smc (list (? boolean? a) c ...) d (list 'neg e ...))  (smcEval (smc (cons (not a) c) d e)) ]
-
+	      [(smc a d (list (? nop? b) c ...)) (smcEval (smc a d c)) ]
 
 
 
@@ -57,4 +57,3 @@
 
               [a a]))
 
-(smcEval (smc '() (hash) (list (neg (or (eq (add 1 1) (sub 3 2)) (ge 5 4))))))

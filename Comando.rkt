@@ -2,7 +2,7 @@
 
 (require peg/peg)
 (require "atribuicao.rkt")
-(require "BoolExp.rkt")
+(require (rename-in "BoolExp.rkt" [and andB] [or orB]))
 (require "AritExp.rkt")
 (require "Reservadas.rkt")
 (require "espacos.rkt")
