@@ -4,12 +4,10 @@
   (require peg/peg)
 
 
-  (require AritExp)
-  (require BoolExp)
+  (require "AritExp.rkt")
+  (require "BoolExp.rkt")
+  (provide peg-rule:exp)
+
 
   (struct Exp (U AritExp BoolExp))
   (define-peg exp (or aritExp boolExp))
-
-  (: parseExp (-> String Exp))
-  (define (parseExp s)
-  (peg exp s)))
