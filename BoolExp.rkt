@@ -4,7 +4,7 @@
 
 (require "espacos.rkt")
 (require "AritExp.rkt")
-(provide peg-rule:boolExp)
+(provide peg-rule:boolExp boolExp?)
 
 (define (string->boolean k) (if (equal? k "true") true false))
 
@@ -76,7 +76,7 @@
              [a a]))
 
 
-
+(provide boolConv)
 
 
 

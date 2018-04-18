@@ -50,3 +50,4 @@
                                                            [(div a b) (div (aritConv a) (aritConv b))]
                                                            [(parenteses a) (aritConv a)]
                                                            [a a]))
+(provide aritConv)

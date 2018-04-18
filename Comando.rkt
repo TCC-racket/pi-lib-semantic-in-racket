@@ -12,6 +12,7 @@
 (provide peg-rule:choiceOp)
 (provide peg-rule:comando)
 (provide peg-rule:cmdUnit)
+(provide nop? if? if-cond if-then if-else )
 
 (struct comando (U seq init atrib print exit) #:transparent)
 (struct seq (comando1 comando2) #:transparent)
@@ -28,7 +29,7 @@
 
 (define-peg exit(and exit"(" spaces (name t1 (or aritExp boolExp)) spaces ")") (exit t1))
 
-(define-peg cmdUnit (or inicializacao atributions condicional loop print exit))
+(define-peg cmdUnit (or inicializacao atribuicao condicional loop print exit))
 
 (define-peg comando (or seq choiceOp cmdUnit))
 
@@ -53,18 +54,9 @@
 (define-peg condicional (or ifElse if))
 
 (struct if (cond then else)#:transparent)
+(struct print(a)#:transparent)
 
-(define (comandoConv exp)
-	(match exp
-	[(ifP condicao corpo) (if (boolConv condicao) (comandoConv corpo) (nop))]
-	[(ifElse condicao then else) (if (boolConv condicao) (comandoConv then) (comandoConv else))]
-	[(whileDo condicao corpo) (loop (boolConv condicao)(comandoConv corpo))]
-	[(seq a b)(seq (comandoConv a)(comandoConv b))]
-	[(prnt a) (print (expConv a))]
-	[(choice a b)(choice (comandoConv a) (comandoConv b))]
-	[(exit a)(exit (expConv a))]
-	))
-
+(provide if if? if-cond if-then if-else)
 
 
 ;loop
@@ -76,5 +68,21 @@
 (define-peg loop (and
 "while" spaces (name condicao boolExp) wordSeparator "do" spaces "{" wordSeparator (name corpo comando) wordSeparator "}") (whileDo 
 condicao corpo))
+
+(struct loop (cond corpo) #:transparent)
+
+
+
+
+(define (comandoConv exp)
+	(match exp
+	[(ifP condicao corpo) (if (boolConv condicao) (comandoConv corpo) (nop))]
+	[(ifElse condicao then else) (if (boolConv condicao) (comandoConv then) (comandoConv else))]
+	[(whileDo condicao corpo) (loop (boolConv condicao)(comandoConv corpo))]
+	[(seq a b)(seq (comandoConv a)(comandoConv b))]
+	[(prnt a) (print (if (boolExp? a) (boolConv a) (aritConv a) ))]
+	[(choice a b)(choice (comandoConv a) (comandoConv b))]
+	[(exit a)(exit (if (boolExp? a) (boolConv a) (aritConv a) ))]
+	))
 
 

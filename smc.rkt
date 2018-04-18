@@ -45,7 +45,7 @@
 
 
 	      [(smc a d (list (? nop? b) c ...)) (smcEval (smc a d c)) ]
-	      [(smc a d (list (? if? b) c ...)) (smcEval (smc a d (append (list (if-condicao b) 'if (if-then b) (if-else b)) c))) ]
+	      [(smc a d (list (? if? b) c ...)) (smcEval (smc a d (append (list (if-cond b) 'if (if-then b) (if-else b)) c))) ]
 	      [(smc (list (? boolean? a) b ...) c (list 'if c1 c2 d ...))  (smcEval (smc b c (append (if a c1 c2) d))) ]
 
 
