@@ -3,7 +3,7 @@
 ;(require "Stack.rkt")
 ;(require "Contexto.rkt")
 (require "AritExp.rkt")
-(require "Comando.rkt")
+(require (rename-in "Comando.rkt" [if ifBPLC] ))
 (require "BoolExp.rkt")
 (provide executeSMC smc)
 (define (executeSMC bplc)
@@ -42,8 +42,11 @@
 	      [(smc (list (? number? a) (? number? b) c ...) d (list 'eq e ...))  (smcEval (smc (cons (= a b) c) d e)) ]
 	      [(smc (list (? number? a) (? number? b) c ...) d (list 'le e ...))  (smcEval (smc (cons (<= b a) c) d e)) ]
 	      [(smc (list (? boolean? a) c ...) d (list 'neg e ...))  (smcEval (smc (cons (not a) c) d e)) ]
-	      [(smc a d (list (? nop? b) c ...)) (smcEval (smc a d c)) ]
 
+
+	      [(smc a d (list (? nop? b) c ...)) (smcEval (smc a d c)) ]
+	      [(smc a d (list (? if? b) c ...)) (smcEval (smc a d (append (list (if-condicao b) 'if (if-then b) (if-else b)) c))) ]
+	      [(smc (list (? boolean? a) b ...) c (list 'if c1 c2 d ...))  (smcEval (smc b c (append (if a c1 c2) d))) ]
 
 
 
@@ -56,4 +59,7 @@
 
 
               [a a]))
+
+(executeSMC (neg (or (ge 4 4) (gt 5 3))))
+
 
