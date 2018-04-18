@@ -7,12 +7,11 @@
 (require "Reservadas.rkt")
 (require "espacos.rkt")
 
-
 (provide peg-rule:seq)
 (provide peg-rule:choiceOp)
 (provide peg-rule:comando)
 (provide peg-rule:cmdUnit)
-(provide nop? if? if-cond if-then if-else )
+(provide nop? if? if-cond if-then if-else nop)
 
 (struct comando (U seq init atrib print exit) #:transparent)
 (struct seq (comando1 comando2) #:transparent)
@@ -55,6 +54,8 @@
 
 (struct if (cond then else)#:transparent)
 (struct print(a)#:transparent)
+(provide print print? print-a)
+
 
 (provide if if? if-cond if-then if-else)
 

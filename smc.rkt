@@ -3,7 +3,7 @@
 ;(require "Stack.rkt")
 ;(require "Contexto.rkt")
 (require "AritExp.rkt")
-(require (rename-in "Comando.rkt" [if ifBPLC] ))
+(require (rename-in "Comando.rkt" [if ifBPLC] [print printBPLC]))
 (require "BoolExp.rkt")
 (provide executeSMC smc)
 (define (executeSMC bplc)
@@ -43,11 +43,13 @@
 	      [(smc (list (? number? a) (? number? b) c ...) d (list 'le e ...))  (smcEval (smc (cons (<= b a) c) d e)) ]
 	      [(smc (list (? boolean? a) c ...) d (list 'neg e ...))  (smcEval (smc (cons (not a) c) d e)) ]
 
-
+	      [(smc a b (list (? string? c) d ...)) (smcEval (smc (cons c a) b d))    ]
 	      [(smc a d (list (? nop? b) c ...)) (smcEval (smc a d c)) ]
 	      [(smc a d (list (? if? b) c ...)) (smcEval (smc a d (append (list (if-cond b) 'if (if-then b) (if-else b)) c))) ]
-	      [(smc (list (? boolean? a) b ...) c (list 'if c1 c2 d ...))  (smcEval (smc b c (append (if a c1 c2) d))) ]
-
+	      [(smc (list (? number? a) b ...) c (list 'if c1 c2 d ...))  (smcEval (smc b c (append (list (if (not (equal? a 0)) c1 c2)) d))) ]
+	      [(smc (list (? boolean? a) b ...) c (list 'if c1 c2 d ...))  (smcEval (smc b c (append (list (if a c1 c2)) d))) ]
+	      [(smc a b (list (? print? c) d ...)) (smcEval (smc a b (append (list (print-a c) 'print) d)) )]
+	      [(smc (list a b ...) c (list 'print d ...)) (display a) (smcEval (smc b c d) )  ]
 
 
 
@@ -60,6 +62,6 @@
 
               [a a]))
 
-(executeSMC (neg (or (ge 4 4) (gt 5 3))))
+(executeSMC (ifBPLC (add 1 1) (printBPLC "ola\n") (nop)))
 
 
