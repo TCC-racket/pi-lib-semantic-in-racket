@@ -12,6 +12,8 @@
 (provide peg-rule:comando)
 (provide peg-rule:cmdUnit)
 (provide nop? if? if-cond if-then if-else nop)
+(provide seq)
+
 
 (struct comando (U seq init atrib print exit) #:transparent)
 (struct seq (comando1 comando2) #:transparent)
@@ -19,6 +21,8 @@
 (struct choice (comando1 comando2) #:transparent)
 (struct exit(a))
 (struct nop () #:transparent)
+
+(provide choice)
 
 (define-peg separador(or virg pointvirg newLines))
 

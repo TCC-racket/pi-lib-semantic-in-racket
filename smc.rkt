@@ -7,11 +7,12 @@
 (require "BoolExp.rkt")
 (provide executeSMC smc)
 (define (executeSMC bplc)
-  (car (smc-val (smcEval (smc '() (hash) (list bplc))))))
+  (smcEval (smc '() (hash) (list bplc))))
   
 (define (smcEval smcP)
-  (writeln smcP)
-  (match smcP [(smc d e (list (add a b) c ...)) (smcEval (smc d e (append (list a b 'add) c)))]
+;  (writeln smcP)
+  (match smcP [(smc (list) a (list)) (smc (list) a (list)) ]
+	      [(smc d e (list (add a b) c ...)) (smcEval (smc d e (append (list a b 'add) c)))]
               [(smc d e (list (sub a b) c ...)) (smcEval (smc d e (append (list a b 'sub) c)))]
               [(smc d e (list (mult a b) c ...)) (smcEval (smc d e (append (list a b 'mult) c)))]
               [(smc d e (list (div a b) c ...)) (smcEval (smc d e (append (list a b 'div) c)))]
@@ -49,9 +50,9 @@
 	      [(smc (list (? number? a) b ...) c (list 'if c1 c2 d ...))  (smcEval (smc b c (append (list (if (not (equal? a 0)) c1 c2)) d))) ]
 	      [(smc (list (? boolean? a) b ...) c (list 'if c1 c2 d ...))  (smcEval (smc b c (append (list (if a c1 c2)) d))) ]
 	      [(smc a b (list (? print? c) d ...)) (smcEval (smc a b (append (list (print-a c) 'print) d)) )]
-	      [(smc (list a b ...) c (list 'print d ...)) (display a) (smcEval (smc b c d) )  ]
-
-
+	      [(smc (list a b ...) c (list 'print d ...)) (begin (display a) (smcEval (smc b c d) ))  ]
+	      [(smc a b (list (seq c d) e ...)) (smcEval (smc a b (append (list c d) e))) ]
+	      [(smc a b (list (choice c d) e ...)) (smcEval (smc a b (append (list (if (equal? 0 (random 2)) c d )) e )))]
 
 
 
@@ -62,6 +63,5 @@
 
               [a a]))
 
-(executeSMC (ifBPLC (add 1 1) (printBPLC "ola\n") (nop)))
 
-
+(executeSMC (ifBPLC (choice (add 1 1) (sub 1 1)) (printBPLC (add 3 4)) (seq (printBPLC (add 3 4)) (printBPLC "\n"))))
