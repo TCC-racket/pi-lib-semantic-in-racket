@@ -39,18 +39,29 @@
 
 (provide peg-rule:condicional)
 
-(struct if (condicao corpo) #:transparent)
+(struct ifP (condicao corpo) #:transparent)
 (struct ifElse (condicao corpoIf corpoElse) #:transparent)
-(struct condicional (U if ifElse) #:transparent)
+(struct condicional (U ifP ifElse) #:transparent)
 
 (define-peg ifElse (and
                   "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpoIf comando) wordSeparator "}" wordSeparator
                    "else" spaces "{" wordSeparator (name corpoElse comando) wordSeparator "}" ) (ifElse condicao corpoIf corpoElse))
 
 (define-peg if (and
-                  "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpo comando) wordSeparator "}") (if condicao corpo))
+                  "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpo comando) wordSeparator "}") (ifP condicao corpo))
 
 (define-peg condicional (or ifElse if))
+
+(struct if (cond then else)#:transparent)
+
+(define (comandoConv exp)
+	(match exp
+	[(ifP condicao corpo) (if (boolConv condicao) (comandoConv corpo) (nop))]
+	[(ifElse condicao then else) (if (boolConv condicao) (comandoConv then) (comandoConv else))]
+	[]
+	[]))
+
+
 
 ;loop
 
