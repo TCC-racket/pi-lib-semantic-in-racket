@@ -23,7 +23,7 @@
 (struct nop () #:transparent)
 
 (provide choice)
-
+(provide loop)
 (define-peg separador(or virg pointvirg newLines))
 
 (define-peg seq(and (name t1 cmdUnit) (?(name sep separador) (name t2 seq))) (if t2 (seq t1 t2) t1))

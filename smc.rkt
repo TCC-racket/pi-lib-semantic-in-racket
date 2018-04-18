@@ -53,8 +53,10 @@
 	      [(smc (list a b ...) c (list 'print d ...)) (begin (display a) (smcEval (smc b c d) ))  ]
 	      [(smc a b (list (seq c d) e ...)) (smcEval (smc a b (append (list c d) e))) ]
 	      [(smc a b (list (choice c d) e ...)) (smcEval (smc a b (append (list (if (equal? 0 (random 2)) c d )) e )))]
-
-
+	      [(smc a d (list (loop b e) c ...)) (smcEval (smc a d (append (list b 'loop b e) c))) ]
+	      [(smc (list (? number? a) b ...) c (list 'loop c1 c2 d ...))  (smcEval (smc b c (append (if (not (equal? a 0)) (list c1 (loop c1 c2)) '())) d)) ]
+	      [(smc (list (? boolean? a) b ...) c (list 'loop c1 c2 d ...))  (smcEval (smc b c (append (if a (list c2 (loop c1 c2)) '()) d ))) ]
+	
 
 
 
@@ -64,4 +66,4 @@
               [a a]))
 
 
-(executeSMC (ifBPLC (choice (add 1 1) (sub 1 1)) (printBPLC (add 3 4)) (seq (printBPLC (add 3 4)) (printBPLC "\n"))))
+(executeSMC (loop (ge 5 4) (printBPLC "oi\n")) )
