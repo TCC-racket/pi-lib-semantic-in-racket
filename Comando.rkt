@@ -58,8 +58,12 @@
 	(match exp
 	[(ifP condicao corpo) (if (boolConv condicao) (comandoConv corpo) (nop))]
 	[(ifElse condicao then else) (if (boolConv condicao) (comandoConv then) (comandoConv else))]
-	[]
-	[]))
+	[(whileDo condicao corpo) (loop (boolConv condicao)(comandoConv corpo))]
+	[(seq a b)(seq (comandoConv a)(comandoConv b))]
+	[(prnt a) (print (expConv a))]
+	[(choice a b)(choice (comandoConv a) (comandoConv b))]
+	[(exit a)(exit (expConv a))]
+	))
 
 
 
