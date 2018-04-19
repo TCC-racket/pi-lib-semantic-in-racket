@@ -12,8 +12,6 @@
 (provide peg-rule:comando)
 (provide peg-rule:cmdUnit)
 (provide nop? if? if-cond if-then if-else nop)
-(provide seq)
-
 
 (struct comando (U seq init atrib print exit) #:transparent)
 (struct seq (comando1 comando2) #:transparent)
@@ -22,8 +20,6 @@
 (struct exit(a))
 (struct nop () #:transparent)
 
-(provide choice)
-(provide loop)
 (define-peg separador(or virg pointvirg newLines))
 
 (define-peg seq(and (name t1 cmdUnit) (?(name sep separador) (name t2 seq))) (if t2 (seq t1 t2) t1))
@@ -32,7 +28,7 @@
 
 (define-peg exit(and exit"(" spaces (name t1 (or aritExp boolExp)) spaces ")") (exit t1))
 
-(define-peg cmdUnit (or inicializacao atribuicao condicional loop print exit))
+(define-peg cmdUnit (or inicializacao declaracao atribuicao condicional loop print exit))
 
 (define-peg comando (or seq choiceOp cmdUnit))
 
