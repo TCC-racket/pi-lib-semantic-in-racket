@@ -11,6 +11,7 @@
   
 (define (smcEval smcP)
 ;  (writeln smcP)
+;  (sleep 1)
   (match smcP [(smc (list) a (list)) (smc (list) a (list)) ]
 	      [(smc d e (list (add a b) c ...)) (smcEval (smc d e (append (list a b 'add) c)))]
               [(smc d e (list (sub a b) c ...)) (smcEval (smc d e (append (list a b 'sub) c)))]
@@ -54,7 +55,7 @@
 	      [(smc a b (list (seq c d) e ...)) (smcEval (smc a b (append (list c d) e))) ]
 	      [(smc a b (list (choice c d) e ...)) (smcEval (smc a b (append (list (if (equal? 0 (random 2)) c d )) e )))]
 	      [(smc a d (list (loop b e) c ...)) (smcEval (smc a d (append (list b 'loop b e) c))) ]
-	      [(smc (list (? number? a) b ...) c (list 'loop c1 c2 d ...))  (smcEval (smc b c (append (if (not (equal? a 0)) (list c1 (loop c1 c2)) '())) d)) ]
+	      [(smc (list (? number? a) b ...) c (list 'loop c1 c2 d ...))  (smcEval (smc b c (append (if (not (equal? a 0)) (list c2 (loop c1 c2)) '()) d ))) ]
 	      [(smc (list (? boolean? a) b ...) c (list 'loop c1 c2 d ...))  (smcEval (smc b c (append (if a (list c2 (loop c1 c2)) '()) d ))) ]
 	
 
@@ -66,4 +67,4 @@
               [a a]))
 
 
-(executeSMC (loop (ge 5 4) (printBPLC "oi\n")) )
+(executeSMC (loop (choice (sub 1 1) (add 5 4)) (seq (printBPLC "oi ") (choice (printBPLC "João seu lindo\n") (printBPLC "seu merda\n") )) ))

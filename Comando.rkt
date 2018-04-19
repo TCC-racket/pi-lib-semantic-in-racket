@@ -12,6 +12,7 @@
 (provide peg-rule:comando)
 (provide peg-rule:cmdUnit)
 (provide nop? if? if-cond if-then if-else nop)
+(provide seq choice)
 
 (struct comando (U seq init atrib print exit) #:transparent)
 (struct seq (comando1 comando2) #:transparent)
@@ -71,7 +72,7 @@
 condicao corpo))
 
 (struct loop (cond corpo) #:transparent)
-
+(provide loop)
 
 
 
