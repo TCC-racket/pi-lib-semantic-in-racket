@@ -25,9 +25,9 @@
 
 (define-peg seq(and (name t1 cmdUnit) (?(name sep separador) (name t2 seq))) (if t2 (seq t1 t2) t1))
 
-(define-peg print(and print"(" spaces (name t1 (or aritExp variable string boolExp)) spaces ")") (prnt t1))
+(define-peg print(and printR"(" spaces (name t1 (or aritExp variable string boolExp)) spaces ")") (prnt t1))
 
-(define-peg exit(and exit"(" spaces (name t1 (or aritExp boolExp)) spaces ")") (exit t1))
+(define-peg exit(and exitR"(" spaces (name t1 (or aritExp boolExp)) spaces ")") (exit t1))
 
 (define-peg cmdUnit (or inicializacao declaracao atribuicao condicional loop print exit))
 
