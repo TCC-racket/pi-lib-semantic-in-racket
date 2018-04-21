@@ -12,6 +12,8 @@
 (provide peg-rule:end)
 (provide peg-rule:virg)
 (provide peg-rule:pointvirg)
+(provide peg-rule:printR)
+(provide peg-rule:exitR)
 
 (define-peg var "var")
 (define-peg const "const")
@@ -20,8 +22,8 @@
 (define-peg proc "proc")
 (define-peg module "Module")
 (define-peg end "end")
-(define-peg print "print")
-(define-peg exit "exit")
+(define-peg printR "print")
+(define-peg exitR "exit")
 (define-peg virg (and spaces "," spaces))
 (define-peg pointvirg (and spaces ";" spaces))
  
