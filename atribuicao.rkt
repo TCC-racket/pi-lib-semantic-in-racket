@@ -17,6 +17,7 @@
 (struct atribution (value var) #:transparent)
 (struct declaraList (var decList) #:transparent)
 (struct atribSeq (atrib1 atribSeq2) #:transparent)
+(struct idt (var) #:transparent)
 
 (define-peg string (and "\"" (* (or space (range #\a #\z) (range #\A #\Z) (range #\0 #\9))) "\""))
 
@@ -33,3 +34,9 @@
 (define-peg variavel (and var wordSeparator (name t1 variable) (? newLines virg newLines (name t2 declaraAux))) (if t2 (declaraList t1 t2) t1))
 (define-peg constante (and const wordSeparator (name t1 variable) (? newLines virg newLines (name t2 declaraAux))) (if t2 (declaraList t1 t2) t1))
 (define-peg declaracao (or variavel constante))
+
+
+
+(define (atriConv exp)
+(match exp
+	[(atribution value var)(assign (if boolExp? value)(boolConv value)(aritConv value)(idt var)]))
