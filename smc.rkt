@@ -58,7 +58,9 @@
 	      [(smc (list (? number? a) b ...) c (list 'loop c1 c2 d ...))  (smcEval (smc b c (append (if (not (equal? a 0)) (list c2 (loop c1 c2)) '()) d ))) ]
 	      [(smc (list (? boolean? a) b ...) c (list 'loop c1 c2 d ...))  (smcEval (smc b c (append (if a (list c2 (loop c1 c2)) '()) d ))) ]
 	
-
+	      [(smc a b (list (assign c d) e ...)) (smcEval (smc a b (append (list d 'assign c) e)))]
+	      [(smc (list a b ...) c (list 'assign d e ...)) (smcEval (smc b (hash-set c d a) e))]
+	      [(smc a b (list (idt c) d ...)) (smcEval (smc (cons (hash-ref b c) a) b d))]
 
 
 
