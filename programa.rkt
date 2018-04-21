@@ -6,6 +6,8 @@
 (require "espacos.rkt")
 (require "Reservadas.rkt")
 
+(provide peg-rule:programa)
+
 (struct prog (modName Body) #:transparent)
 (struct variavelOp (a b) #:transparent)
 (struct constanteOp (a b) #:transparent)
