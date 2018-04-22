@@ -18,6 +18,9 @@
 (struct less (a b)  #:transparent)  ;<
 (struct more (a b)  #:transparent)  ;>
 
+(define (boolExp? exp) (or (more? exp) (less? exp) (be? exp) (le? exp) (eq? exp) (neg? exp) (orOp? exp) (andOp? exp) (parenteses? exp)))
+(provide boolExp?)
+
 (struct boolExp (U andOp orOp neg eq le be less parenteses) #:transparent)
 
 (define-peg boolean (name str (or "true" "false")) (string->boolean str))
