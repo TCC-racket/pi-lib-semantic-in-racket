@@ -9,6 +9,10 @@
 (struct prod (a b) #:transparent)
 (struct div (a b) #:transparent)
 (struct parenteses (a) #:transparent)
+
+(define (aritExp? exp) (or (soma? exp) (sub? exp) (prod? exp) (div? exp) (parenteses? exp) (number? exp)))
+(provide aritExp?)
+
 (provide peg-rule:aritExp)
 (provide add sub mult div)
 
