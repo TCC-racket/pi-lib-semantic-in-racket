@@ -20,7 +20,7 @@
 (define-peg bar (and spaces "|" spaces))
 (define-peg init "init")
 (define-peg proc "proc")
-(define-peg module "Module")
+(define-peg module "module")
 (define-peg end "end")
 (define-peg printR "print")
 (define-peg exitR "exit")
