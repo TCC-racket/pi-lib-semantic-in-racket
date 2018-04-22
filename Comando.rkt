@@ -21,7 +21,7 @@
 (struct exit(a))
 (struct nop () #:transparent)
 
-(define-peg separador(or virg pointvirg newLines))
+(define-peg separador(and wordSeparator (or virg pointvirg newLines) wordSeparator))
 
 (define-peg seq(and (name t1 cmdUnit) (?(name sep separador) (name t2 seq))) (if t2 (seq t1 t2) t1))
 
