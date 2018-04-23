@@ -39,4 +39,4 @@
 
 (define (atriConv exp)
 (match exp
-	[(atribution value var)(assign (if boolExp? value)(boolConv value)(aritConv value)(idt var)]))
+	[(atribution value var) (assign (if (boolExp? value) (boolConv value) (aritConv value)) (idt var))]))
