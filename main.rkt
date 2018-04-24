@@ -2,6 +2,8 @@
 
 (require peg/peg)
 (require "programa.rkt")
+(require "Comando.rkt")
+(require "smc.rkt")
 
 ;(define in (open-input-file "C:\\Users\\Pichau\\Desktop\\8 PERÍODO\\COMPILADORES\\RACKET TEST\\fact.imp"))
 
@@ -17,3 +19,19 @@
 (define in (open-input-file (vector-ref (current-command-line-arguments) 0)))
 (peg programa (port->string in))
 
+(module+ test
+  (require peg/peg)
+  (define t
+    (lambda()(peg programa "(module Fact
+    var y , x
+    init y = 1 , x = 5
+    proc fact(x) {
+		while ~ (x == 0)
+        do {               
+		  y := y * x ;
+          x := x - 1
+		} ; 
+		print(y)
+	}
+end)")))
+  (executeSMC (comandoConv t)))
