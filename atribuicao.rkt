@@ -36,6 +36,7 @@
 (define-peg declaracao (or variavel constante))
 
 (struct assign (exp idt) #:transparent)
+(provide assign)
 
 (define (atriConv exp)
 (match exp
