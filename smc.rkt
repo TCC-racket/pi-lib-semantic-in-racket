@@ -11,8 +11,8 @@
   (smcEval (smc '() (hash) (list bplc))))
   
 (define (smcEval smcP)
-  (writeln smcP)
-  (sleep 1)
+;  (writeln smcP)
+;  (sleep 1)
   (match smcP [(smc (list) a (list)) (smc (list) a (list)) ]
 	      [(smc d e (list (add a b) c ...)) (smcEval (smc d e (append (list a b 'add) c)))]
               [(smc d e (list (sub a b) c ...)) (smcEval (smc d e (append (list a b 'sub) c)))]
@@ -81,3 +81,5 @@
 						(seq 
 							(printBPLC " vezes\n")
 							(assign (idt "x") (add (idt "x") 1))))))))
+
+(executeSMC (seq (assign (idt "x") 100) (seq (assign (idt "acc") 1) (loop (ge (idt "x") 2) (seq (assign (idt "acc") (mult (idt "acc") (idt "x"))) (assign (idt "x") (sub (idt "x") 1))))))) 
