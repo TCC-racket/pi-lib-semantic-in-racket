@@ -80,4 +80,4 @@
 						(printBPLC (idt "x"))
 						(seq 
 							(printBPLC " vezes\n")
-							(assign (idt "x") (add (idt "x") 1)))))))))
+							(assign (idt "x") (add (idt "x") 1))))))))
