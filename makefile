@@ -3,6 +3,7 @@ install:
 	hdiutil attach ./racket.dmg
 	raco test main.rkt
 	raco test smc.rkt
+	raco pkg install peg
 
 uninstall:
 	hdiutil detach /Volumes/racket

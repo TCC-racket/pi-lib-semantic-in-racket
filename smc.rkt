@@ -69,17 +69,20 @@
 
               [a a]))
 
-
-(executeSMC 
-		(seq 
-			(assign (idt "x") 0)
-			(loop (le (idt "x") 5)
-				(seq 
-					(printBPLC "executei ")
+(module+ test
+	(require rackunit)
+	(check(executeSMC 
+			(seq 
+				(assign (idt "x") 0)
+				(loop (le (idt "x") 5)
 					(seq 
-						(printBPLC (idt "x"))
+						(printBPLC "executei ")
 						(seq 
-							(printBPLC " vezes\n")
-							(assign (idt "x") (add (idt "x") 1))))))))
+							(printBPLC (idt "x"))
+							(seq 
+								(printBPLC " vezes\n")
+								(assign (idt "x") (add (idt "x") 1))))))))
 
-(executeSMC (seq (assign (idt "x") 100) (seq (assign (idt "acc") 1) (loop (ge (idt "x") 2) (seq (assign (idt "acc") (mult (idt "acc") (idt "x"))) (assign (idt "x") (sub (idt "x") 1))))))) 
+	(executeSMC (seq (assign (idt "x") 100) (seq (assign (idt "acc") 1) (loop (ge (idt "x") 2) (seq (assign (idt "acc") (mult (idt "acc") (idt "x"))) (assign (idt "x") (sub (idt "x") 1)))))))
+
+
