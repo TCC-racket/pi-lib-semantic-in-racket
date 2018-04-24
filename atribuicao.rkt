@@ -35,7 +35,7 @@
 (define-peg constante (and const wordSeparator (name t1 variable) (? newLines virg newLines (name t2 declaraAux))) (if t2 (declaraList t1 t2) t1))
 (define-peg declaracao (or variavel constante))
 
-
+(struct assign (exp idt) #:transparent)
 
 (define (atriConv exp)
 (match exp
