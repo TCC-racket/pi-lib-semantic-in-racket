@@ -63,7 +63,8 @@
 	      [(smc (list a b ...) c (list 'assign (idt d) e ...)) (smcEval (smc b (hash-set c d a) e))]
 	      [(smc a b (list (idt c) d ...)) (smcEval (smc (cons (hash-ref b c) a) b d))]
 
-
+	      [(smc a b (list (? exit? c) d ...)) (smcEval (smc a b (append (list (exit-a c) 'exit) d  ))) ]
+	      [(smc (list a b ...) c (list 'exit d ...) )  (exit a)  ]
 
 
 
@@ -71,7 +72,7 @@
 
 (module+ test
 	(require rackunit)
-	(check(executeSMC 
+	(check-match (executeSMC 
 			(seq 
 				(assign (idt "x") 0)
 				(loop (le (idt "x") 5)
@@ -81,8 +82,19 @@
 							(printBPLC (idt "x"))
 							(seq 
 								(printBPLC " vezes\n")
-								(assign (idt "x") (add (idt "x") 1))))))))
+								(assign (idt "x") (add (idt "x") 1)))))))) (smc '() _ '())  )
 
-	(executeSMC (seq (assign (idt "x") 100) (seq (assign (idt "acc") 1) (loop (ge (idt "x") 2) (seq (assign (idt "acc") (mult (idt "acc") (idt "x"))) (assign (idt "x") (sub (idt "x") 1)))))))
+	(check-match  (executeSMC (seq (assign (idt "x") 100) (seq (assign (idt "acc") 1) (loop (ge (idt "x") 2) (seq (assign (idt "acc") (mult (idt "acc") (idt "x"))) (assign (idt "x") (sub (idt "x") 1))))))) (smc '() (hash-table ("x" 1)) '()))
+
+
+
+)
+
+
+
+
+
+
+
 
 

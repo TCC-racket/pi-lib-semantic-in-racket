@@ -74,7 +74,7 @@ condicao corpo))
 (struct loop (cond corpo) #:transparent)
 (provide loop)
 
-
+(provide exit? exit-a)
 
 (define (comandoConv exp)
 	(match exp
