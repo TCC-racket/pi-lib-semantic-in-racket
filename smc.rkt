@@ -77,7 +77,7 @@
 				(seq 
 					(printBPLC "executei ")
 					(seq 
-						(printBPLC (idt "x")
+						(printBPLC (idt "x"))
 						(seq 
 							(printBPLC " vezes\n")
 							(assign (idt "x") (add (idt "x") 1)))))))))
