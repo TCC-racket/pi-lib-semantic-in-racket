@@ -5,6 +5,7 @@
 (require "AritExp.rkt")
 (require (rename-in "Comando.rkt" [if ifBPLC] [print printBPLC]))
 (require "BoolExp.rkt")
+(require "atribuicao.rkt")
 (provide executeSMC smc)
 (define (executeSMC bplc)
   (smcEval (smc '() (hash) (list bplc))))
