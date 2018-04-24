@@ -14,6 +14,6 @@
 ;(pgrm) ;peg programa "l1"
 
 
-(define in (open-input-file (vector-ref (current-comando-line-arguments) 0)))
+(define in (open-input-file (vector-ref (current-command-line-arguments) 0)))
 (peg programa (port->string in))
 
