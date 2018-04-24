@@ -75,6 +75,7 @@ condicao corpo))
 (provide loop)
 
 (provide exit? exit-a)
+(provide comandoConv)
 
 (define (comandoConv exp)
 	(match exp
