@@ -1,0 +1,79 @@
+\documentclass{beamer}
+
+\usetheme[
+  outer/progressbar=frametitle
+]{metropolis}
+
+\usepackage[portuguese]{babel}
+\usepackage[utf8]{inputenc}
+
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue,citecolor=blue}
+
+\title[Compiladores 2018.1]{2$^{a.}$ Apresentação do compilador Dante}
+\author[Abrev.]{Autores: João Pedro Abreu, Luis Freitas e Raphael Leardini} 
+
+\institute[UFF]{Universidade Federal Fluminense}
+
+\date{Data: 25/04/2018} 
+
+\begin{document}
+
+% ---
+
+\begin{frame}[plain]
+
+\titlepage
+
+\end{frame}
+
+% ---
+
+\begin{frame}{PEG}
+/ coisas sobre PEG/
+\end{frame}
+
+% ---
+
+\begin{frame}{Transformação}
+Ao contrário dos outros grupos, fizemos duas transformações de árvores sintáticas.
+
+A primeira foi de símbolos para uma línguagem abstrata que não era o BPLC.
+
+(Ex: "4+4" transforma em (soma 4 4))
+
+A segunda foi dessa línguagem abstrata para o BPLC.
+
+(Ex: (soma 4 4) se transforma em (add 4 4))
+
+A pergunta então se torna para que fazer isso?
+
+\end{frame}
+
+% ---
+\begin{frame}{Transformação}
+Motivos:
+\begin{itemize}
+
+   \item Mais fácil entendimento do código para os membros do grupo.
+   \item Potencial de portabilidade desse mesmo compilador para outra linguagem.
+   
+\end{itemize}
+Levando em conta um único contra, que é o tempo, que acabou não sendo problema grande nessa parte do projeto.
+\end{frame}
+
+%---
+\begin{frame}{SMC}
+/Coisas sobre SMC/
+
+
+
+\end{frame}
+
+%---
+\begin{frame}{Dificuldades}
+
+Para a transformação a maior dificuldade foi a atribuição. Devido o tipo ID que a função assign do BPLC realiza, o responsável por essa transformação teve problemas.
+
+\end{frame}
+
+\end{document}
