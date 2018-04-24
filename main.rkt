@@ -16,13 +16,13 @@
 ;(pgrm) ;peg programa "l1"
 
 
-(define in (open-input-file (vector-ref (current-command-line-arguments) 0)))
-(peg programa (port->string in))
+;(define in (open-input-file (vector-ref (current-command-line-arguments) 0)))
+;(peg programa (port->string in))
 
 (module+ test
   (require peg/peg)
-  (define t
-    (lambda()(peg programa "(module Fact
+  (executeSMC
+    (comandoConv (peg programa "(module Fact
     var y , x
     init y = 1 , x = 5
     proc fact(x) {
@@ -33,5 +33,4 @@
 		} ; 
 		print(y)
 	}
-end)")))
-  (executeSMC (comandoConv t)))
+end)"))))
