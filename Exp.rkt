@@ -10,4 +10,4 @@
 (struct Exp (U AritExp BoolExp))
 (define-peg exp (or aritExp boolExp))
 
-(define (expConv exp) (match exp)
+(define (expConv exp) (match exp))
