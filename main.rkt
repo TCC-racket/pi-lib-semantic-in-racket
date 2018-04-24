@@ -22,15 +22,12 @@
 (module+ test
   (require peg/peg)
   (executeSMC
-    (comandoConv (peg programa "(module Fact
-    var y , x
-    init y = 1 , x = 5
-    proc fact(x) {
+    (comandoConv (peg comando "x := 5 ;
+    y := 1 ;
 		while ~ (x == 0)
         do {               
 		  y := y * x ;
           x := x - 1
 		} ; 
 		print(y)
-	}
-end)"))))
+	}"))))
