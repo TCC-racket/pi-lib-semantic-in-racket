@@ -1,10 +1,10 @@
 #lang racket
 
 (require peg/peg)
-
+(require "idt.rkt");master hack
 (require "espacos.rkt")
 (require "AritExp.rkt")
-(provide peg-rule:boolExp)
+(provide peg-rule:boolExp boolExp?)
 
 (define (string->boolean k) (if (equal? k "true") true false))
 
@@ -17,8 +17,10 @@
 (struct be (a b)  #:transparent)    ;>=
 (struct less (a b)  #:transparent)  ;<
 (struct more (a b)  #:transparent)  ;>
+(define (boolExp? exp) (if (more? exp) #t (if (less? exp) #t (if (be? exp) #t (if (le? exp) #t (if (eq? exp) #t (if (neg? exp) #t (if (orOp? exp) #t (if (andOp? exp) #t (if (parenteses? exp) #t #f))))))))))
+(provide boolExp?)
 
-(struct boolExp (U andOp orOp neg eq le be less parenteses) #:transparent)
+;(struct boolExp (U andOp orOp neg eq le be less parenteses) #:transparent)
 
 (define-peg boolean (name str (or "true" "false")) (string->boolean str))
                  
@@ -30,10 +32,10 @@
                       (name eq2 (or boolean)) spaces) ;aritExp)))
                   (eq eq1 eq2))
 
-(define-peg ncOp (and (name nc1 aritExp) (? (and spaces (name op (or "==" ">=" "<=" ">" "<")) spaces (name nc2 relacional))))
-      (if nc2 (if (equal? op " == ") (eq nc1 nc2) 
-        (if (equal? op " >= ") (be nc1 nc2) 
-          (if (equal? op " <= ") (le nc1 nc2) (if (equal? op " > ") (more nc1 nc2) (less nc1 nc2))))) nc1))
+(define-peg ncOp (and (name nc1 aritExp) (? (and spaces (name op (or "==" ">=" "<=" ">" "<")) spaces (name nc2 aritExp))))
+      (if nc2 (if (equal? op "==") (eq nc1 nc2) 
+        (if (equal? op ">=") (be nc1 nc2) 
+          (if (equal? op "<=") (le nc1 nc2) (if (equal? op ">") (more nc1 nc2) (less nc1 nc2))))) nc1))
  
 (define-peg relacional (or equal ncOp))
 
@@ -66,17 +68,17 @@
 (define (boolConv exp)
   (match exp [(andOp a b) (and (boolConv a) (boolConv b))]
              [(orOp a b) (or (boolConv a) (boolConv b))]
-             [(be a b) (ge (boolConv a) (boolConv b))]
-             [(more a b) (gt (boolConv a) (boolConv b))]
-             [(less a b) (lt (boolConv a) (boolConv b))]
+             [(be a b) (ge (aritConv a) (aritConv b))]
+             [(more a b) (gt (aritConv a) (aritConv b))]
+             [(less a b) (lt (aritConv a) (aritConv b))]
              [(neg a) (neg (boolConv a))]
-             [(eq a b) (eq (boolConv a) (boolConv b))]
-             [(le a b) (le (boolConv a) (boolConv b))]
+             [(eq a b) (eq (aritConv a) (aritConv b))] ;quando expConv funcionar, mude.
+             [(le a b) (le (aritConv a) (aritConv b))]
              [(parenteses a) (boolConv a)]
              [a a]))
 
 
-
+(provide boolConv)
 
 
 

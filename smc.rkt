@@ -2,16 +2,20 @@
 (struct smc (val amb control) #:transparent)
 ;(require "Stack.rkt")
 ;(require "Contexto.rkt")
+(require "idt.rkt")
 (require "AritExp.rkt")
+(require (rename-in "Comando.rkt" [if ifBPLC] [print printBPLC]))
 (require "BoolExp.rkt")
-;(require "Comando.rkt")
+(require "atribuicao.rkt")
 (provide executeSMC smc)
 (define (executeSMC bplc)
-  (car (smc-val (smcEval (smc '() (hash) (list bplc))))))
+  (smcEval (smc '() (hash) (list bplc))))
   
 (define (smcEval smcP)
-  (writeln smcP)
-  (match smcP [(smc d e (list (add a b) c ...)) (smcEval (smc d e (append (list a b 'add) c)))]
+;  (writeln smcP)
+;  (sleep 1)
+  (match smcP [(smc (list) a (list)) (smc (list) a (list)) ]
+	      [(smc d e (list (add a b) c ...)) (smcEval (smc d e (append (list a b 'add) c)))]
               [(smc d e (list (sub a b) c ...)) (smcEval (smc d e (append (list a b 'sub) c)))]
               [(smc d e (list (mult a b) c ...)) (smcEval (smc d e (append (list a b 'mult) c)))]
               [(smc d e (list (div a b) c ...)) (smcEval (smc d e (append (list a b 'div) c)))]
@@ -43,18 +47,55 @@
 	      [(smc (list (? number? a) (? number? b) c ...) d (list 'le e ...))  (smcEval (smc (cons (<= b a) c) d e)) ]
 	      [(smc (list (? boolean? a) c ...) d (list 'neg e ...))  (smcEval (smc (cons (not a) c) d e)) ]
 
+	      [(smc a b (list (? string? c) d ...)) (smcEval (smc (cons c a) b d))    ]
+	      [(smc a d (list (? nop? b) c ...)) (smcEval (smc a d c)) ]
+	      [(smc a d (list (? if? b) c ...)) (smcEval (smc a d (append (list (if-cond b) 'if (if-then b) (if-else b)) c))) ]
+	      [(smc (list (? number? a) b ...) c (list 'if c1 c2 d ...))  (smcEval (smc b c (append (list (if (not (equal? a 0)) c1 c2)) d))) ]
+	      [(smc (list (? boolean? a) b ...) c (list 'if c1 c2 d ...))  (smcEval (smc b c (append (list (if a c1 c2)) d))) ]
+	      [(smc a b (list (? print? c) d ...)) (smcEval (smc a b (append (list (print-a c) 'print) d)) )]
+	      [(smc (list a b ...) c (list 'print d ...)) (begin (display a) (smcEval (smc b c d) ))  ]
+	      [(smc a b (list (seq c d) e ...)) (smcEval (smc a b (append (list c d) e))) ]
+	      [(smc a b (list (choice c d) e ...)) (smcEval (smc a b (append (list (if (equal? 0 (random 2)) c d )) e )))]
+	      [(smc a d (list (loop b e) c ...)) (smcEval (smc a d (append (list b 'loop b e) c))) ]
+	      [(smc (list (? number? a) b ...) c (list 'loop c1 c2 d ...))  (smcEval (smc b c (append (if (not (equal? a 0)) (list c2 (loop c1 c2)) '()) d ))) ]
+	      [(smc (list (? boolean? a) b ...) c (list 'loop c1 c2 d ...))  (smcEval (smc b c (append (if a (list c2 (loop c1 c2)) '()) d ))) ]
+	
+	      [(smc a b (list (assign c d) e ...)) (smcEval (smc a b (append (list d 'assign c) e)))]
+	      [(smc (list a b ...) c (list 'assign (idt d) e ...)) (smcEval (smc b (hash-set c d a) e))]
+	      [(smc a b (list (idt c) d ...)) (smcEval (smc (cons (hash-ref b c) a) b d))]
 
-
-
-
-
-
-
-
-
+	      [(smc a b (list (? exit? c) d ...)) (smcEval (smc a b (append (list (exit-a c) 'exit) d  ))) ]
+	      [(smc (list a b ...) c (list 'exit d ...) )  (exit a)  ]
 
 
 
               [a a]))
 
-(smcEval (smc '() (hash) (list (neg (or (eq (add 1 1) (sub 3 2)) (ge 5 4))))))
+(module+ test
+	(require rackunit)
+	(check-match (executeSMC 
+			(seq 
+				(assign (idt "x") 0)
+				(loop (le (idt "x") 5)
+					(seq 
+						(printBPLC "executei ")
+						(seq 
+							(printBPLC (idt "x"))
+							(seq 
+								(printBPLC " vezes\n")
+								(assign (idt "x") (add (idt "x") 1)))))))) (smc '() _ '())  )
+
+	(check-match  (executeSMC (seq (assign (idt "x") 5) (seq (assign (idt "acc") 1) (loop (ge (idt "x") 2) (seq (assign (idt "acc") (mult (idt "acc") (idt "x"))) (assign (idt "x") (sub (idt "x") 1))))))) (smc '() (hash-table ("x" 1)) '()))
+
+
+
+)
+
+
+
+
+
+
+
+
+

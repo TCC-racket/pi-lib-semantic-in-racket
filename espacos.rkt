@@ -11,11 +11,12 @@
 (provide peg-rule:wordSeparator)
 
 (define-peg space #\space)
-(define-peg tab (or #\t #\v))
+(define-peg tab (or "\t" "\v"))
 (define-peg newLine 
                       (or
-                          #\n ; para sistemas de verdade
-                          (and #\n #\f))) ; para o windows
+                          "\n" ; para sistemas de verdade
+                          (and "\n" "\f"))) ; para o windows
+;(define-peg newLine #\newline)
 (define-peg spaces (* space))
 (define-peg tabs (* tab))
 (define-peg newLines (* newLine))

@@ -1,7 +1,7 @@
 #lang racket
 
 (require peg/peg)
-
+(require "idt.rkt")
 (require "espacos.rkt")
 
 (struct soma (a b) #:transparent)
@@ -9,6 +9,10 @@
 (struct prod (a b) #:transparent)
 (struct div (a b) #:transparent)
 (struct parenteses (a) #:transparent)
+
+(define (aritExp? exp) (or (soma? exp) (sub? exp) (prod? exp) (div? exp) (parenteses? exp) (number? exp)))
+(provide aritExp?)
+
 (provide peg-rule:aritExp)
 (provide add sub mult div)
 
@@ -18,9 +22,9 @@
 
 (define-peg parenteses (and spaces "(" spaces (name value aritExp) spaces ")" spaces) (parenteses value))
 (define-peg number (name value (+ (range #\0 #\9))) (string->number value))
-(define-peg variable (and 
+(define-peg variable (name var (and 
                           (or (range #\a #\z) (range #\A #\Z))
-                          (* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9)))))
+                          (* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9))))) (idt var) )
 
 
 (define (normSub l) (reduce sub l))
@@ -50,3 +54,4 @@
                                                            [(div a b) (div (aritConv a) (aritConv b))]
                                                            [(parenteses a) (aritConv a)]
                                                            [a a]))
+(provide aritConv)
