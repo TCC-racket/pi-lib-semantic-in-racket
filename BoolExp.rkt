@@ -18,7 +18,7 @@
 (struct less (a b)  #:transparent)  ;<
 (struct more (a b)  #:transparent)  ;>
 
-(define (boolExp? exp) (or (more? exp) (less? exp) (be? exp) (le? exp) (eq? exp) (neg? exp) (orOp? exp) (andOp? exp) (parenteses? exp)))
+(define (boolExp? exp) (if (more? exp) #t (if (less? exp) #t (if (be? exp) #t (if (le? exp) #t (if (eq? exp) #t (if (neg? exp) #t (if (orOp? exp) #t (if (andOp? exp) #t (if (parenteses? exp) #t #f))))))))))
 (provide boolExp?)
 
 ;(struct boolExp (U andOp orOp neg eq le be less parenteses) #:transparent)

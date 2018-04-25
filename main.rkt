@@ -4,7 +4,6 @@
 (require "programa.rkt")
 (require "Comando.rkt")
 (require "smc.rkt")
-
 ;(define in (open-input-file "C:\\Users\\Pichau\\Desktop\\8 PERÍODO\\COMPILADORES\\RACKET TEST\\fact.imp"))
 
 ;(define l1(lambda()(read-string 1000 in)))
@@ -21,7 +20,7 @@
 
 (module+ test
   (require peg/peg)
-  (peg comando "x := 5 ;
+  (executeSMC (comandoConv (peg comando "x := 5 ;
     y := 1 ;
 		while ~ (x == 0)
         do {               
@@ -29,7 +28,7 @@
           x := x - 1
 		} ; 
 		print(y)
-	}"))
+	}"))))
 ;  (executeSMC
  ;   (comandoConv (peg comando "x := 5 ;
  ;   y := 1 ;

@@ -1,0 +1,1 @@
+("6.10.1" ("b86a4779cb0c9376de224acd8ba3481c3b777691" . "c841ac06c86ca2c5440cf302a57def866d8d9d3f") #"/home/joao/dante/apresenta-o-de-racket/espacos.rkt" (collects #"peg" #"peg.rkt") (collects #"racket" #"main.rkt") (collects #"racket" #"runtime-config.rkt") (indirect collects #"racket" #"match" #"gen-match.rkt") (indirect collects #"racket" #"match" #"parse.rkt"))

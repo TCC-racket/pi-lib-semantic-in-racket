@@ -86,6 +86,7 @@ condicao corpo))
 	[(prnt a) (print (if (boolExp? a) (boolConv a) (aritConv a) ))]
 	[(choice a b)(choice (comandoConv a) (comandoConv b))]
 	[(exit a)(exit (if (boolExp? a) (boolConv a) (aritConv a) ))]
+	[(atribution a b) (atribConv (atribution a b)) ]
 	))
 
 

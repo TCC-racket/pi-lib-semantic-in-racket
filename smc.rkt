@@ -11,8 +11,8 @@
   (smcEval (smc '() (hash) (list bplc))))
   
 (define (smcEval smcP)
-;  (writeln smcP)
-;  (sleep 1)
+  (writeln smcP)
+  (read)
   (match smcP [(smc (list) a (list)) (smc (list) a (list)) ]
 	      [(smc d e (list (add a b) c ...)) (smcEval (smc d e (append (list a b 'add) c)))]
               [(smc d e (list (sub a b) c ...)) (smcEval (smc d e (append (list a b 'sub) c)))]

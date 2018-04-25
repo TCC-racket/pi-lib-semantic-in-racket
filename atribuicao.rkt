@@ -14,10 +14,12 @@
 (provide peg-rule:constante)
 (provide peg-rule:declaracao)
 
-(struct atribution (value var) #:transparent)
+(struct atribution (var value) #:transparent)
 (struct declaraList (var decList) #:transparent)
 (struct atribSeq (atrib1 atribSeq2) #:transparent)
 (struct idt (var) #:transparent)
+
+(provide atribution)
 
 (define-peg string (and "\"" (* (or space (range #\a #\z) (range #\A #\Z) (range #\0 #\9))) "\""))
 
@@ -25,7 +27,7 @@
 		(or(range #\a #\z) (range #\A #\Z))
 		(* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9)))))
 
-(define-peg atribuicao (and (name t1 variable) spaces (or ":=" "=") spaces (name t2 (or boolExp aritExp string))) (atribution t2 t1))
+(define-peg atribuicao (and (name t1 variable) spaces ":=" spaces (name t2 (or boolExp aritExp string))) (atribution t1 t2))
 
 (define-peg atribAux (and spaces (name t1 atribuicao) (? newLines virg newLines (name t2 atribAux))) (if t2 (atribSeq t1 t2) t1))
 (define-peg inicializacao (and init wordSeparator (name t1 atribuicao) (? newLines virg newLines (name t2 atribAux))) (if t2 (atribSeq t1 t2) t1))
@@ -40,6 +42,8 @@
 
 
 
-(define (atriConv exp)
+(define (atribConv exp)
 (match exp
-	[(atribution value var) (assign (if (boolExp? value) (boolConv value) (aritConv value)) (idt var))]))
+	[(atribution var value) (assign (idt var)  (if (boolExp? value) (boolConv value) (aritConv value)) )]))
+
+(provide atribConv)
