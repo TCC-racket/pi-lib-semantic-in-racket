@@ -68,8 +68,12 @@ Levando em conta um único contra, que é o tempo, que acabou não sendo problem
 
 %---
 \begin{frame}{SMC}
-/Coisas sobre SMC/
 
+O SMC é apenas uma sequência de destruições de estruturas, passos indutivos e
+execuções das respectivas operações.
+
+(assign (idt "x") (add 1 1)) =\textgreater ((add 1 1) 'assign (idt "x")
+=\textgreater 2  ('assign (idt "x")) 
 
 
 \end{frame}
@@ -80,6 +84,9 @@ Com relação a PEG a maior dificuldade encontrada foi definir todas as possibil
 "2 +2" ou "2+ 2" ou "2 + 2")
 
 Para a transformação a maior dificuldade foi a atribuição. Devido o tipo ID que a função assign do BPLC realiza, o responsável por essa transformação teve problemas.
+
+ Para o SMC, houve uma preocupação pelas estruturas do bplc terem nomes que sobrescrevem funções do racket, exigindo uma renomeação na importação.
+
 
 \end{frame}
 
