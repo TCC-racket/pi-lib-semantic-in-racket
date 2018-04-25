@@ -1,7 +1,7 @@
 #lang racket
 
 (require peg/peg)
-(require (rename-in "BoolExp.rkt" [and andB] [or orB] ))
+(require (rename-in "BoolExp.rkt" [and andB] [or orB]))
 (require "AritExp.rkt")
 (require "Reservadas.rkt")
 (require "espacos.rkt")
@@ -37,6 +37,8 @@
 
 (struct assign (exp idt) #:transparent)
 (provide assign idt)
+
+
 
 (define (atriConv exp)
 (match exp

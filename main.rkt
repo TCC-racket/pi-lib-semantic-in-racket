@@ -21,8 +21,7 @@
 
 (module+ test
   (require peg/peg)
-  (executeSMC
-    (comandoConv (peg comando "x := 5 ;
+  (peg comando "x := 5 ;
     y := 1 ;
 		while ~ (x == 0)
         do {               
@@ -30,4 +29,14 @@
           x := x - 1
 		} ; 
 		print(y)
-	}"))))
+	}"))
+;  (executeSMC
+ ;   (comandoConv (peg comando "x := 5 ;
+ ;   y := 1 ;
+;		while ~ (x == 0)
+ ;       do {               
+;		  y := y * x ;
+ ;         x := x - 1
+;		} ; 
+;		print(y)
+;	}"))))

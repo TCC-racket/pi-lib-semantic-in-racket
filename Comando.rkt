@@ -23,7 +23,7 @@
 
 (define-peg separador(and wordSeparator (or virg pointvirg newLines) wordSeparator))
 
-(define-peg seq(and (name t1 cmdUnit) (?(name sep separador) (name t2 seq))) (if t2 (seq t1 t2) t1))
+(define-peg seq(and (name t1 cmdUnit) (?(name sep separador) (name t2 seq))) (cond [t2 (seq t1 t2)] [else t1]))
 
 (define-peg print(and printR"(" spaces (name t1 (or aritExp variable string boolExp)) spaces ")") (prnt t1))
 
@@ -80,7 +80,7 @@ condicao corpo))
 (define (comandoConv exp)
 	(match exp
 	[(ifP condicao corpo) (if (boolConv condicao) (comandoConv corpo) (nop))]
-	[(ifElse condicao then else) (if (boolConv condicao) (comandoConv then) (comandoConv else))]
+	[(if condicao then else) (if (boolConv condicao) (comandoConv then) (comandoConv else))]
 	[(whileDo condicao corpo) (loop (boolConv condicao)(comandoConv corpo))]
 	[(seq a b)(seq (comandoConv a)(comandoConv b))]
 	[(prnt a) (print (if (boolExp? a) (boolConv a) (aritConv a) ))]
