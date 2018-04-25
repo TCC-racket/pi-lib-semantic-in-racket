@@ -5,6 +5,7 @@
 (require "AritExp.rkt")
 (require "Reservadas.rkt")
 (require "espacos.rkt")
+(require "idt.rkt")
 
 (provide peg-rule:string)
 (provide peg-rule:atribuicao)
@@ -17,7 +18,7 @@
 (struct atribution (var value) #:transparent)
 (struct declaraList (var decList) #:transparent)
 (struct atribSeq (atrib1 atribSeq2) #:transparent)
-(struct idt (var) #:transparent)
+
 
 (provide atribution)
 
@@ -37,13 +38,12 @@
 (define-peg constante (and const wordSeparator (name t1 variable) (? newLines virg newLines (name t2 declaraAux))) (if t2 (declaraList t1 t2) t1))
 (define-peg declaracao (or variavel constante))
 
-(struct assign (exp idt) #:transparent)
-(provide assign idt)
-
+(struct assign (idt exp) #:transparent)
+(provide assign)
 
 
 (define (atribConv exp)
 (match exp
-	[(atribution var value) (assign (idt var)  (if (boolExp? value) (boolConv value) (aritConv value)) )]))
+	[(atribution var value) (assign (idt var)  (cond [(boolExp? value) (boolConv value)] [else (aritConv value)] ) )]))
 
 (provide atribConv)

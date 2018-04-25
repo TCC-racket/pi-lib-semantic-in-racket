@@ -83,7 +83,7 @@ condicao corpo))
 	[(if condicao then else) (if (boolConv condicao) (comandoConv then) (comandoConv else))]
 	[(whileDo condicao corpo) (loop (boolConv condicao)(comandoConv corpo))]
 	[(seq a b)(seq (comandoConv a)(comandoConv b))]
-	[(prnt a) (print (if (boolExp? a) (boolConv a) (aritConv a) ))]
+	[(prnt a) (print (cond [(boolExp? a) (boolConv a)] [else (aritConv a)] ))]
 	[(choice a b)(choice (comandoConv a) (comandoConv b))]
 	[(exit a)(exit (if (boolExp? a) (boolConv a) (aritConv a) ))]
 	[(atribution a b) (atribConv (atribution a b)) ]

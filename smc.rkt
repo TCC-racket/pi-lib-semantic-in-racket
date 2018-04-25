@@ -2,6 +2,7 @@
 (struct smc (val amb control) #:transparent)
 ;(require "Stack.rkt")
 ;(require "Contexto.rkt")
+(require "idt.rkt")
 (require "AritExp.rkt")
 (require (rename-in "Comando.rkt" [if ifBPLC] [print printBPLC]))
 (require "BoolExp.rkt")
@@ -11,8 +12,8 @@
   (smcEval (smc '() (hash) (list bplc))))
   
 (define (smcEval smcP)
-  (writeln smcP)
-  (read)
+;  (writeln smcP)
+;  (sleep 1)
   (match smcP [(smc (list) a (list)) (smc (list) a (list)) ]
 	      [(smc d e (list (add a b) c ...)) (smcEval (smc d e (append (list a b 'add) c)))]
               [(smc d e (list (sub a b) c ...)) (smcEval (smc d e (append (list a b 'sub) c)))]
@@ -84,7 +85,7 @@
 								(printBPLC " vezes\n")
 								(assign (idt "x") (add (idt "x") 1)))))))) (smc '() _ '())  )
 
-	(check-match  (executeSMC (seq (assign (idt "x") 100) (seq (assign (idt "acc") 1) (loop (ge (idt "x") 2) (seq (assign (idt "acc") (mult (idt "acc") (idt "x"))) (assign (idt "x") (sub (idt "x") 1))))))) (smc '() (hash-table ("x" 1)) '()))
+	(check-match  (executeSMC (seq (assign (idt "x") 5) (seq (assign (idt "acc") 1) (loop (ge (idt "x") 2) (seq (assign (idt "acc") (mult (idt "acc") (idt "x"))) (assign (idt "x") (sub (idt "x") 1))))))) (smc '() (hash-table ("x" 1)) '()))
 
 
 
