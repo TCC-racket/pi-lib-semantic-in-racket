@@ -73,6 +73,7 @@
 
 (module+ test
 	(require rackunit)
+	;loop execução 6 vezes
 	(check-match (executeSMC 
 			(seq 
 				(assign (idt "x") 0)
@@ -83,9 +84,9 @@
 							(printBPLC (idt "x"))
 							(seq 
 								(printBPLC " vezes\n")
-								(assign (idt "x") (add (idt "x") 1)))))))) (smc '() _ '())  )
-
-	(check-match  (executeSMC (seq (assign (idt "x") 5) (seq (assign (idt "acc") 1) (loop (ge (idt "x") 2) (seq (assign (idt "acc") (mult (idt "acc") (idt "x"))) (assign (idt "x") (sub (idt "x") 1))))))) (smc '() (hash-table ("x" 1)) '()))
+								(assign (idt "x") (add (idt "x") 1)))))))) (smc '() _ '()) )
+	;factorial de 5. se quiser qualquer outro numero, mude o assign do x inicial para o numero que quiser
+	(check-match  (executeSMC (seq (assign (idt "x") 5) (seq (assign (idt "acc") 1) (loop (ge (idt "x") 2) (seq (assign (idt "acc") (mult (idt "acc") (idt "x"))) (assign (idt "x") (sub (idt "x") 1))))))) (smc '() (hash-table ("x" 1) ("acc" 120)) '())  )
 
 
 

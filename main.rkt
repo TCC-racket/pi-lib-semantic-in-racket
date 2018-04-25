@@ -15,12 +15,13 @@
 ;(pgrm) ;peg programa "l1"
 
 
-(define in (open-input-file (vector-ref (current-command-line-arguments) 0)))
-(define smc (executeSMC (comandoConv (peg comando (port->string in)))))
+;(define in (open-input-file (vector-ref (current-command-line-arguments) 0)))
+;(define smc (executeSMC (comandoConv (peg comando (port->string in)))))
 
 
 (module+ test
   (require peg/peg)
+(require rackunit)
 (executeSMC (comandoConv (peg comando "x := 5 ;
     y := 1 ;
 		while ~ (x == 0)
@@ -28,8 +29,8 @@
 		  y := y * x ;
           x := x - 1
 		} ; 
-		print(y)
-	}"))))
+		print(y);
+	}"))) )
 ;  (executeSMC
  ;   (comandoConv (peg comando "x := 5 ;
  ;   y := 1 ;
