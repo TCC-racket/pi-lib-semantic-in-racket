@@ -22,7 +22,7 @@
 
 (provide atribution)
 
-(define-peg string (and "\"" (* (or space (range #\a #\z) (range #\A #\Z) (range #\0 #\9))) "\""))
+(define-peg string (and "\"" (* (or space (range #\a #\z) (range #\A #\Z) (range #\0 #\9) (and "\\" (range #\a #\z)))) "\""))
 
 (define-peg variable (and
 		(or(range #\a #\z) (range #\A #\Z))
