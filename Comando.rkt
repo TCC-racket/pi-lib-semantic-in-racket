@@ -14,6 +14,7 @@
 (provide nop? if? if-cond if-then if-else nop)
 (provide seq choice)
 
+(struct block (declarations commands) #:transparent)
 (struct comando (U seq init atrib print exit) #:transparent)
 (struct seq (comando1 comando2) #:transparent)
 (struct prnt(a) #:transparent)
