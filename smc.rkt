@@ -62,8 +62,8 @@
 	      [(smc env (list (? boolean? a) b ...) c (list 'loop c1 c2 d ...))  (smcEval (smc env b c (append (if a (list c2 (loop c1 c2)) '()) d ))) ]
 	
 	      [(smc env a b (list (assign c d) e ...)) (smcEval (smc env a b (append (list d 'assign c) e)))]
-	      [(smc env (list a b ...) c (list 'assign (idt d) e ...)) (let-values ([(newEnv newMemory) (envAssign env c)]) (smcEval (smc newEnv b newMemory e)))]
-	      [(smc env a b (list (idt c) d ...)) (let ([v (envIdt env b)]) (smcEval (smc env (cons v a) b d)))]
+	      [(smc env (list a b ...) c (list 'assign (idt d) e ...)) (let-values ([(newEnv newMemory) (envAssign env c d a)]) (smcEval (smc newEnv b newMemory e)))]
+	      [(smc env a b (list (idt c) d ...)) (let ([v (envIdt env b c)]) (smcEval (smc env (cons v a) b d)))]
 
 	      [(smc env a b (list (? exit? c) d ...)) (smcEval (smc env a b (append (list (exit-a c) 'exit) d  ))) ]
 	      [(smc env (list a b ...) c (list 'exit d ...) )  (exit a)  ]
