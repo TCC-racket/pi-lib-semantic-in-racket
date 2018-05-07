@@ -7,9 +7,10 @@
 (require (rename-in "Comando.rkt" [if ifBPLC] [print printBPLC]))
 (require "BoolExp.rkt")
 (require "atribuicao.rkt")
+(require "ambiente.rkt")
 (provide executeSMC smc)
 (define (executeSMC bplc)
-  (smcEval (smc (hash) '() (hash) (list bplc))))
+  (smcEval (smc newEnv '() (hash) (list bplc))))
   
 (define (smcEval smcP)
 ;  (writeln smcP)
@@ -61,15 +62,15 @@
 	      [(smc env (list (? boolean? a) b ...) c (list 'loop c1 c2 d ...))  (smcEval (smc env b c (append (if a (list c2 (loop c1 c2)) '()) d ))) ]
 	
 	      [(smc env a b (list (assign c d) e ...)) (smcEval (smc env a b (append (list d 'assign c) e)))]
-	      [(smc env (list a b ...) c (list 'assign (idt d) e ...)) (smcEval (smc env b (hash-set c d a) e))]
-	      [(smc env a b (list (idt c) d ...)) (smcEval (smc env (cons (hash-ref b c) a) b d))]
+	      [(smc env (list a b ...) c (list 'assign (idt d) e ...)) (let-values ([(newEnv newMemory) (envAssign env c)]) (smcEval (smc newEnv b newMemory e)))]
+	      [(smc env a b (list (idt c) d ...)) (let ([v (envIdt env b)]) (smcEval (smc env (cons v a) b d)))]
 
 	      [(smc env a b (list (? exit? c) d ...)) (smcEval (smc env a b (append (list (exit-a c) 'exit) d  ))) ]
 	      [(smc env (list a b ...) c (list 'exit d ...) )  (exit a)  ]
+	      [(smc env a b (list (blk c d) e ...)) (smcEval (smc env (cons env a) b (append (list c d 'blk) e)  )) ]
+	      [(smc env (list (? env? a) b ...) c (list 'blk d ...)) (smcEval (smc a b (envClean a c) d))]
 
-
-
-              [a a]))
+              [a (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a))]))
 
 (module+ test
 	(require rackunit)
