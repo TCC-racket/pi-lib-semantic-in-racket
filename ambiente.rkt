@@ -19,7 +19,8 @@
 
 
 (define (envAssign envi memory id value)
-	)
+	(hash-set memory (hash-ref envi id) value))
+	
 
 
 
