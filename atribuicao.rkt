@@ -14,11 +14,15 @@
 (provide peg-rule:variavel)
 (provide peg-rule:constante)
 (provide peg-rule:declaracao)
+(provide decSeq)
 
 (struct atribution (var value) #:transparent)
 (struct declaraList (var decList) #:transparent)
 (struct atribSeq (atrib1 atribSeq2) #:transparent)
-
+(struct decSeq (dec1 decSeq2) #:transparent)
+(struct constante (name) #:transparent)
+(struct variavel (name) #:transparent)
+(struct init (name val) #:transparent)
 
 (provide atribution)
 
@@ -30,13 +34,17 @@
 
 (define-peg atribuicao (and (name t1 variable) spaces ":=" spaces (name t2 (or boolExp aritExp string))) (atribution t1 t2))
 
-(define-peg atribAux (and spaces (name t1 atribuicao) (? newLines virg newLines (name t2 atribAux))) (if t2 (atribSeq t1 t2) t1))
-(define-peg inicializacao (and init wordSeparator (name t1 atribuicao) (? newLines virg newLines (name t2 atribAux))) (if t2 (atribSeq t1 t2) t1))
+(define-peg inicializacao (and init wordSeparator (name t1 variable) wordSeparator "=" wordSeparator (name t2 (or boolExp aritExp))
+                               (? wordSeparator virg wordSeparator (name t3 declaraINI))) (cond [t3 (decSeq t1 t2) t3] [else (init t1 t2)]))
 
-(define-peg declaraAux (and spaces (name t1 variable) (? newLines virg newLines (name t2 declaraAux))) (if t2 (declaraList t1 t2) t1))
-(define-peg variavel (and var wordSeparator (name t1 variable) (? newLines virg newLines (name t2 declaraAux))) (if t2 (declaraList t1 t2) t1))
-(define-peg constante (and const wordSeparator (name t1 variable) (? newLines virg newLines (name t2 declaraAux))) (if t2 (declaraList t1 t2) t1))
-(define-peg declaracao (or variavel constante))
+(define-peg declaraINI (and wordSeparator (name t1 variable) wordSeparator "=" wordSeparator (name t2 (or boolExp aritExp))
+                            (? wordSeparator virg wordSeparator (name t3 declaraINI))) (cond [t3 (decSeq (init t1 t2) t3)] [else (init t1 t2)]))
+(define-peg declaraVAR (and wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraVAR))) (cond [t2 (decSeq (variavel t1) t2)] [else (variavel t1)]))
+(define-peg declaraCONST (and wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraCONST))) (cond [t2 (decSeq (constante t1) t2)] [else (constante t1)]))
+(define-peg variavel (and wordSeparator var wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraVAR))) (cond [t2 (decSeq (variavel t1) t2)] [else (variavel t1)]))
+(define-peg constante (and wordSeparator const wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraCONST))) (cond [t2 (decSeq (constante t1) t2)] [else (constante t1)]))
+
+(define-peg declaracao(and (name t1 (or variavel constante inicializacao)) (? wordSeparator (name t2 declaracao))) (cond [t2 (decSeq t1 t2)] [else t1]))
 
 (struct assign (idt exp) #:transparent)
 (provide assign)

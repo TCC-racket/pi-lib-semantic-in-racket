@@ -19,23 +19,27 @@
 (struct seq (comando1 comando2) #:transparent)
 (struct prnt(a) #:transparent)
 (struct choice (comando1 comando2) #:transparent)
-(struct exit(a))
+(struct exit(a) #:transparent)
 (struct nop () #:transparent)
+(struct blk (decSeq seq) #:transparent)
 
 (define-peg separador(and wordSeparator (or virg pointvirg newLines) wordSeparator))
 
 (define-peg seq(and (name t1 cmdUnit) (?(name sep separador) (name t2 seq))) (cond [t2 (seq t1 t2)] [else t1]))
 
-(define-peg print(and printR"(" spaces (name t1 (or aritExp variable string boolExp)) spaces ")") (prnt t1))
+(define-peg print(and wordSeparator printR"(" spaces (name t1 (or aritExp variable string boolExp)) spaces ")") (prnt t1))
 
-(define-peg exit(and exitR"(" spaces (name t1 (or aritExp boolExp)) spaces ")") (exit t1))
+(define-peg exit(and wordSeparator exitR"(" spaces (name t1 (or aritExp boolExp)) spaces ")") (exit t1))
 
-(define-peg cmdUnit (or inicializacao declaracao atribuicao condicional loop print exit))
+(define-peg cmdUnit (or atribuicao condicional loop print exit))
 
 (define-peg comando (or seq choiceOp cmdUnit))
 
 (define-peg choiceOp (and (name t1 cmdUnit) (? (and bar (name t2 choiceOp)))) (choice t1 t2))
 
+(define-peg statement (or declaracao comando))
+
+(define-peg bloco (and wordSeparator (name t1 declaracao) wordSeparator (name t2 comando)) (blk decSeq seq))
 
 ;condicionais
 
@@ -46,11 +50,11 @@
 (struct condicional (U ifP ifElse) #:transparent)
 
 (define-peg ifElse (and
-                  "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpoIf comando) wordSeparator "}" wordSeparator
-                   "else" spaces "{" wordSeparator (name corpoElse comando) wordSeparator "}" ) (ifElse condicao corpoIf corpoElse))
+                  "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpoIf (or bloco comando)) wordSeparator "}" wordSeparator
+                   "else" spaces "{" wordSeparator (name corpoElse (or bloco comando)) wordSeparator "}" ) (ifElse condicao corpoIf corpoElse))
 
 (define-peg if (and
-                  "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpo comando) wordSeparator "}") (ifP condicao corpo))
+                  "if" spaces (name condicao boolExp) spaces "{" wordSeparator (name corpo (or bloco comando)) wordSeparator "}") (ifP condicao corpo))
 
 (define-peg condicional (or ifElse if))
 
@@ -69,7 +73,7 @@
 (struct whileDo (condicao corpo)  #:transparent)
 
 (define-peg loop (and
-"while" spaces (name condicao boolExp) wordSeparator "do" spaces "{" wordSeparator (name corpo comando) wordSeparator "}") (whileDo 
+"while" spaces (name condicao boolExp) wordSeparator "do" spaces "{" wordSeparator (name corpo (or bloco comando)) wordSeparator "}") (whileDo 
 condicao corpo))
 
 (struct loop (cond corpo) #:transparent)
