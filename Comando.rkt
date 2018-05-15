@@ -39,7 +39,7 @@
 
 (define-peg statement (or declaracao comando))
 
-(define-peg bloco (and wordSeparator (name t1 declaracao) wordSeparator (name t2 comando)) (blk decSeq seq))
+(define-peg bloco (and wordSeparator (name t1 declaracao) wordSeparator (name t2 comando)) (blk t1 t2))
 
 ;condicionais
 
