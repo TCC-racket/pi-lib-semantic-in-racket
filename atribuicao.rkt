@@ -34,23 +34,33 @@
 
 (define-peg atribuicao (and (name t1 variable) spaces ":=" spaces (name t2 (or boolExp aritExp string))) (atribution t1 t2))
 
-(define-peg inicializacao (and init wordSeparator (name t1 variable) wordSeparator "=" wordSeparator (name t2 (or boolExp aritExp))
-                               (? wordSeparator virg wordSeparator (name t3 declaraINI))) (cond [t3 (decSeq t1 t2) t3] [else (init t1 t2)]))
+;auxiliares vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 (define-peg declaraINI (and wordSeparator (name t1 variable) wordSeparator "=" wordSeparator (name t2 (or boolExp aritExp))
                             (? wordSeparator virg wordSeparator (name t3 declaraINI))) (cond [t3 (decSeq (init t1 t2) t3)] [else (init t1 t2)]))
+
 (define-peg declaraVAR (and wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraVAR))) (cond [t2 (decSeq (variavel t1) t2)] [else (variavel t1)]))
+
 (define-peg declaraCONST (and wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraCONST))) (cond [t2 (decSeq (constante t1) t2)] [else (constante t1)]))
+
+;auxiliares ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 (define-peg variavel (and wordSeparator var wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraVAR))) (cond [t2 (decSeq (variavel t1) t2)] [else (variavel t1)]))
+
 (define-peg constante (and wordSeparator const wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraCONST))) (cond [t2 (decSeq (constante t1) t2)] [else (constante t1)]))
+
+(define-peg inicializacao (and init wordSeparator (name t1 variable) wordSeparator "=" wordSeparator (name t2 (or boolExp aritExp))
+                               (? wordSeparator virg wordSeparator (name t3 declaraINI))) (cond [t3 (decSeq t1 t2) t3] [else (init t1 t2)]))
 
 (define-peg declaracao(and (name t1 (or variavel constante inicializacao)) (? wordSeparator (name t2 declaracao))) (cond [t2 (decSeq t1 t2)] [else t1]))
 
 (struct assign (idt exp) #:transparent)
+
 (provide assign)
 
 
 (define (atribConv exp)
+
 (match exp
 	[(atribution var value) (assign (idt var)  (cond [(boolExp? value) (boolConv value)] [else (aritConv value)] ) )]))
 
