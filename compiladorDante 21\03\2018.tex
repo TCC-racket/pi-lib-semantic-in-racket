@@ -402,4 +402,22 @@ construir a estrutura.
 
 \end{frame}
 
+
+
+\begin{frame}{Bloco}
+
+Quando o SMC encontra um bloco, ele salva o ambiente atual na pilha de valores, destroi o bloco e coloca no final do comando do bloco 'blk, para saber quando deve sair do bloco, ou seja, restaurar o contexto anteriormente salvo.
+
+(blk a b) $\longrightarrow$ (a b 'blk)
+\end{frame}
+
+
+\begin{frame}{Ambiente}
+
+O ambiente é um hash cujas chaves são strings e os valores são (U Number Boolean Loc), onde Loc é uma estrutura
+que contém apenas um número como membro, para diferenciar variaveis de constantes.
+
+\end{frame}
+
+
 \end{document}
