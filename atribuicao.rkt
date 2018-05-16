@@ -45,12 +45,12 @@
 
 ;auxiliares ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-(define-peg variavel (and wordSeparator var wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraVAR))) (cond [t2 (cons (variavel t1) t2)] [else (variavel t1)]))
+(define-peg variavel (? (and wordSeparator var wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraVAR)))) (cond [t2 (cons (variavel t1) t2)] [else (variavel t1)]))
 
-(define-peg constante (and wordSeparator const wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraCONST))) (cond [t2 (cons (constante t1) t2)] [else (constante t1)]))
+(define-peg constante (? (and wordSeparator const wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraCONST)))) (cond [t2 (cons (constante t1) t2)] [else (constante t1)]))
 
-(define-peg inicializacao (and init wordSeparator (name t1 variable) wordSeparator "=" wordSeparator (name t2 (or boolExp aritExp))
-                               (? wordSeparator virg wordSeparator (name t3 declaraINI))) (cond [t3 (cons (init t1 t2) t3)] [else (init t1 t2)]))
+(define-peg inicializacao (? (and wordSeparator init wordSeparator (name t1 variable) wordSeparator "=" wordSeparator (name t2 (or boolExp aritExp))
+                               (? wordSeparator virg wordSeparator (name t3 declaraINI)))) (cond [t3 (cons (init t1 t2) t3)] [else (init t1 t2)]))
 
 (define-peg declaracao (name t1 (and variavel constante inicializacao))  (decSeq t1))
 
