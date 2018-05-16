@@ -19,7 +19,7 @@
 (struct atribution (var value) #:transparent)
 (struct declaraList (var decList) #:transparent)
 (struct atribSeq (atrib1 atribSeq2) #:transparent)
-(struct decSeq (dec1 decSeq2) #:transparent)
+(struct decSeq (lista) #:transparent)
 (struct constante (name) #:transparent)
 (struct variavel (name) #:transparent)
 (struct init (name val) #:transparent)
@@ -50,9 +50,9 @@
 (define-peg constante (and wordSeparator const wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraCONST))) (cond [t2 (decSeq (constante t1) t2)] [else (constante t1)]))
 
 (define-peg inicializacao (and init wordSeparator (name t1 variable) wordSeparator "=" wordSeparator (name t2 (or boolExp aritExp))
-                               (? wordSeparator virg wordSeparator (name t3 declaraINI))) (cond [t3 (decSeq t1 t2) t3] [else (init t1 t2)]))
+                               (? wordSeparator virg wordSeparator (name t3 declaraINI))) (cond [t3 (init t1 t2 t3)] [else (init t1 t2)]))
 
-(define-peg declaracao(and (name t1 (or variavel constante inicializacao)) (? wordSeparator (name t2 declaracao))) (cond [t2 (decSeq t1 t2)] [else t1]))
+(define-peg declaracao (name t1 (and variavel constante inicializacao))  (decSeq t1))
 
 (struct assign (idt exp) #:transparent)
 
