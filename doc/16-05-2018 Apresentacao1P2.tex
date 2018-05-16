@@ -1,0 +1,64 @@
+\documentclass{beamer}
+
+\usetheme[
+  outer/progressbar=frametitle
+]{metropolis}
+
+\usepackage[portuguese]{babel}
+\usepackage[utf8]{inputenc}
+
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue,citecolor=blue}
+
+\title[Compiladores 2018.1]{1$^{a.}$ Apresentação do compilador Dante P2}
+\author[Abrev.]{Autores: João Pedro Abreu, Luis Freitas e Raphael Leardini} 
+
+\institute[UFF]{Universidade Federal Fluminense}
+
+\date{Data: 16/05/2018} 
+
+\begin{document}
+
+% ---
+
+\begin{frame}[plain]
+
+\titlepage
+
+\end{frame}
+
+% ---
+
+\begin{frame}{Parser}
+\begin{verbatim}
+
+(define-peg statement (or declaracao comando))
+
+
+(define-peg bloco (and wordSeparator (name t1 declaracao) wordSeparator (name t2 comando)) (blk t1 t2))
+
+
+(define-peg loop (and
+"while" spaces (name condicao boolExp) wordSeparator "do" spaces "{" wordSeparator (name corpo (or bloco comando)) wordSeparator "}") (whileDo 
+condicao corpo))
+
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}{Bloco}
+
+Quando o SMC encontra um bloco, ele salva o ambiente atual na pilha de valores, destroi o bloco e coloca no final do comando do bloco 'blk, para saber quando deve sair do bloco, ou seja, restaurar o contexto anteriormente salvo.
+
+(blk a b) $\longrightarrow$ (a b 'blk)
+\end{frame}
+
+
+\begin{frame}{Ambiente}
+
+O ambiente é um hash cujas chaves são strings e os valores são (U Number Boolean Loc), onde Loc é uma estrutura
+que contém apenas um número como membro, para diferenciar variaveis de constantes.
+
+\end{frame}
+
+
+\end{document}
