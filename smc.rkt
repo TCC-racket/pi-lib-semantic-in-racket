@@ -69,8 +69,14 @@
 	      [(smc env (list a b ...) c (list 'exit d ...) )  (exit a)  ]
 	      [(smc env a b (list (blk c d) e ...)) (smcEval (smc env (cons env a) b (append (list c d 'blk) e)  )) ]
 	      [(smc env (list (? env? a) b ...) c (list 'blk d ...)) (smcEval (smc a b (envClean a c) d))]
+	      
+	      [(smc env v m (list (ref a b) r ...)) (smcEval (smc env v m (append (list b 'ref a) r)))]
+	      [(smc env v m (list (cns a b) r ...)) (smcEval (smc env v m (append (list b 'cns a) r)))]
+	      [(smc env (list a v ...) m (list 'ref (idt i) r ...)) (let-values ([(newMem newEnv) (envRef env m i)]) (smcEval (smc newEnv v newMem r))]
+	      [(smc env (list a v ...) m (list 'cns (idt i) r ...)) (let ([newEnv (envCns env i)]) (smcEval (smc newEnv v m r))]
 
-              [a (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a))]))
+
+	      [a (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a))]))
 
 (module+ test
 	(require rackunit)
