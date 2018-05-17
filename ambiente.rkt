@@ -1,24 +1,19 @@
 #lang racket
 
-(provide env env? envClean envIdt envAssign newEnv)
+(provide clean idt assign )
 
-(struct loc (a) #:transparent)
+(struct loc (adress) #:transparent)
 
+(define (clean envi mem)
+	(for/hash ([i (filter loc? (hash-values envi))]) (values i (hash-ref mem i))    ))
 
-(struct env (realEnv positionFree) #:transparent)
-
-(define newEnv (env (hash) 0))
-
-(define (envClean envi mem)
-	mem)
-
-(define (envIdt envi mem id)
+(define (idt envi mem id)
 	(if (not (hash-has-key? envi id)) (raise "variavel não declarada\n")
 		(if (not (loc? (hash-ref envi id))) (hash-ref envi id)
 			(hash-ref mem (hash-ref envi id)))))
 
 
-(define (envAssign envi memory id value)
+(define (assign envi memory id value)
 	(hash-set memory (hash-ref envi id) value))
 	
 
