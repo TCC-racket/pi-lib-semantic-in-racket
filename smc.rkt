@@ -10,7 +10,7 @@
 (require "ambiente.rkt")
 (provide executeSMC smc)
 (define (executeSMC bplc)
-  (smcEval (smc newEnv '() (hash) (list bplc))))
+  (smcEval (smc (hash) '() (hash) (list bplc))))
   
 (define (smcEval smcP)
 ;  (writeln smcP)
@@ -62,18 +62,18 @@
 	      [(smc env (list (? boolean? a) b ...) c (list 'loop c1 c2 d ...))  (smcEval (smc env b c (append (if a (list c2 (loop c1 c2)) '()) d ))) ]
 	
 	      [(smc env a b (list (assign c d) e ...)) (smcEval (smc env a b (append (list d 'assign c) e)))]
-	      [(smc env (list a b ...) c (list 'assign (idt d) e ...)) (let ([newMemory (envAssign env c d a)]) (smcEval (smc env b newMemory e)))]
-	      [(smc env a b (list (idt c) d ...)) (let ([v (envIdt env b c)]) (smcEval (smc env (cons v a) b d)))]
+	      [(smc env (list a b ...) c (list 'assign (idt d) e ...)) (let ([newMemory (atrib env c d a)]) (smcEval (smc env b newMemory e)))]
+	      [(smc env a b (list (idt c) d ...)) (let ([v (identifier env b c)]) (smcEval (smc env (cons v a) b d)))]
 
 	      [(smc env a b (list (? exit? c) d ...)) (smcEval (smc env a b (append (list (exit-a c) 'exit) d  ))) ]
 	      [(smc env (list a b ...) c (list 'exit d ...) )  (exit a)  ]
 	      [(smc env a b (list (blk c d) e ...)) (smcEval (smc env (cons env a) b (append (list c d 'blk) e)  )) ]
-	      [(smc env (list (? env? a) b ...) c (list 'blk d ...)) (smcEval (smc a b (envClean a c) d))]
-	      
+	      [(smc env (list (? env? a) b ...) c (list 'blk d ...)) (smcEval (smc a b (clean a c) d))]
+	      [(smc env a m (list (dec a b) c ...)) (smcEval (smc env a m (append (list a b) c)))]
 	      [(smc env v m (list (ref a b) r ...)) (smcEval (smc env v m (append (list b 'ref a) r)))]
 	      [(smc env v m (list (cns a b) r ...)) (smcEval (smc env v m (append (list b 'cns a) r)))]
-	      [(smc env (list a v ...) m (list 'ref (idt i) r ...)) (let-values ([(newMem newEnv) (envRef env m i)]) (smcEval (smc newEnv v newMem r))]
-	      [(smc env (list a v ...) m (list 'cns (idt i) r ...)) (let ([newEnv (envCns env i)]) (smcEval (smc newEnv v m r))]
+	      [(smc env (list a v ...) m (list 'ref (idt i) r ...)) (let-values ([(newMem newEnv) (reference env m i)]) (smcEval (smc newEnv v newMem r)))]
+	      [(smc env (list a v ...) m (list 'cns (idt i) r ...)) (let ([newEnv (constant env i)]) (smcEval (smc newEnv v m r)))]
 
 
 	      [a (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a))]))
