@@ -16,6 +16,13 @@
 (define (atrib envi memory id value)
 	(hash-set memory (hash-ref envi id) value))
 	
+(define (reference env memory ident value)
+	(let ([newLoc (add1 (hash-count memory))]) 
+		(values (hash-set memory (loc newLoc) value) (hash-set env ident (loc newLoc)))))
 
+
+
+(define (constant env i value)
+	(hash-set env i value))
 
 

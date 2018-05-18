@@ -72,8 +72,8 @@
 	      [(smc env a m (list (dec a b) c ...)) (smcEval (smc env a m (append (list a b) c)))]
 	      [(smc env v m (list (ref a b) r ...)) (smcEval (smc env v m (append (list b 'ref a) r)))]
 	      [(smc env v m (list (cns a b) r ...)) (smcEval (smc env v m (append (list b 'cns a) r)))]
-	      [(smc env (list a v ...) m (list 'ref (idt i) r ...)) (let-values ([(newMem newEnv) (reference env m i)]) (smcEval (smc newEnv v newMem r)))]
-	      [(smc env (list a v ...) m (list 'cns (idt i) r ...)) (let ([newEnv (constant env i)]) (smcEval (smc newEnv v m r)))]
+	      [(smc env (list a v ...) m (list 'ref (idt i) r ...)) (let-values ([(newMem newEnv) (reference env m i a)]) (smcEval (smc newEnv v newMem r)))]
+	      [(smc env (list a v ...) m (list 'cns (idt i) r ...)) (let ([newEnv (constant env i a )]) (smcEval (smc newEnv v m r)))]
 
 
 	      [a (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a))]))
