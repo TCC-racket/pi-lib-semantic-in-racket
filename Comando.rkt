@@ -92,7 +92,7 @@ condicao corpo))
 	[(choice a b)(choice (comandoConv a) (comandoConv b))]
 	[(exit a)(exit (if (boolExp? a) (boolConv a) (aritConv a) ))]
 	[(atribution a b) (atribConv (atribution a b)) ]
-	[(blk a b) (blk (atribConv(a) (comandoConv b))]
+	[(block a b) (blk (atribConv(a) (comandoConv b))]
 	))
 
 
