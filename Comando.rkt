@@ -81,6 +81,8 @@ condicao corpo))
 
 (provide exit? exit-a)
 (provide comandoConv)
+(provide blk)
+
 
 (define (comandoConv exp)
 	(match exp

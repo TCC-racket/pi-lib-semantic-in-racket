@@ -6,6 +6,8 @@
 (require "Reservadas.rkt")
 (require "espacos.rkt")
 (require "idt.rkt")
+(require "Exp.rkt")
+
 
 (provide peg-rule:string)
 (provide peg-rule:atribuicao)
@@ -74,6 +76,22 @@
 (struct assign (idt exp) #:transparent)
 
 (provide assign)
+
+
+(struct ref (a b) #:transparent)
+(struct cns (a b) #:transparent)
+(struct dec (a b) #:transparent)
+
+(provide dec ref cns)
+(define (variavelTrans a)
+	(match a
+		[(iniSeq a b) (dec (variavelTrans a) (variavelTrans b))]
+		[(init a b) (ref (idt a) (expConv b))]))
+
+(define (constanteTrans a)
+	(match a
+		[(iniSeq a b) (dec (constanteTrans a) (constanteTrans b))]
+		[(init a b) (cns (idt a) (expConv b))]))
 
 
 (define (atribConv exp)

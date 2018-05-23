@@ -1,6 +1,6 @@
 #lang racket
 
-(provide clean identifier atrib )
+(provide clean identifier atrib reference constant)
 
 (struct loc (adress) #:transparent)
 
