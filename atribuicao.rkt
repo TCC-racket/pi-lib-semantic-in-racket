@@ -79,6 +79,9 @@
 (define (atribConv exp)
 
 (match exp
-	[(atribution var value) (assign (idt var)  (cond [(boolExp? value) (boolConv value)] [else (aritConv value)] ) )]))
+	[(atribution var value) (assign (idt var)  (cond [(boolExp? value) (boolConv value)] [else (aritConv value)] ) )]
+	[(decSeq a b) (dec (atribConv a) (atribConv b))]
+	[(variavelBlk a) (variavelTrans a)]
+	[(constanteBlk a) (constanteTrans a)]))
 
 (provide atribConv)
