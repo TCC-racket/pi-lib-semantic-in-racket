@@ -94,7 +94,7 @@
 	      [(smc env a m (list (dec a b) c ...) locali) (smcEval (smc env a m (append (list a b) c) locali))]
 	      [(smc env v m (list (ref a b) r ...) locali) (smcEval (smc env v m (append (list b 'ref a) r) locali))]
 	      [(smc env v m (list (cns a b) r ...) locali) (smcEval (smc env v m (append (list b 'cns a) r) locali))]
-	      [(smc env (list a v ...) m (list 'ref (idt i) r ...) locali) (let-values ([(newMem newEnv) (reference env m i a)]) (smcEval (smc newEnv v newMem r (cons (hash-ref newEnv i) r)))]
+	      [(smc env (list a v ...) m (list 'ref (idt i) r ...) locali) (let-values ([(newMem newEnv) (reference env m i a)]) (smcEval (smc newEnv v newMem r (cons (hash-ref newEnv i) locali))))]
 	      [(smc env (list a v ...) m (list 'cns (idt i) r ...) locali) (let ([newEnv (constant env i a )]) (smcEval (smc newEnv v m r locali)))]
 
 
