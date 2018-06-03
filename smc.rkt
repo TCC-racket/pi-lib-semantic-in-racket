@@ -14,7 +14,7 @@
   (smcEval (smc (hash) '() (hash) (list bplc) '())))
   
 (define (smcEval smcP)
-  (writeln smcP)
+;(writeln smcP)
 ;  (sleep 1)
   (match smcP [(smc env (list) a (list) locali) (smc env (list) a (list) locali) ]
 	      [(smc env d e (list (add a b) c ...) locali) (smcEval (smc env d e (append (list a b 'add) c) locali))]
