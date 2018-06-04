@@ -5,7 +5,7 @@
 (struct loc (adress) #:transparent)
 
 (define (clean locali mem)
-	(foldl (compose hash-remove (lambda (x y) (values y x))) mem locali )	
+	(foldl (compose hash-remove (lambda (x y) (values y x))) mem locali ))	
 
 (define (identifier envi mem id)
 	(if (not (hash-has-key? envi id)) (raise "variavel não declarada\n")
