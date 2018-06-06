@@ -1,8 +1,7 @@
 #lang racket
 ; smc (hash? list? hash? list? (listof loc))
 (struct smc (env val mem control loc) #:transparent)
-;(require "Stack.rkt")
-;(require "Contexto.rkt")
+
 (require "idt.rkt")
 (require "AritExp.rkt")
 (require (rename-in "Comando.rkt" [if ifBPLC] [print printBPLC]))
@@ -49,38 +48,37 @@
 	      [(smc env (list (? number? a) (? number? b) c ...) d (list 'le e ...) locali)  (smcEval (smc env (cons (<= b a) c) d e) locali) ]
 	      [(smc env (list (? boolean? a) c ...) d (list 'neg e ...) locali)  (smcEval (smc env (cons (not a) c) d e) locali) ]
 
-
-;		possivel adição ao IMP = strings
-;	      [(smc env a b (list (? string? c) d ...)) (smcEval (smc env (cons c a) b d))    ]
 	      [(smc env a d (list (? nop? b) c ...) locali) (smcEval (smc env a d c locali)) ]
+	      
 	      [(smc env a d (list (? if? b) c ...) locali) (smcEval (smc env a d (append (list (if-cond b) 'if (if-then b) (if-else b)) c) locali)) ]
-;		Isso não é C, if testa apenas booleanos
-;	      [(smc env (list (? number? a) b ...) c (list 'if c1 c2 d ...))  (smcEval (smc env b c (append (list (if (not (equal? a 0)) c1 c2)) d))) ]
 	      [(smc env (list (? boolean? a) b ...) c (list 'if c1 c2 d ...) locali)  (smcEval (smc env b c (append (list (if a c1 c2)) d) locali)) ]
 
 ;		Talvez criar mais um item semantico contendo os efeitos colaterais fosse legal, tornaria o smcEval 100% funcional, sem efeito colateral
 	      [(smc env a b (list (? print? c) d ...) locali) (smcEval (smc env a b (append (list (print-a c) 'print) d) locali) )]
 	      [(smc env (list a b ...) c (list 'print d ...) locali) (begin (display a) (smcEval (smc env b c d locali) ))  ]
+	      
 	      [(smc env a b (list (seq c d) e ...) locali) (smcEval (smc env a b (append (list c d) e) locali)) ]
 
 
 ;		Poderia mudar isso para uso do operador 'amb', de escolha não-deterministica
 ;		Mas para isso precisaria da chamada de fail em algum lugar, ou seja, precisaria
-;		de alguma condição sendo testada. Se for uma modal(talvez PDL??) pode dar certo
-;		Obviamente precisaria ser decidivel, mas não sei como fazer com os loops infinitos
+;		de alguma condição sendo testada. Se for uma modal(LTL(linear temporal logic)) pode dar certo
+;		Obviamente precisaria ser decidivel(não é, então assim, o que eu faço?), mas não sei como fazer com os loops infinitos
 ;		decidiveis
 	      [(smc env a b (list (choice c d) e ...) locali)  (smcEval (smc env a b (append (list (if (equal? 0 (random 2)) c d )) e ) locali))]
+
 	      [(smc env a d (list (loop b e) c ...) locali) (smcEval (smc env a d (append (list b 'loop b e) c) locali)) ]
 
-;		Isso não é C, loop testa só booleanos
-;	      [(smc env (list (? number? a) b ...) c (list 'loop c1 c2 d ...))  (smcEval (smc env b c (append (if (not (equal? a 0)) (list c2 (loop c1 c2)) '()) d ))) ]
 	      [(smc env (list (? boolean? a) b ...) c (list 'loop c1 c2 d ...) locali)  (smcEval (smc env b c (append (if a (list c2 (loop c1 c2)) '()) d ) locali)) ]
-	
+;;TODO : verify types in atrib	
 	      [(smc env a b (list (assign c d) e ...) locali) (smcEval (smc env a b (append (list d 'assign c) e) locali))]
 	      [(smc env (list a b ...) c (list 'assign (idt d) e ...) locali) (let ([newMemory (atrib env c d a)]) (smcEval (smc env b newMemory e locali)))]
+	      
+	      ;;TODO : verify types in identifier
 	      [(smc env a b (list (idt c) d ...) locali) (let ([v (identifier env b c)]) (smcEval (smc env (cons v a) b d locali)))]
 
 	      [(smc env a b (list (? exit? c) d ...) locali) (smcEval (smc env a b (append (list (exit-a c) 'exit) d  ) locali)) ]
+	      ;TODO : consertar esse exit
 	      [(smc env (list a b ...) c (list 'exit d ...) locali)  (exit a)  ]
 
 
