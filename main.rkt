@@ -137,5 +137,5 @@
 
 		(check-equal?
 			saidaSMC
-			())) ;;João, o que o smc deveria devolver??
+			()))) ;;João, o que o smc deveria devolver??
 
