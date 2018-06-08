@@ -24,27 +24,27 @@
 	(require rackunit)
 
 
-	(test-suite "if com chaves, com declarações, sem comandos"
+	(let* ([saidaParser (peg comando "
+		if (true)
+		{
+			var x := 0, y:= 8, z := 12;
+		}")]
+		[saidaBPLC (comandoConv saidaParser)]
+		[saidaSMC (executeSMC saidaBPLC)])
 
-		(define saidaParser (peg comando "
-			if (true)
-			{
-				var x := 0, y:= 8, z := 12;
-			}"))
-		
 		(check-equal? 
-			saidaParser
-			()) ;;Raphael, o que o parser deveria retornar aqui??
-		(define saidaBPLC (comandoConv saidaParser))
-		
+		saidaParser
+		()) ;;Raphael, o que o parser deveria retornar aqui??
+	
 		(check-equal?
-			saidaBPLC
-			()) ;;Luis, o que a tradução pro bplc deveria ser??
-		(define saidaSMC (executeSMC saidaBPLC))
+		saidaBPLC
+		()) ;;Luis, o que a tradução pro bplc deveria ser??
+		(check-equal?
+		saidaSMC
+		())) ;;João, o que o smc deveria devolver??
 
-		(check-equal?
-			saidaSMC
-			())) ;;João, o que o smc deveria devolver??
+
+
 	(test-suite "if com chaves, sem declarações, com comandos"
 
 		(define saidaParser (peg comando "
