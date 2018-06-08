@@ -74,11 +74,9 @@
 	      [(smc env a b (list (assign c d) e ...) locali) (smcEval (smc env a b (append (list d 'assign c) e) locali))]
 	      [(smc env (list a b ...) c (list 'assign (idt d) e ...) locali) (let ([newMemory (atrib env c d a)]) (smcEval (smc env b newMemory e locali)))]
 	      
-	      ;;TODO : verify types in identifier
 	      [(smc env a b (list (idt c) d ...) locali) (let ([v (identifier env b c)]) (smcEval (smc env (cons v a) b d locali)))]
 
 	      [(smc env a b (list (? exit? c) d ...) locali) (smcEval (smc env a b (append (list (exit-a c) 'exit) d  ) locali)) ]
-	      ;TODO : consertar esse exit
 	      [(smc env (list a b ...) c (list 'exit d ...) locali)  (exit a)  ]
 
 
@@ -88,7 +86,7 @@
 	      [(smc env a b (list (blk c d) e ...) locali) (smcEval (smc env (append (list env locali) a) b (append (list c d 'blk) e)  '())) ]
 
 
-	      [(smc env (list a e b ...) c (list 'blk d ...) locali) (smcEval (smc a b (clean locali c) d e))]
+	      [(smc env (list (? hash? a) (? listLoc? e) b ...) c (list 'blk d ...) locali) (smcEval (smc a b (clean locali c) d e))]
 	      [(smc env a m (list (dec a b) c ...) locali) (smcEval (smc env a m (append (list a b) c) locali))]
 	      [(smc env v m (list (ref a b) r ...) locali) (smcEval (smc env v m (append (list b 'ref a) r) locali))]
 	      [(smc env v m (list (cns a b) r ...) locali) (smcEval (smc env v m (append (list b 'cns a) r) locali))]
