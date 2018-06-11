@@ -11,7 +11,7 @@
 (provide peg-rule:choiceOp)
 (provide peg-rule:comando)
 (provide peg-rule:cmdUnit)
-(provide nop? if? if-cond if-then if-else nop)
+(provide nop? if? if-cond if-then if-else nop peg-rule:bloco peg-rule:declaracao)
 (provide seq choice)
 
 (struct block (declarations commands) #:transparent)
@@ -27,7 +27,7 @@
 
 (define-peg seq(and (name t1 cmdUnit) (?(name sep separador) (name t2 seq))) (cond [t2 (seq t1 t2)] [else t1]))
 
-(define-peg print(and wordSeparator printR"(" spaces (name t1 (or aritExp variable string boolExp)) spaces ")") (prnt t1))
+(define-peg print (and wordSeparator printR"(" spaces (name t1 (or aritExp variable string boolExp)) spaces ")") (prnt t1))
 
 (define-peg exit(and wordSeparator exitR"(" spaces (name t1 (or aritExp boolExp)) spaces ")") (exit t1))
 
@@ -39,8 +39,10 @@
 
 (define-peg statement (or declaracao comando))
 
+;(define-peg bloco (and wordSeparator (name t1 (? declaracao)) wordSeparator (name t2 (? comando)))
+;  (cond [(not (empty? t1)) (blk t1 (cond  [(not (empty? t2)) t2] [else (nop)]))]
+;        [else (cond [(not (empty? t2)) t2] [else (nop)])])) 
 (define-peg bloco (and wordSeparator (name t1 declaracao) wordSeparator (name t2 comando)) (blk t1 t2))
-
 ;condicionais
 
 (provide peg-rule:condicional)
@@ -50,9 +52,13 @@
 (struct condicional (U ifP ifElse) #:transparent)
 
 (define-peg ifElse (and
-                  "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (name corpoIf (or bloco comando)) wordSeparator "}")(name corpoIf cmdUnit)) wordSeparator
-                   "else" spaces (or (and "{" wordSeparator (name corpoElse (or bloco comando)) wordSeparator "}")(name corpoElse cmdUnit)) )
-  (ifElse condicao corpoIf corpoElse))
+                  "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (? (name corpoIf (or bloco comando))) wordSeparator "}")(name corpoIf cmdUnit)) wordSeparator
+                   "else" spaces (or (and "{" wordSeparator (? (name corpoElse (or bloco comando))) wordSeparator "}") (name corpoElse cmdUnit)))
+                                
+  (cond [(and corpoIf corpoElse) (ifElse condicao corpoIf corpoElse)]
+        [corpoIf (ifElse condicao corpoIf (nop))]
+        [corpoElse (ifElse condicao (nop) corpoElse)]
+        [else (ifElse condicao (nop) (nop))]))
 
 (define-peg if (and
                   "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (name corpo (or bloco comando)) wordSeparator "}")
@@ -97,5 +103,4 @@
 	[(choice a b)(choice (comandoConv a) (comandoConv b))]
 	[(exit a)(exit (if (boolExp? a) (boolConv a) (aritConv a) ))]
 	[(atribution a b) (atribConv (atribution a b)) ]
-	[(block a b) (blk (atribConv a) (comandoConv b))]
-	))
+	[(blk a b) (blk (atribConv a) (comandoConv b))]))

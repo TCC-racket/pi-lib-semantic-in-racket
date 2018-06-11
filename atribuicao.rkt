@@ -34,7 +34,7 @@
 (define-peg string (and "\"" (* (or space (range #\a #\z) (range #\A #\Z) (range #\0 #\9) (and "\\" (range #\a #\z)))) "\""))
 
 (define-peg variable (and
-		(or(range #\a #\z) (range #\A #\Z))
+		(or (range #\a #\z) (range #\A #\Z))
 		(* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9)))))
 
 (define-peg atribuicao (and (name t1 variable) spaces ":=" spaces (name t2 (or boolExp aritExp string))) (atribution t1 t2))
@@ -59,9 +59,9 @@
 
 ;(define-peg clause (name t1 (and variavel constante inicializacao))  (clauses t1))
 
-(define-peg declaracao (or decSeq decUnit))
+(define-peg declaracao (and (name value (or decSeq decUnit)) (drop (? (and wordSeparator pointvirg)))) value)
 
-(define-peg decSeq (and wordSeparator (name t1 decUnit) (? wordSeparator pointvirg wordSeparator (name t2 decSeq))) (cond [t2 (decSeq t1 t2)] [else t1]))
+(define-peg decSeq (and wordSeparator (name t1 decUnit) (? wordSeparator pointvirg wordSeparator (name t2 decSeq)) ) (cond [t2 (decSeq t1 t2)] [else t1]))
 
 (define-peg decUnit (or constanteBlk variavelBlk))
 

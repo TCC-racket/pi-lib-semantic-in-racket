@@ -20,7 +20,8 @@
 
 ; (-> hash mem string (U bool number) mem)
 (define (atrib envi memory id value)
-	(hash-set memory (hash-ref envi id) value))
+  (if (loc? (hash-ref envi id))
+	(hash-set memory (hash-ref envi id) value) (raise "não pode atribuir para constantes\n")))
 
 
 ; (-> env (hash loc (U bool number)) string (U bool number))

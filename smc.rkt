@@ -14,6 +14,7 @@
   
 (define (smcEval smcP)
 ;(writeln smcP)
+  ;(read)
 ;  (sleep 1)
   (match smcP [(smc env (list) a (list) locali) (smc env (list) a (list) locali) ]
 	      [(smc env d e (list (add a b) c ...) locali) (smcEval (smc env d e (append (list a b 'add) c) locali))]
@@ -44,9 +45,9 @@
 	      [(smc env (list (? number? a) (? number? b) c ...) d (list 'gt e ...) locali)  (smcEval (smc env (cons (> b a) c) d e locali)) ]
 
 	      [(smc env (list (? number? a) (? number? b) c ...) d (list 'lt e ...) locali)  (smcEval (smc env (cons (< b a) c) d e locali)) ]
-	      [(smc env (list (? number? a) (? number? b) c ...) d (list 'eq e ...) locali)  (smcEval (smc env (cons (= a b) c) d e) locali) ]
+	      [(smc env (list (? number? a) (? number? b) c ...) d (list 'eq e ...) locali)  (smcEval (smc env (cons (= a b) c) d e locali)) ]
 	      [(smc env (list (? number? a) (? number? b) c ...) d (list 'le e ...) locali)  (smcEval (smc env (cons (<= b a) c) d e) locali) ]
-	      [(smc env (list (? boolean? a) c ...) d (list 'neg e ...) locali)  (smcEval (smc env (cons (not a) c) d e) locali) ]
+	      [(smc env (list (? boolean? a) c ...) d (list 'neg e ...) locali)  (smcEval (smc env (cons (not a) c) d e locali)) ]
 
 	      [(smc env a d (list (? nop? b) c ...) locali) (smcEval (smc env a d c locali)) ]
 	      
@@ -55,7 +56,7 @@
 
 ;		Talvez criar mais um item semantico contendo os efeitos colaterais fosse legal, tornaria o smcEval 100% funcional, sem efeito colateral
 	      [(smc env a b (list (? print? c) d ...) locali) (smcEval (smc env a b (append (list (print-a c) 'print) d) locali) )]
-	      [(smc env (list a b ...) c (list 'print d ...) locali) (begin (display a) (smcEval (smc env b c d locali) ))  ]
+	      [(smc env (list a b ...) c (list 'print d ...) locali) (begin (display (format "~a\n" a)) (smcEval (smc env b c d locali) ))  ]
 	      
 	      [(smc env a b (list (seq c d) e ...) locali) (smcEval (smc env a b (append (list c d) e) locali)) ]
 
@@ -87,7 +88,7 @@
 
 
 	      [(smc env (list (? hash? a) (? listLoc? e) b ...) c (list 'blk d ...) locali) (smcEval (smc a b (clean locali c) d e))]
-	      [(smc env a m (list (dec a b) c ...) locali) (smcEval (smc env a m (append (list a b) c) locali))]
+	      [(smc env a m (list (dec b c) d ...) locali) (smcEval (smc env a m (append (list b c) d) locali))]
 	      [(smc env v m (list (ref a b) r ...) locali) (smcEval (smc env v m (append (list b 'ref a) r) locali))]
 	      [(smc env v m (list (cns a b) r ...) locali) (smcEval (smc env v m (append (list b 'cns a) r) locali))]
 	      [(smc env (list a v ...) m (list 'ref (idt i) r ...) locali) (let-values ([(newMem newEnv) (reference env m i a)]) (smcEval (smc newEnv v newMem r (cons (hash-ref newEnv i) locali))))]
