@@ -4,20 +4,23 @@
 (require "programa.rkt")
 (require "Comando.rkt")
 (require "smc.rkt")
-;(define in (open-input-file "C:\\Users\\Pichau\\Desktop\\8 PERÍODO\\COMPILADORES\\RACKET TEST\\fact.imp"))
 
-;(define l1(lambda()(read-string 1000 in)))
+(check-equal (executeSMC (comandoConv (peg comando "
 
-;(define pgrm(lambda()(peg programa (read-string 1000 in))))
-
-;(l1) ;o que tem dentro do arquivo
-
-;(pgrm) ;peg programa "l1"
-
-
-;(define in (open-input-file (vector-ref (current-command-line-arguments) 0)))
-;(define smc (executeSMC (comandoConv (peg comando (port->string in)))))
-
+if(true)
+{
+	var x := 10;
+	if(true)
+	{
+		var y := 6;
+		var x := 1;
+		x = y+5;
+		print(x);
+		print(y);
+	}
+	print(x);
+}
+"
 
 (module+ test
 	(require peg/peg)
