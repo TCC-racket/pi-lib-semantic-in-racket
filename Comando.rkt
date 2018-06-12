@@ -81,7 +81,7 @@ condicao corpo))
 (define (comandoConv exp)
 	(match exp
 	[(ifP condicao corpo) (if (boolConv condicao) (comandoConv corpo) (nop))]
-	[(ifElse condicao then else) (if (boolConv condicao) (comandoConv then) (comandoConv else))]
+	[(if condicao then else) (if (boolConv condicao) (comandoConv then) (comandoConv else))]
 	[(whileDo condicao corpo) (loop (boolConv condicao)(comandoConv corpo))]
 	[(seq a b)(seq (comandoConv a)(comandoConv b))]
 	[(prnt a) (print (cond [(boolExp? a) (boolConv a)] [else (aritConv a)] ))]
