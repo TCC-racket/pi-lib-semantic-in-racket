@@ -51,16 +51,14 @@
 (struct ifElse (condicao corpoIf corpoElse) #:transparent)
 (struct condicional (U ifP ifElse) #:transparent)
 
-(define-peg ifElse (and
+(define-peg ifElse (and wordSeparator
                   "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (? (name corpoIf (or bloco comando))) wordSeparator "}")(name corpoIf cmdUnit)) wordSeparator
                    "else" spaces (or (and "{" wordSeparator (? (name corpoElse (or bloco comando))) wordSeparator "}") (name corpoElse cmdUnit)))
                                 
-  (cond [(and corpoIf corpoElse) (ifElse condicao corpoIf corpoElse)]
-        [corpoIf (ifElse condicao corpoIf (nop))]
-        [corpoElse (ifElse condicao (nop) corpoElse)]
-        [else (ifElse condicao (nop) (nop))]))
+  (ifElse condicao corpoIf corpoElse))
+        
 
-(define-peg if (and
+(define-peg if (and wordSeparator
                   "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (name corpo (or bloco comando)) wordSeparator "}")
                                                                  (name corpo cmdUnit)))
   (ifP condicao corpo))
@@ -96,7 +94,7 @@
 (define (comandoConv exp)
 	(match exp
 	[(ifP condicao corpo) (if (boolConv condicao) (comandoConv corpo) (nop))]
-	[(ifElse condicao then else) (if (boolConv condicao) (comandoConv then) (comandoConv else))]
+	[(if condicao then else) (if (boolConv condicao) (comandoConv then) (comandoConv else))]
 	[(whileDo condicao corpo) (loop (boolConv condicao)(comandoConv corpo))]
 	[(seq a b)(seq (comandoConv a)(comandoConv b))]
 	[(prnt a) (print (cond [(boolExp? a) (boolConv a)] [else (aritConv a)] ))]
