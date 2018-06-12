@@ -33,8 +33,9 @@
 
 (define-peg cmdUnit (or atribuicao condicional loop print exit))
 
+;(define-peg comando (and (name value (or seq choiceOp cmdUnit)) (drop (? (and wordSeparator pointvirg)))) value)
 (define-peg comando (or seq choiceOp cmdUnit))
-
+                         
 (define-peg choiceOp (and (name t1 cmdUnit) (? (and bar (name t2 choiceOp)))) (choice t1 t2))
 
 (define-peg statement (or declaracao comando))
@@ -52,18 +53,17 @@
 (struct condicional (U ifP ifElse) #:transparent)
 
 (define-peg ifElse (and wordSeparator
-                  "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (? (name corpoIf (or bloco comando))) wordSeparator "}")(name corpoIf cmdUnit)) wordSeparator
-                   "else" spaces (or (and "{" wordSeparator (? (name corpoElse (or bloco comando))) wordSeparator "}") (name corpoElse cmdUnit)))
-                                
+                  "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (name corpoIf (or bloco comando)) wordSeparator "}")(name corpoIf cmdUnit)) wordSeparator
+                   "else" spaces (or (and "{" wordSeparator (name corpoElse (or bloco comando)) wordSeparator "}") (name corpoElse cmdUnit)))
   (ifElse condicao corpoIf corpoElse))
-        
+
 
 (define-peg if (and wordSeparator
                   "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (name corpo (or bloco comando)) wordSeparator "}")
                                                                  (name corpo cmdUnit)))
   (ifP condicao corpo))
 
-(define-peg condicional (or ifElse if))
+(define-peg condicional (or if ifElse))
 
 (struct if (cond then else)#:transparent)
 (struct print(a)#:transparent)
