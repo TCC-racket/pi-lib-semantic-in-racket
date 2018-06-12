@@ -104,6 +104,15 @@ var wordSeparator (name t1 iniSeq))
 \end{verbatim}
 
 \end{frame}
+\begin{frame}{Tradução BPLC}
+Para a tradução para BPLC nada muito rebuscado foi necessário.
+
+Tivemos que incluir um novo conversor para as estruturas de bloco que criamos. Esse conversor por sua vez divide o bloco em duas partes, o variavelBlk(Bloco de Variaveis) e constanteBlk(Bloco de constantes).
+
+Por sua vez eles fazem o match corretamente.
+
+Não tivemos problemas nessa parte, pois as alterações foram minimas.
+\end{frame}
 
 \begin{frame}{SMC}
 O (S,M,C) foi extendido para (E,S,M,C,L) sendo o E o ambiente e o L a lista de localizações. Esta lista é utilizada, quando do retorno do bloco, para limpar a memoria das
