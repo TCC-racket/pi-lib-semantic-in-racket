@@ -5,7 +5,7 @@
 (require "Comando.rkt")
 (require "smc.rkt")
 
-(check-equal (executeSMC (comandoConv (peg comando "
+(executeSMC (comandoConv (peg comando "
 
 if(true)
 {
@@ -20,7 +20,7 @@ if(true)
 	}
 	print(x);
 }
-"
+")))
 
 (module+ test
 	(require peg/peg)
