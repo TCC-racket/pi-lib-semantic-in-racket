@@ -1,105 +1,152 @@
-#lang racket
+\documentclass{beamer}
 
-(require peg/peg)
-(require (rename-in "BoolExp.rkt" [and andB] [or orB]))
-(require "AritExp.rkt")
-(require "Reservadas.rkt")
-(require "espacos.rkt")
-(require "idt.rkt")
-(require "Exp.rkt")
+\usetheme[
+  outer/progressbar=frametitle
+]{metropolis}
+
+\usepackage[portuguese]{babel}
+\usepackage[utf8]{inputenc}
+
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue,citecolor=blue}
+
+\title[Compiladores 2018.1]{Apresentação do compilador Dante P2}
+\author[Abrev.]{Autores: João Pedro Abreu, Luis Freitas e Raphael Leardini} 
+
+\institute[UFF]{Universidade Federal Fluminense}
+
+\date{Data: 13/06/2018} 
+
+\begin{document}
+
+% ---
+
+\begin{frame}[plain]
+
+\titlepage
+
+\end{frame}
+
+% ---
+
+\begin{frame}{Parser}
+\begin{verbatim}
+
+(define-peg statement (or declaracao comando))
 
 
-(provide peg-rule:string)
-(provide peg-rule:atribuicao)
-(provide peg-rule:variable)
-(provide peg-rule:inicializacao)
-(provide peg-rule:variavel)
-(provide peg-rule:constante)
-(provide peg-rule:declaracao)
+(define-peg bloco (and wordSeparator (name t1 declaracao) wordSeparator (name t2 comando)) (blk t1 t2))
 
-(struct atribution (var value) #:transparent)
-(struct declaraList (var decList) #:transparent)
-(struct atribSeq (atrib1 atribSeq2) #:transparent)
-(struct clauses (lista) #:transparent)
-(struct constante (name) #:transparent)
-(struct constanteBlk (iniSeq) #:transparent)
-(struct variavel (name) #:transparent)
-(struct variavelBlk (iniSeq) #:transparent)
-(struct init (name val) #:transparent)
-(struct iniSeq (ini iniSeq) #:transparent)
-(struct decSeq (declaracao decSeq) #:transparent)
 
-(provide atribution)
+Ex:
 
-(define-peg string (and "\"" (* (or space (range #\a #\z) (range #\A #\Z) (range #\0 #\9) (and "\\" (range #\a #\z)))) "\""))
+(define-peg loop (and while spaces 
 
-(define-peg variable (and
-		(or (range #\a #\z) (range #\A #\Z))
-		(* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9)))))
+(name condicao boolExp) wordSeparator do spaces 
 
-(define-peg atribuicao (and (name t1 variable) spaces ":=" spaces (name t2 (or boolExp aritExp string))) (atribution t1 t2))
+"\{" wordSeparator 
 
-;auxiliares vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+(name corpo (or bloco comando)) wordSeparator "\}") 
 
-(define-peg declaraINI (and wordSeparator (name t1 variable) wordSeparator "=" wordSeparator (name t2 (or boolExp aritExp))
-                            (? wordSeparator virg wordSeparator (name t3 declaraINI))) (cond [t3 (cons (init t1 t2) t3)] [else (list (init t1 t2))]))
+(whileDo condicao corpo))
 
-(define-peg declaraVAR (and wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraVAR))) (cond [t2 (cons (variavel t1) t2)] [else (list (variavel t1))]))
+\end{verbatim}
 
-(define-peg declaraCONST (and wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraCONST))) (cond [t2 (cons (constante t1) t2)] [else (list (constante t1))]))
+\end{frame}
 
-;auxiliares ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\begin{frame}{Parser}
+\begin{verbatim}
 
-(define-peg variavel (? (and wordSeparator var wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraVAR)))) (cond [t2 (cons (variavel t1) t2)] [else (variavel t1)]))
+(define-peg declaracao (or decSeq decUnit))
 
-(define-peg constante (? (and wordSeparator const wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraCONST)))) (cond [t2 (cons (constante t1) t2)] [else (constante t1)]))
 
-(define-peg inicializacao (? (and wordSeparator init wordSeparator (name t1 variable) wordSeparator "=" wordSeparator (name t2 (or boolExp aritExp))
-                               (? wordSeparator virg wordSeparator (name t3 declaraINI)))) (cond [t3 (cons (init t1 t2) t3)] [else (init t1 t2)]))
+(define-peg decSeq (and wordSeparator (name t1 decUnit) 
+                    (? wordSeparator pointvirg wordSeparator 
+                     
+                     (name t2 decSeq))) 
+ 
+ (cond [t2 (decSeq t1 t2)] [else t1]))
 
-;(define-peg clause (name t1 (and variavel constante inicializacao))  (clauses t1))
-
-(define-peg declaracao (and (name value (or decSeq decUnit)) (drop (? (and wordSeparator pointvirg)))) value)
-
-(define-peg decSeq (and wordSeparator (name t1 decUnit) (? wordSeparator pointvirg wordSeparator (name t2 decSeq)) ) (cond [t2 (decSeq t1 t2)] [else t1]))
 
 (define-peg decUnit (or constanteBlk variavelBlk))
 
-(define-peg constanteBlk (and wordSeparator const wordSeparator (name t1 iniSeq)) (constanteBlk t1))
+\end{verbatim}
 
-(define-peg variavelBlk (and wordSeparator var wordSeparator (name t1 iniSeq)) (variavelBlk t1))
+\end{frame}
 
-(define-peg inicializacaoBlk (and wordSeparator (name t1 variable) wordSeparator "=" wordSeparator (name t2 (or boolExp aritExp))) (init t1 t2))
+\begin{frame}{Parser}
+\begin{verbatim}
 
-(define-peg iniSeq (and wordSeparator (name t1 inicializacaoBlk) (? wordSeparator virg wordSeparator (name t2 iniSeq))) (cond [t2 (iniSeq t1 t2)] [else t1]))
+Ex:
 
-(struct assign (idt exp) #:transparent)
+(define-peg variavelBlk (and wordSeparator 
 
-(provide assign)
+var wordSeparator (name t1 iniSeq)) 
 
-
-(struct ref (a b) #:transparent)
-(struct cns (a b) #:transparent)
-(struct dec (a b) #:transparent)
-
-(provide dec ref cns)
-(define (variavelTrans a)
-	(match a
-		[(iniSeq a b) (dec (variavelTrans a) (variavelTrans b))]
-		[(init a b) (ref (idt a) (expConv b))]))
-
-(define (constanteTrans a)
-	(match a
-		[(iniSeq a b) (dec (constanteTrans a) (constanteTrans b))]
-		[(init a b) (cns (idt a) (expConv b))]))
+(variavelBlk t1))
 
 
-(define (atribConv exp)
+(define-peg iniSeq (and wordSeparator 
 
-(match exp
-	[(atribution var value) (assign (idt var)  (cond [(boolExp? value) (boolConv value)] [else (aritConv value)] ) )]
-	[(decSeq a b) (dec (atribConv a) (atribConv b))]
-	[(variavelBlk a) (variavelTrans a)]
-	[(constanteBlk a) (constanteTrans a)]))
+(name t1 inicializacaoBlk) 
 
-(provide atribConv)
+(? wordSeparator virg wordSeparator (name t2 iniSeq))) 
+(cond [t2 (iniSeq t1 t2)] [else t1]))
+
+
+(define-peg inicializacaoBlk (and wordSeparator 
+
+(name t1 variable) wordSeparator 
+
+"=" wordSeparator (name t2 (or boolExp aritExp))) 
+
+(init t1 t2))
+
+\end{verbatim}
+
+\end{frame}
+\begin{frame}{Tradução BPLC}
+Para a tradução para BPLC nada muito rebuscado foi necessário.
+
+Tivemos que incluir um novo conversor para as estruturas de bloco que criamos. Esse conversor por sua vez divide o bloco em duas partes, o variavelBlk(Bloco de Variaveis) e constanteBlk(Bloco de constantes).
+
+Por sua vez eles fazem o match corretamente.
+
+Não tivemos problemas nessa parte, pois as alterações foram minimas.
+\end{frame}
+
+\begin{frame}{SMC}
+O (S,M,C) foi extendido para (E,S,M,C,L) sendo o E o ambiente e o L a lista de localizações. Esta lista é utilizada, quando do retorno do bloco, para limpar a memoria das
+variaveis criadas internamente. Atualmente a única parte não-funcional(entenda funcional como o paradigma) do codigo é a execução do print e do exit, mas isso poderia ser
+resolvido extendendo para um (O,E,S,M,C,L) onde o O é uma lista de efeitos colaterais, como descrito na especificação(não realizado ainda).
+\end{frame}
+
+\begin{frame}{SMC - Problemas}
+Assim como na primeira parte, não houveram percalços significativos na execução desta. O smc basicamente se tornou uma tradução assistida da especificação, sem necessidade
+de entender o que se esta fazendo(nós entendemos).
+\end{frame}
+
+\begin{frame}{SMC}
+Toda operação que "altera" o ambiente e a memoria foi encapsulada no modulo "ambiente.rkt",fazendo com que o smcEval seja um código de reescrita quase puro e simples.
+
+Exatamente por isso podemos extender essa implementação para a utilização de uma função de avaliação, a qual aparece na especificação como "val" e igualmente serve para devolver o valor ou o tipo, fazendo com que, sem uma única linha adicionada, o smcEval possa fazer type-checking. 
+
+O único porém seria a avaliação de loops, o qual exigiria algum contexto ou alguma tática ainda não plenamente compreendida.
+\end{frame}
+
+\begin{frame}{Bloco}
+
+Quando o SMC encontra um bloco, ele salva o ambiente atual e a atual lista de localizações na pilha de valores, destrói o bloco e coloca no final do comando do bloco 'blk, para saber quando deve sair do bloco, ou seja, restaurar o contexto anteriormente salvo e limpar a memoria.
+ 
+Cada operação de criação de variáveis dentro de um bloco adiciona a localização desta variável na lista de localizações. (i.e cada ref faz um cons, cada 'blk faz um free).
+\end{frame}
+
+
+\begin{frame}{Ambiente}
+
+O ambiente é um hash cujas chaves são strings(identificadores) e os valores são (U Number Boolean Loc), onde Loc é uma estrutura que contém apenas um número como membro,
+para diferenciar variaveis de constantes.
+
+\end{frame}
+
+
+\end{document}
