@@ -53,7 +53,8 @@
 (struct condicional (U ifP ifElse) #:transparent)
 
 (define-peg ifElse (and wordSeparator
-                  "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (name corpoIf (or bloco comando)) wordSeparator "}")(name corpoIf cmdUnit)) wordSeparator
+                  "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (name corpoIf (or bloco comando)) wordSeparator "}")
+                                                                 (name corpoIf cmdUnit)) wordSeparator
                    "else" spaces (or (and "{" wordSeparator (name corpoElse (or bloco comando)) wordSeparator "}") (name corpoElse cmdUnit)))
   (ifElse condicao corpoIf corpoElse))
 
@@ -63,7 +64,7 @@
                                                                  (name corpo cmdUnit)))
   (ifP condicao corpo))
 
-(define-peg condicional (or if ifElse))
+(define-peg condicional (or ifElse if))
 
 (struct if (cond then else)#:transparent)
 (struct print(a)#:transparent)
