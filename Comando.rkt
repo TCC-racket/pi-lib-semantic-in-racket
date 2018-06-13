@@ -43,7 +43,7 @@
 ;(define-peg bloco (and wordSeparator (name t1 (? declaracao)) wordSeparator (name t2 (? comando)))
 ;  (cond [(not (empty? t1)) (blk t1 (cond  [(not (empty? t2)) t2] [else (nop)]))]
 ;        [else (cond [(not (empty? t2)) t2] [else (nop)])])) 
-(define-peg bloco (and wordSeparator (name t1 declaracao) wordSeparator (name t2 comando)) (blk t1 t2))
+(define-peg bloco (and wordSeparator (name t1 declaracao) wordSeparator pointvirg wordSeparator (name t2 comando)) (blk t1 t2))
 ;condicionais
 
 (provide peg-rule:condicional)

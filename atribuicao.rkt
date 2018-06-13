@@ -59,7 +59,7 @@
 
 ;(define-peg clause (name t1 (and variavel constante inicializacao))  (clauses t1))
 
-(define-peg declaracao (and (name value (or decSeq decUnit)) (drop (? (and wordSeparator pointvirg)))) value)
+(define-peg declaracao (or decSeq decUnit))
 
 (define-peg decSeq (and wordSeparator (name t1 decUnit) (? wordSeparator pointvirg wordSeparator (name t2 decSeq)) ) (cond [t2 (decSeq t1 t2)] [else t1]))
 
