@@ -39,7 +39,7 @@
  
 (define-peg relacional (or equal ncOp))
 
-(define-peg parenteses (and spaces "(" spaces (name value boolExp) spaces ")" spaces) (parenteses value))
+(define-peg parenteses (and spaces "(" spaces (name value boolExp) spaces ")" spaces)  value)
 
 (define-peg negation (and "~"(name n boolExp)) (neg n))
 
