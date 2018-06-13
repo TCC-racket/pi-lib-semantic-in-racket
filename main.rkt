@@ -28,3 +28,10 @@ var y = 1, x = 100;
          x := x - 1}; 
 print(y)
 }")))))
+
+
+
+;call tests
+
+(teste1)
+(teste2)
