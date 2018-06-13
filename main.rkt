@@ -7,31 +7,22 @@
 
 (define teste1 (lambda() (executeSMC
                           (comandoConv
-                           (peg comando
-"if(true){
+                           (peg bloco
+"
  var y = 6, x = 1;
  x := y+5;
- if(x == 11){
+ if(x == 42){
   print(y)
- }
+ } else { var x = 3;
   print(x);
-  print(y)
-}")))))
+  print(y)}")))))
 
 (define teste2 (lambda() (executeSMC
                           (comandoConv
-                           (peg comando
-"if(true){
-var y = 1, x = 100;
+                           (peg bloco
+"
+var y = 1, x = 19000;
   while ~ (x == 0)
     do { y := y * x ;
          x := x - 1}; 
-print(y)
-}")))))
-
-
-
-;call tests
-
-(teste1)
-(teste2)
+print(y)")))))
