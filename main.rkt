@@ -26,3 +26,6 @@ var y = 1, x = 19000;
     do { y := y * x ;
          x := x - 1}; 
 print(y)")))))
+
+(teste2)
+(teste1)
