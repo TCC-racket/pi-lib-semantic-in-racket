@@ -6,7 +6,7 @@ install:
 	hdiutil attach ./racket.dmg
 	export PATH=$PATH:/Volumes/racket/
 	raco pkg install peg
-	raco test main.rkt
+	racket main.rkt
 
 uninstall:
 	hdiutil detach /Volumes/racket
