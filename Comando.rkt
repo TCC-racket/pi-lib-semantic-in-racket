@@ -54,27 +54,28 @@
 
 
 (define-peg newIf (and wordSeparator
-                  "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (name corpoIf (or bloco comando)) wordSeparator "}")
+                  "if" spaces (name condicao boolExp) wordSeparator (or (and "{" wordSeparator (name corpoIf (or bloco comando)) wordSeparator "}")
                                                                  (name corpoIf cmdUnit)) wordSeparator
-                   (? (and "else" spaces (or (and "{" wordSeparator (name corpoElse (or bloco comando)) wordSeparator "}") (name corpoElse cmdUnit)))))
+                   (? (and "else" wordSeparator (or (and "{" wordSeparator (name corpoElse (or bloco comando)) wordSeparator "}") (name corpoElse cmdUnit)))))
   (cond [corpoElse (ifElse condicao corpoIf corpoElse)] [else (ifP condicao corpoIf)]))
 
 
 
 
-(define-peg ifElse (and wordSeparator
-                  "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (name corpoIf (or bloco comando)) wordSeparator "}")
-                                                                 (name corpoIf cmdUnit)) wordSeparator
-                   "else" spaces (or (and "{" wordSeparator (name corpoElse (or bloco comando)) wordSeparator "}") (name corpoElse cmdUnit)))
-  (ifElse condicao corpoIf corpoElse))
+;(define-peg ifElse (and wordSeparator
+;                  "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (name corpoIf (or bloco comando)) wordSeparator "}")
+;                                                                 (name corpoIf cmdUnit)) wordSeparator
+;                   "else" spaces (or (and "{" wordSeparator (name corpoElse (or bloco comando)) wordSeparator "}") (name corpoElse cmdUnit)))
+;  (ifElse condicao corpoIf corpoElse))
 
 
-(define-peg if (and wordSeparator
-                  "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (name corpo (or bloco comando)) wordSeparator "}")
-                                                                 (name corpo cmdUnit)))
-  (ifP condicao corpo))
+;(define-peg if (and wordSeparator
+;                  "if" spaces (name condicao boolExp) spaces (or (and "{" wordSeparator (name corpo (or bloco comando)) wordSeparator "}")
+;                                                                 (name corpo cmdUnit)))
+;  (ifP condicao corpo))
 
-(define-peg condicional (or ifElse if))
+(define-peg condicional newIf)
+  ;(or ifElse if))
 
 (struct if (cond then else)#:transparent)
 (struct print(a)#:transparent)
