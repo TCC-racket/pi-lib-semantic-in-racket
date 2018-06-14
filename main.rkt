@@ -27,5 +27,6 @@ var y = 1, x = 19000;
          x := x - 1}; 
 print(y)")))))
 
+;chamada dos testes
 (teste2)
 (teste1)
