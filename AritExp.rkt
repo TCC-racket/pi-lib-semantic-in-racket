@@ -20,7 +20,7 @@
 (define (reduceAux f acc l) (if (null? l) acc (reduceAux f (f acc (car l)) (cdr l))))
 
 
-(define-peg parenteses (and spaces "(" spaces (name value aritExp) spaces ")" spaces) value)
+(define-peg parenteses (and spaces "(" spaces (name value aritExp) spaces ")" spaces) (parenteses value))
 (define-peg number (name value (+ (range #\0 #\9))) (string->number value))
 (define-peg variable (name var (and (! (or "true" "false")) 
                           (or (range #\a #\z) (range #\A #\Z))
