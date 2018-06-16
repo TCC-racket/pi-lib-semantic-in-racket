@@ -4,40 +4,29 @@
 (require "programa.rkt")
 (require "Comando.rkt")
 (require "smc.rkt")
-;(define in (open-input-file "C:\\Users\\Pichau\\Desktop\\8 PERÍODO\\COMPILADORES\\RACKET TEST\\fact.imp"))
 
-;(define l1(lambda()(read-string 1000 in)))
+(define teste1 (lambda() (executeSMC
+                          (comandoConv
+                           (peg bloco
+"
+ var y = 6, x = 1;
+ x := y+5;
+ if(x == 42){
+  print(y)
+ } else { var x = 3;
+  print(x);
+  print(y)}")))))
 
-;(define pgrm(lambda()(peg programa (read-string 1000 in))))
+(define teste2 (lambda() (executeSMC
+                          (comandoConv
+                           (peg bloco
+"
+var y = 1, x = 19000;
+  while ~ (x == 0)
+    do { y := y * x ;
+         x := x - 1}; 
+print(y)")))))
 
-;(l1) ;o que tem dentro do arquivo
-
-;(pgrm) ;peg programa "l1"
-
-
-;(define in (open-input-file (vector-ref (current-command-line-arguments) 0)))
-;(define smc (executeSMC (comandoConv (peg comando (port->string in)))))
-
-
-(module+ test
-  (require peg/peg)
-(require rackunit)
-(executeSMC (comandoConv (peg comando "x := 5 ;
-    y := 1 ;
-		while ~ (x == 0)
-        do {               
-		  y := y * x ;
-          x := x - 1
-		} ; 
-		print(y);
-	}"))) )
-;  (executeSMC
- ;   (comandoConv (peg comando "x := 5 ;
- ;   y := 1 ;
-;		while ~ (x == 0)
- ;       do {               
-;		  y := y * x ;
- ;         x := x - 1
-;		} ; 
-;		print(y)
-;	}"))))
+;chamada dos testes
+(teste2)
+(teste1)
