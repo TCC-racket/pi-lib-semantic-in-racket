@@ -16,9 +16,12 @@
 ;(writeln smcP)
   ;(read)
 ;  (sleep 1)
-  (match smcP [(smc env (list) a (list) locali) (smc env (list) a (list) locali) ]
-	      [(smc env d e (list (add a b) c ...) locali) (smcEval (smc env d e (append (list a b 'add) c) locali))]
-              [(smc env d e (list (sub a b) c ...) locali) (smcEval (smc env d e (append (list a b 'sub) c) locali))]
+  (if
+  	(and (empty? (smc-val smcP)) (empty? (smc-control smcP)))
+	smcP
+  	(smcEval (match smcP 
+	      [(smc env d e (list (add a b) c ...) locali) (smc env d e (append (list a b 'add) c) locali)]
+              [(smc env d e (list (sub a b) c ...) locali) (smc env d e (append (list a b 'sub) c) locali)]
               [(smc env d e (list (mult a b) c ...) locali) (smcEval (smc env d e (append (list a b 'mult) c) locali))]
               [(smc env d e (list (div a b) c ...) locali) (smcEval (smc env d e (append (list a b 'div) c) locali))]
               
