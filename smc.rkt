@@ -87,10 +87,11 @@
 
 
 ;		Salvo o ambiente, as localizações atuais e reinicio as localicações
-	      [(smc env a b (list (blk c d) e ...) locali) (smc env (append (list env locali) a) b (append (list c d 'blk) e)  '()) ]
-
-
+	      [(smc env a b (list (blkComandDec c d) e ...) locali) (smc env (append (list env locali) a) b (append (list c d 'blk) e)  '()) ]
+	      [(smc env a b (list (blkComand c) e ...) locali) (smc env (append (list env locali) a) b (append (list c 'blk) e)  '()) ]
 	      [(smc env (list (? hash? a) (? listLoc? e) b ...) c (list 'blk d ...) locali) (smc a b (clean locali c) d e)]
+
+
 	      [(smc env a m (list (dec b c) d ...) locali) (smc env a m (append (list b c) d) locali)]
 	      [(smc env v m (list (ref a b) r ...) locali) (smc env v m (append (list b 'ref a) r) locali)]
 	      [(smc env v m (list (cns a b) r ...) locali) (smc env v m (append (list b 'cns a) r) locali)]
