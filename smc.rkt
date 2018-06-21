@@ -22,7 +22,7 @@
   	(smcEval (match smcP 
 	      [(smc env d e (list (add a b) c ...) locali) (smc env d e (append (list a b 'add) c) locali)]
               [(smc env d e (list (sub a b) c ...) locali) (smc env d e (append (list a b 'sub) c) locali)]
-              [(smc env d e (list (mult a b) c ...) locali) (smcEval (smc env d e (append (list a b 'mult) c) locali))]
+              [(smc env d e (list (mult a b) c ...) locali) (smc env d e (append (list a b 'mult) c) locali)]
               [(smc env d e (list (div a b) c ...) locali) (smcEval (smc env d e (append (list a b 'div) c) locali))]
               
               [(smc env d e (list (? number? a) b ...) locali) (smcEval (smc env (cons a d) e b locali))]
