@@ -10,6 +10,7 @@
 (provide peg-rule:seq)
 (provide peg-rule:choiceOp)
 (provide peg-rule:comando)
+(provide peg-rule:bloco)
 (provide peg-rule:cmdUnit)
 (provide nop? if? if-cond if-then if-else nop peg-rule:bloco peg-rule:declaracao)
 (provide seq choice)
@@ -22,6 +23,32 @@
 (struct exit(a) #:transparent)
 (struct nop () #:transparent)
 (struct blk (decSeq seq) #:transparent)
+(struct idt (nome) #:transparent)
+(struct call (nome arg) #:transparent)
+
+;Parte de programa / função -> call
+(define-peg ident (name nome (and  
+                          (or (range #\a #\z) (range #\A #\Z))
+                          (* (and (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9))
+                              (* (or "_" "-")
+                                 (or (range #\a #\z) (range #\A #\Z))
+                                 (and (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9)))))))) (idt nome) )
+
+(define-peg expAUX (and wordSeparator
+                            (name t1 (or aritExp boolExp))
+                            (? wordSeparator virg wordSeparator
+                               (name t2 expAUX)))
+  (cond [t2 (cons t1 t2)] [else (list t1)]))
+
+(define-peg expList (? (and wordSeparator
+                             (name t1 (or aritExp boolExp))
+                             (? wordSeparator virg wordSeparator (name t2 expAUX))))
+  (cond [t2 (cons t1 t2)] [else  t1 ]))
+
+(define-peg funct (and wordSeparator (name t1 ident) wordSeparator
+                       "(" wordSeparator (name t2 expList)
+                       wordSeparator ")" wordSeparator) (call t1 t2))
+;--------------------------------------------------------------------------------------
 
 (define-peg separador(and wordSeparator (or virg pointvirg newLines) wordSeparator))
 
@@ -31,7 +58,8 @@
 
 (define-peg exit(and wordSeparator exitR"(" spaces (name t1 (or aritExp boolExp)) spaces ")") (exit t1))
 
-(define-peg cmdUnit (or atribuicao condicional loop print exit))
+;Agora com funct
+(define-peg cmdUnit (or atribuicao condicional loop print exit funct))
 
 ;(define-peg comando (and (name value (or seq choiceOp cmdUnit)) (drop (? (and wordSeparator pointvirg)))) value)
 (define-peg comando (or seq choiceOp cmdUnit))

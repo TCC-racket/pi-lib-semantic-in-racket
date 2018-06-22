@@ -20,12 +20,12 @@
 (struct atribution (var value) #:transparent)
 (struct declaraList (var decList) #:transparent)
 (struct atribSeq (atrib1 atribSeq2) #:transparent)
-(struct clauses (lista) #:transparent)
-(struct constante (name) #:transparent)
+(struct constanteCL (name) #:transparent)
 (struct constanteBlk (iniSeq) #:transparent)
-(struct variavel (name) #:transparent)
+(struct variavelCL (name) #:transparent)
 (struct variavelBlk (iniSeq) #:transparent)
 (struct init (name val) #:transparent)
+(struct initCL (name val) #:transparent)
 (struct iniSeq (ini iniSeq) #:transparent)
 (struct decSeq (declaracao decSeq) #:transparent)
 
@@ -39,25 +39,34 @@
 
 (define-peg atribuicao (and (name t1 variable) spaces ":=" spaces (name t2 (or boolExp aritExp string))) (atribution t1 t2))
 
-;auxiliares vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+;auxiliares de clauses, usadas nas PEGs variavel | constante | inicializacao
 
 (define-peg declaraINI (and wordSeparator (name t1 variable) wordSeparator "=" wordSeparator (name t2 (or boolExp aritExp))
-                            (? wordSeparator virg wordSeparator (name t3 declaraINI))) (cond [t3 (cons (init t1 t2) t3)] [else (list (init t1 t2))]))
+                            (? wordSeparator virg wordSeparator (name t3 declaraINI))) (cond [t3 (cons (initCL t1 t2) t3)] [else (list (initCL t1 t2))]))
 
-(define-peg declaraVAR (and wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraVAR))) (cond [t2 (cons (variavel t1) t2)] [else (list (variavel t1))]))
+(define-peg declaraVAR (and wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraVAR))) (cond [t2 (cons (variavelCL t1) t2)] [else (list (variavelCL t1))]))
 
-(define-peg declaraCONST (and wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraCONST))) (cond [t2 (cons (constante t1) t2)] [else (list (constante t1))]))
+(define-peg declaraCONST (and wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraCONST))) (cond [t2 (cons (constanteCL t1) t2)] [else (list (constanteCL t1))]))
 
-;auxiliares ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+;Usadas em clauses, em programa.rkt  
+(define-peg variavel (? (and wordSeparator var wordSeparator
+                             (name t1 variable)
+                             (? wordSeparator virg wordSeparator (name t2 declaraVAR))))
+  (cond [t2 (cons (variavelCL t1) t2)] [else (variavelCL t1)]))
 
-(define-peg variavel (? (and wordSeparator var wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraVAR)))) (cond [t2 (cons (variavel t1) t2)] [else (variavel t1)]))
+(define-peg constante (? (and wordSeparator const wordSeparator
+                              (name t1 variable)
+                              (? wordSeparator virg wordSeparator (name t2 declaraCONST))))
+  (cond [t2 (cons (constanteCL t1) t2)] [else (constanteCL t1)]))
 
-(define-peg constante (? (and wordSeparator const wordSeparator (name t1 variable) (? wordSeparator virg wordSeparator (name t2 declaraCONST)))) (cond [t2 (cons (constante t1) t2)] [else (constante t1)]))
+(define-peg inicializacao (? (and wordSeparator init wordSeparator                    
+                                  (name t1 variable) wordSeparator "=" wordSeparator
+                                  (name t2 (or boolExp aritExp))
+                                  (? wordSeparator virg wordSeparator
+                                  (name t3 declaraINI))))
+  (cond [t3 (cons (initCL t1 t2) t3)] [else (initCL t1 t2)]))
 
-(define-peg inicializacao (? (and wordSeparator init wordSeparator (name t1 variable) wordSeparator "=" wordSeparator (name t2 (or boolExp aritExp))
-                               (? wordSeparator virg wordSeparator (name t3 declaraINI)))) (cond [t3 (cons (init t1 t2) t3)] [else (init t1 t2)]))
-
-;(define-peg clause (name t1 (and variavel constante inicializacao))  (clauses t1))
+; ------------------------------------------------------------------------
 
 (define-peg declaracao (or decSeq decUnit))
 
