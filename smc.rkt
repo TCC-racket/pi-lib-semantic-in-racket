@@ -1,6 +1,7 @@
 #lang racket
 ; smc (hash? list? hash? list? (listof loc))
 (struct smc (env val mem control loc) #:transparent)
+(struct abs (formals block) #:transparent)
 
 (require "idt.rkt")
 (require "AritExp.rkt")
@@ -95,6 +96,10 @@
 	      [(smc env a m (list (dec b c) d ...) locali) (smc env a m (append (list b c) d) locali)]
 	      [(smc env v m (list (ref a b) r ...) locali) (smc env v m (append (list b 'ref a) r) locali)]
 	      [(smc env v m (list (cns a b) r ...) locali) (smc env v m (append (list b 'cns a) r) locali)]
+	      [(smc env v m (list (? prcFormals? a) r ...) locali) (smc (addProcFormals env a) v m r locali)]
+	      [(smc env v m (list (? prc? a) r ...) locali) (smc (addProc env a) v m r locali)]
+	      [(smc env v m (list (cal a) r ...) locali) (smc env v m (append (list a 'cal) r) locali)]
+	      [(smc env v m (list (calFormals id atuals) r ...) locali) (smc env v m (append (list id atuals 'cal) r) locali)]
 	      [(smc env (list a v ...) m (list 'ref (idt i) r ...) locali) (let-values ([(newMem newEnv) (reference env m i a)]) (smc newEnv v newMem r (cons (hash-ref newEnv i) locali)))]
 	      [(smc env (list a v ...) m (list 'cns (idt i) r ...) locali) (let ([newEnv (constant env i a )]) (smc newEnv v m r locali))]
 
