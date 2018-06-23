@@ -88,8 +88,10 @@
 
 
 ;		Salvo o ambiente, as localizações atuais e reinicio as localicações
-	      [(smc env a b (list (blkComandDec c d) e ...) locali) (smc env (append (list env locali) a) b (append (list c d 'blk) e)  '()) ]
-	      [(smc env a b (list (blkComand c) e ...) locali) (smc env (append (list env locali) a) b (append (list c 'blk) e)  '()) ]
+	      [(smc env a b (list (blkComandDec c d) e ...) locali)
+	      	(smc env (append (list env locali) a) b (append (list c d 'blk) e)  '()) ]
+	      [(smc env a b (list (blkComand c) e ...) locali)
+	      	(smc env (append (list env locali) a) b (append (list c 'blk) e)  '()) ]
 	      [(smc env (list (? hash? a) (? listLoc? e) b ...) c (list 'blk d ...) locali) (smc a b (clean locali c) d e)]
 
 
@@ -99,9 +101,20 @@
 	      [(smc env v m (list (? prcFormals? a) r ...) locali) (smc (addProcFormals env a) v m r locali)]
 	      [(smc env v m (list (? prc? a) r ...) locali) (smc (addProc env a) v m r locali)]
 	      [(smc env v m (list (cal a) r ...) locali) (smc env v m (append (list a 'cal) r) locali)]
-	      [(smc env v m (list (calFormals id atuals) r ...) locali) (smc env v m (append (list id atuals 'cal) r) locali)]
-	      [(smc env (list a v ...) m (list 'ref (idt i) r ...) locali) (let-values ([(newMem newEnv) (reference env m i a)]) (smc newEnv v newMem r (cons (hash-ref newEnv i) locali)))]
-	      [(smc env (list a v ...) m (list 'cns (idt i) r ...) locali) (let ([newEnv (constant env i a )]) (smc newEnv v m r locali))]
+	      [(smc env v m (list (calAtuals id atuals) r ...) locali) (smc env v m (append (list id atuals 'cal) r) locali)]
+	      [(smc env (list atuals ... (absFormals formals block) r1 ...) m (list 'cal r ...) locali)
+	      	(smc env r1 m (cons (blk (casa formals atuals) block) r) locali) ]
+		
+	      [(smc env (list (abs block) r1 ...) m (list 'cal r ...) locali)
+	      	(smc env r1 m (cons block r) locali) ]
+		
+	      [(smc env v m (list (act e actuals) r ...) locali) (smc env v m (append (list actuals e) r) locali)]
+	      
+	      [(smc env (list a v ...) m (list 'ref (idt i) r ...) locali)
+	      	(let-values ([(newMem newEnv) (reference env m i a)])
+			(smc newEnv v newMem r (cons (hash-ref newEnv i) locali)))]
+	      [(smc env (list a v ...) m (list 'cns (idt i) r ...) locali)
+	      	(let ([newEnv (constant env i a )]) (smc newEnv v m r locali))]
 
 
 	      [a (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a))]))))
