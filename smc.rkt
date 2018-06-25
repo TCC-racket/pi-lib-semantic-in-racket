@@ -98,8 +98,9 @@
 	      [(smc env a m (list (dec b c) d ...) locali) (smc env a m (append (list b c) d) locali)]
 	      [(smc env v m (list (ref a b) r ...) locali) (smc env v m (append (list b 'ref a) r) locali)]
 	      [(smc env v m (list (cns a b) r ...) locali) (smc env v m (append (list b 'cns a) r) locali)]
-	      [(smc env v m (list (? prcFormals? a) r ...) locali) (smc (addProcFormals env a) v m r locali)]
-	      [(smc env v m (list (? prc? a) r ...) locali) (smc (addProc env a) v m r locali)]
+	      [(smc env v m (list (prcFormals (idt i) formals block) r ...) locali)
+	      	(smc (constant env i (absFormals formals block)) v m r locali)]
+	      [(smc env v m (list (prc (idt i) block) r ...) locali) (smc (constant env i (abs block)) v m r locali)]
 	      [(smc env v m (list (cal a) r ...) locali) (smc env v m (append (list a 'cal) r) locali)]
 	      [(smc env v m (list (calAtuals id atuals) r ...) locali) (smc env v m (append (list id atuals 'cal) r) locali)]
 	      [(smc env (list atuals ... (absFormals formals block) r1 ...) m (list 'cal r ...) locali)
