@@ -13,6 +13,15 @@
 (define (executeSMC bplc)
   (smcEval (smc (hash) '() (hash) (list bplc) '())))
   
+  
+  
+
+(define (casa formals atuals)
+	(match (cons formals atuals)
+		[(cons (list a) (list c)) (ref a c)   ]
+		[(cons (list a b ...) (list c d ...)) (dec (ref a c) (casa b d))]))
+
+
 (define (smcEval smcP)
 ;(writeln smcP)
   ;(read)
