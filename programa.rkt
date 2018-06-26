@@ -75,3 +75,33 @@
 (define-peg procSeq(and wordSeparator (name t1 procedureUnit) (? wordSeparator (name t2 procSeq))) (cond [t2 (procSeq t1 t2)] [else t1]))
 
 (define-peg blocoPRC (and (name t1 comando)) (blkP t1))
+
+
+(define (var->list a)
+  (match a
+    [#f '()]
+    [(variavelCL i) '(i)]
+    [(? list l) (map (lambda(x) (variavelCL-name x)) l)]))
+
+(define (destroyGlobals lVar lConst lInit)
+  (if (and (empty? lInit) (or (not (empty? lVar)) (not (empty? lConst))))
+      (raise "Init's não casados\nFaça-o.")
+      (match (list lVar lConst lInit)
+        (list '() (
+      
+
+
+(define (destroyClauses a)
+  (match a
+    [(clauses (#f #f #f p)) (if (hash-Main? (progConv procs)) (blk (progConv procs) (call (idt "main"))) (progConv procs))]))
+#|    [(clauses (var const init procs))
+       (let ([globals (destroyGlobals (var->list var) (const->list const) (init->list init))]
+             [newProcs (convertProcs procs)])
+         (if (has-Main? newProcs) (blk (if globals (dec globals newProcs) newProcs) (call (idt "main") ))
+             (if globals (dec globals newProcs) newProcs)))]))
+|#
+(define (progConv p)
+  (match p
+    [(pgrm name (? clauses? a)) (destroyClauses a)]
+    [(procSeq a b) (dec (progConv a) (progConv b))]
+    [(proc ident args bloco) ]))

@@ -17,6 +17,8 @@
 (provide peg-rule:constante)
 (provide peg-rule:declaracao)
 
+(provide variavelCL variavelCL? variavelCL-name)
+
 (struct atribution (var value) #:transparent)
 (struct declaraList (var decList) #:transparent)
 (struct atribSeq (atrib1 atribSeq2) #:transparent)
