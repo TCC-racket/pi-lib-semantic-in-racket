@@ -83,18 +83,29 @@
     [(variavelCL i) '(i)]
     [(? list l) (map (lambda(x) (variavelCL-name x)) l)]))
 
+#|
 (define (destroyGlobals lVar lConst lInit)
   (if (and (empty? lInit) (or (not (empty? lVar)) (not (empty? lConst))))
       (raise "Init's não casados\nFaça-o.")
       (match (list lVar lConst lInit)
         (list '() (
       
+|#
+(struct prc (ident bloco) #:transparent)
+(struct prcFormals (ident args bloco) #:transparent)
 
+(define (hasMain? a)
+  (match a
+    [(prc (idt "main") _ ) #t]
+    [(prcFormals (idt "main") _ _) #t]
+    [(dec a b) (or (hasMain? a) (hasMain? b))]
+    [else #f]))
 
 (define (destroyClauses a)
   (match a
-    [(clauses (#f #f #f p)) (if (hash-Main? (progConv procs)) (blk (progConv procs) (call (idt "main"))) (progConv procs))]))
-#|    [(clauses (var const init procs))
+    [(clauses #f #f #f p) (let ([procs (progConv p)]) (if (hasMain? procs) (blk procs (call (idt "main"))) procs))]))
+#|
+    [(clauses (var const init procs))
        (let ([globals (destroyGlobals (var->list var) (const->list const) (init->list init))]
              [newProcs (convertProcs procs)])
          (if (has-Main? newProcs) (blk (if globals (dec globals newProcs) newProcs) (call (idt "main") ))
@@ -104,4 +115,5 @@
   (match p
     [(pgrm name (? clauses? a)) (destroyClauses a)]
     [(procSeq a b) (dec (progConv a) (progConv b))]
-    [(proc ident args bloco) ]))
+    [(proc ident (idt #f) bloco) (prc ident (comandoConv bloco))]
+    [(proc ident args bloco) (prcFormals ident (progConv args) (comandoConv bloco))]))
