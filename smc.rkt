@@ -18,8 +18,8 @@
 
 (define (casa formals atuals)
 	(match (cons formals atuals)
-		[(cons (list a) (list c)) (ref a c)   ]
-		[(cons (list a b ...) (list c d ...)) (dec (ref a c) (casa b d))]))
+		[(cons (par a) (list c)) (ref a c)   ]
+		[(cons (for a b) (list c d ...)) (dec (ref a c) (casa b d))]))
 
 
 (define (smcEval smcP)
@@ -129,6 +129,6 @@
 
 	      [a (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a))]))))
 
-
-
+(struct absFormals (formals block) #:transparent)
+(struct abs (block) #:transparent)
 
