@@ -1,7 +1,8 @@
 #lang racket
 ; smc (hash? list? hash? list? (listof loc))
 (struct smc (env val mem control loc) #:transparent)
-(struct abs (formals block) #:transparent)
+(struct absFormals (formals block) #:transparent)
+(struct abs (block) #:transparent)
 
 (require "idt.rkt")
 (require "AritExp.rkt")
@@ -129,6 +130,5 @@
 
 	      [a (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a))]))))
 
-(struct absFormals (formals block) #:transparent)
-(struct abs (block) #:transparent)
+
 
