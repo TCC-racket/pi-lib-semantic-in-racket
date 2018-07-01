@@ -94,26 +94,29 @@
 (struct prc (ident bloco) #:transparent)
 (struct prcFormals (ident args bloco) #:transparent)
 
-(define (hasMain? a)
-  (match a
-    [(prc (idt "main") _ ) #t]
-    [(prcFormals (idt "main") _ _) #t]
-    [(dec a b) (or (hasMain? a) (hasMain? b))]
-    [else #f]))
+(struct par (ident) #:transparent)
+(struct for (ident rest) #:transparent)
 
 (define (destroyClauses a)
   (match a
-    [(clauses #f #f #f p) (let ([procs (progConv p)]) (if (hasMain? procs) (blk procs (call (idt "main"))) procs))]))
-#|
+    [(clauses #f #f #f p) (let ([procs (progConv p)]) (blk procs (call (idt "main"))))]))
     [(clauses (var const init procs))
-       (let ([globals (destroyGlobals (var->list var) (const->list const) (init->list init))]
-             [newProcs (convertProcs procs)])
-         (if (has-Main? newProcs) (blk (if globals (dec globals newProcs) newProcs) (call (idt "main") ))
-             (if globals (dec globals newProcs) newProcs)))]))
-|#
+      (let ([decGlobais (constroiGlobais var const init)]
+            [semGlobais (destroyClauses (clauses #f #f #f procs))])
+            
+            (blk decGlobais semGlobais))]))
+
+
 (define (progConv p)
   (match p
     [(pgrm name (? clauses? a)) (destroyClauses a)]
     [(procSeq a b) (dec (progConv a) (progConv b))]
     [(proc ident (idt #f) bloco) (prc ident (comandoConv bloco))]
-    [(proc ident args bloco) (prcFormals ident (progConv args) (comandoConv bloco))]))
+    [(proc ident args bloco) (prcFormals ident (progConv args) (comandoConv bloco))]
+    [])) ;argumentos
+
+
+
+
+
+
