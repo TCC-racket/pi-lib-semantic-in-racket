@@ -83,14 +83,7 @@
     [(variavelCL i) '(i)]
     [(? list l) (map (lambda(x) (variavelCL-name x)) l)]))
 
-#|
-(define (destroyGlobals lVar lConst lInit)
-  (if (and (empty? lInit) (or (not (empty? lVar)) (not (empty? lConst))))
-      (raise "Init's não casados\nFaça-o.")
-      (match (list lVar lConst lInit)
-        (list '() (
-      
-|#
+
 (struct prc (ident bloco) #:transparent)
 (struct prcFormals (ident args bloco) #:transparent)
 
@@ -103,7 +96,6 @@
     [(clauses (var const init procs))
       (let ([decGlobais (constroiGlobais var const init)]
             [semGlobais (destroyClauses (clauses #f #f #f procs))])
-            
             (blk decGlobais semGlobais))]))
 
 
@@ -113,7 +105,9 @@
     [(procSeq a b) (dec (progConv a) (progConv b))]
     [(proc ident (idt #f) bloco) (prc ident (comandoConv bloco))]
     [(proc ident args bloco) (prcFormals ident (progConv args) (comandoConv bloco))]
-    [])) ;argumentos
+    [(? idt? x) (par x)]
+    [(list a) (par a)] ; argumento
+    [(list a b ...) (for (par a) (progConv b))])) ;argumentos
 
 
 
