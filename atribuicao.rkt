@@ -1,6 +1,8 @@
 #lang racket
 
 (require peg/peg)
+ (require racket/lazy-require)
+(lazy-require ["Comando.rkt" (peg-rule:functF)] )
 (require (rename-in "BoolExp.rkt" [and andB] [or orB]))
 (require "AritExp.rkt")
 (require "Reservadas.rkt")
@@ -39,7 +41,7 @@
 		(or (range #\a #\z) (range #\A #\Z))
 		(* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9)))))
 
-(define-peg atribuicao (and (name t1 variable) spaces ":=" spaces (name t2 (or boolExp aritExp string))) (atribution t1 t2))
+(define-peg atribuicao (and (name t1 variable) spaces ":=" spaces (name t2 (or boolExp aritExp functF string ))) (atribution t1 t2))
 
 ;auxiliares de clauses, usadas nas PEGs variavel | constante | inicializacao
 

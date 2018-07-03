@@ -79,19 +79,24 @@
 
 (define (var->list a)
   (match a
-    [#f '()]
-    [(variavelCL i) '(i)]
-    [(? list l) (map (lambda(x) (variavelCL-name x)) l)]))
+    [#f (list)]
+    [(variavelCL #f) '()]
+    [(variavelCL i) (list i)]
+    [(? list? l) (map (lambda(x) (variavelCL-name x)) l)]))
+
 (define (const->list a)
   (match a
-    [#f '()]
-    [(constanteCL i) '(i)]
-    [(? list l) (map (lambda(x) (constanteCL-name x))l)]))
+    [#f (list)]
+    [(constanteCL #f) '()]
+    [(constanteCL i) (list i)]
+    [(? list? l) (map (lambda(x) (constanteCL-name x)) l)]))
 
 (define (init->list a)
   (match a
-    [#f '()]
-    [a a]))
+    [#f (list)]
+    [(initCL #f #f) '()]
+    [(initCL a b) (list (initCL a b))]
+    [(? list? l) l]))
 
 
 
@@ -104,28 +109,25 @@
 
 
 (define (constroiGlobais v c i)
+  (writeln (list v c i))
   (match (list v c i)
     [(list (list) (list a) (list (initCL a value))) 
      (cns a value)]
-    [(list(list a)(list) (list(initCL a value)))
+    [(list (list a) (list) (list (initCL a value)))
      (ref a value)]
-     
     [(list (list-no-order a b ...) (? list? k) (list-no-order (initCL a value) c ...))
      (dec (ref a value) (constroiGlobais b k c))]
     [(list (? list? k) (list-no-order a b ...) (list-no-order (initCL a value) c ...))
-     (dec (cns a value) (constroiGlobais b k c))]
-    [(list (list)(list)(list(initCL a value)c ...))
-     (raise "Mais inicializacoes do que variaveis ou constantes")]
-    ))
+     (dec (cns a value) (constroiGlobais k b c))]))
 
   
 
 (define (destroyClauses a)
   (match a
-    [(clauses #f #f #f p) (let ([procs (progConv p)]) (blk procs (call (idt "main"))))]
+    [(clauses (variavelCL #f) (constanteCL #f) (initCL #f #f) p) (let ([procs (progConv p)]) (blk procs (cal (idt "main"))))]
     [(clauses var const initCL procs)
       (let ([decGlobais (constroiGlobais (var->list var) (const->list const) (init->list initCL))]
-            [semGlobais (destroyClauses (clauses #f #f #f procs))])
+            [semGlobais (destroyClauses (clauses (variavelCL #f) (constanteCL #f) (initCL #f #f) procs))])
             (blk decGlobais semGlobais))]))
 
 
@@ -139,9 +141,6 @@
     [(? idt? x) (par x)]
     [(list a) (par a)] ; argumento
     [(list a b ...) (for (par a) (progConv b))])) ;argumentos
-
-
-
 
 
 
