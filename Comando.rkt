@@ -6,7 +6,7 @@
 (require "AritExp.rkt")
 (require "Reservadas.rkt")
 (require "espacos.rkt")
-
+(require "Exp.rkt")
 (provide peg-rule:seq)
 (provide peg-rule:choiceOp)
 (provide peg-rule:comando)
@@ -126,10 +126,17 @@
 (struct loop (cond corpo) #:transparent)
 (provide loop)
 
+(struct act (exp a) #:transparent)
+
+(struct calAtuals (idt a) #:transparent)
+(struct cal (idt) #:transparent)
 (provide exit? exit-a)
 (provide comandoConv)
 (provide blk)
-
+(define  (transAtual a)
+  (match a
+    [(list b) (expConv b)]
+    [(list a b ...) (act (expConv a) (transAtual b))]))
 
 (define (comandoConv exp)
 	(match exp
@@ -141,4 +148,6 @@
 	[(choice a b)(choice (comandoConv a) (comandoConv b))]
 	[(exit a)(exit (if (boolExp? a) (boolConv a) (aritConv a) ))]
 	[(atribution a b) (atribConv (atribution a b)) ]
-	[(blk a b) (blk (atribConv a) (comandoConv b))]))
+	[(blk a b) (blk (atribConv a) (comandoConv b))]
+        [(call a #f) (cal a)]
+        [(call a b) (calAtuals a (transAtual b))] ))

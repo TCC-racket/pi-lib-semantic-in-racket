@@ -82,6 +82,18 @@
     [#f '()]
     [(variavelCL i) '(i)]
     [(? list l) (map (lambda(x) (variavelCL-name x)) l)]))
+(define (const->list a)
+  (match a
+    [#f '()]
+    [(constanteCL i) '(i)]
+    [(? list l) (map (lambda(x) (constanteCL-name x))l)]))
+
+(define (init->list a)
+  (match a
+    [#f '()]
+    [a a]))
+
+
 
 
 (struct prc (ident bloco) #:transparent)
@@ -90,13 +102,32 @@
 (struct par (ident) #:transparent)
 (struct for (ident rest) #:transparent)
 
+
+(define (constroiGlobais v c i)
+  (match (list v c i)
+    [(list (list) (list a) (list (initCL a value))) 
+     (cns a value)]
+    [(list(list a)(list) (list(initCL a value)))
+     (ref a value)]
+     
+    [(list (list-no-order a b ...) (? list? k) (list-no-order (initCL a value) c ...))
+     (dec (ref a value) (constroiGlobais b k c))]
+    [(list (? list? k) (list-no-order a b ...) (list-no-order (initCL a value) c ...))
+     (dec (cns a value) (constroiGlobais b k c))]
+    [(list (list)(list)(list(initCL a value)c ...))
+     (raise "Mais inicializacoes do que variaveis ou constantes")]
+    ))
+
+  
+
 (define (destroyClauses a)
   (match a
-    [(clauses #f #f #f p) (let ([procs (progConv p)]) (blk procs (call (idt "main"))))]))
-    [(clauses (var const init procs))
-      (let ([decGlobais (constroiGlobais var const init)]
+    [(clauses #f #f #f p) (let ([procs (progConv p)]) (blk procs (call (idt "main"))))]
+    [(clauses var const initCL procs)
+      (let ([decGlobais (constroiGlobais (var->list var) (const->list const) (init->list initCL))]
             [semGlobais (destroyClauses (clauses #f #f #f procs))])
             (blk decGlobais semGlobais))]))
+
 
 
 (define (progConv p)

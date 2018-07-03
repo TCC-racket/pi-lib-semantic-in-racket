@@ -18,7 +18,7 @@
 (provide peg-rule:declaracao)
 
 (provide variavelCL variavelCL? variavelCL-name)
-
+(provide constanteCL constanteCL? constanteCL-name)
 (struct atribution (var value) #:transparent)
 (struct declaraList (var decList) #:transparent)
 (struct atribSeq (atrib1 atribSeq2) #:transparent)
@@ -87,6 +87,7 @@
 (struct assign (idt exp) #:transparent)
 
 (provide assign)
+(provide initCL)
 
 
 (struct ref (a b) #:transparent)
