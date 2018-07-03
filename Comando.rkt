@@ -16,6 +16,9 @@
 (provide seq choice)
 (provide call)
 (provide peg-rule:functF)
+(provide peg-rule:returnR)
+;(provide peg-rule:blocoF)
+;(provide peg-rule:comandoF)
 (provide cal)
 
 (struct block (declarations commands) #:transparent)
@@ -29,6 +32,8 @@
 (struct idt (nome) #:transparent)
 (struct call (nome arg) #:transparent)
 (struct callF (nome arg) #:transparent)
+;(struct blkF (decSeq seq) #:transparent)
+(struct rtn (exp) #:transparent)
 
 
 ;Parte de programa / função -> call
@@ -57,6 +62,23 @@
 (define-peg functF (and wordSeparator (name t1 ident) wordSeparator
                        "(" wordSeparator (name t2 expList)
                        wordSeparator ")" wordSeparator) (callF t1 t2))
+#|
+(define-peg blocoF (and wordSeparator (name t1 declaracao)
+                       wordSeparator pointvirg wordSeparator
+                       (name t2 comandoF))
+  (blkF t1 t2))
+
+(define-peg comandoF (or seqF choiceOp cmdUnitF))
+
+(define-peg seqF(and (name t1 cmdUnitF)
+                     (?(name sep separador)
+                       (name t2 seqF)))
+  (cond [t2 (seq t1 t2)] [else t1]))
+
+(define-peg cmdUnitF (or atribuicao condicional loop  print exit returnR funct))
+|#
+(define-peg returnR (and wordSeparator return spaces (name t1 (or boolExp aritExp functF variable string )) spaces) (rtn t1))
+
 ;--------------------------------------------------------------------------------------
 
 (define-peg separador(and wordSeparator (or virg pointvirg newLines) wordSeparator))
@@ -91,9 +113,9 @@
 
 
 (define-peg newIf (and wordSeparator
-                  "if" spaces (name condicao boolExp) wordSeparator (or (and "{" wordSeparator (name corpoIf (or bloco comando)) wordSeparator "}")
+                  "if" spaces (name condicao boolExp) wordSeparator (or (and "{" wordSeparator (name corpoIf (or bloco comando)) wordSeparator "}") ;or blocoF bloco comandoF comando
                                                                  (name corpoIf cmdUnit)) wordSeparator
-                   (? (and "else" wordSeparator (or (and "{" wordSeparator (name corpoElse (or bloco comando)) wordSeparator "}") (name corpoElse cmdUnit)))))
+                   (? (and "else" wordSeparator (or (and "{" wordSeparator (name corpoElse (or bloco comando)) wordSeparator "}") (name corpoElse cmdUnit))))) ;or blocoF bloco comandoF comando
   (cond [corpoElse (ifElse condicao corpoIf corpoElse)] [else (ifP condicao corpoIf)]))
 
 
@@ -129,7 +151,7 @@
 (struct whileDo (condicao corpo)  #:transparent)
 
 (define-peg loop (and
-"while" spaces (name condicao boolExp) wordSeparator "do" spaces "{" wordSeparator (name corpo (or bloco comando)) wordSeparator "}")
+"while" spaces (name condicao boolExp) wordSeparator "do" spaces "{" wordSeparator (name corpo (or bloco comando)) wordSeparator "}") ;or blocoF bloco comandoF comando
   (whileDo condicao corpo))
 
 (struct loop (cond corpo) #:transparent)

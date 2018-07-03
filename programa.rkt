@@ -1,19 +1,25 @@
 #lang racket
 
 (require peg/peg)
+(require racket/lazy-require)
 (require "Comando.rkt")
 (require "atribuicao.rkt")
 (require "espacos.rkt")
 (require "Reservadas.rkt")
+(lazy-require ["AritExp.rkt" (peg-rule:aritExp)] )
+(lazy-require ["BoolExp.rkt" (peg-rule:boolExp)] )
 
 ;(provide peg-rule:programa)
 
 (struct proc (idt args corpo) #:transparent)
+(struct fun (idt args corpo retorno) #:transparent)
 (struct procSeq (proc seq) #:transparent)
+(struct funSeq (fun seq) #:transparent)
 (struct idt (nome) #:transparent)
 (struct pgrm (ident clauses) #:transparent)
-(struct clauses (vars consts inits procs) #:transparent)
+(struct clauses (vars consts inits procs funs) #:transparent)
 (struct blkP (cmds) #:transparent)
+(struct blkFUN (cmds) #:transparent)
 
 ;(define-peg processo (and proc wordSeparator (name t1 token) wordSeparator "{" wordSeparator (name t2 comando) wordSeparator "}") (proc t1 t2))
 
@@ -48,11 +54,11 @@
                              (? wordSeparator virg wordSeparator (name t2 variableAUX))))
   (cond [t2 (cons (idt t1) t2)] [else (idt t1)]))
                    
-(define-peg programa (and wordSeparator "("
+(define-peg programa (and wordSeparator
                       wordSeparator module wordSeparator
                       (name t1 ident) wordSeparator
                       (name t2 clausesR) wordSeparator
-                      end ")") (pgrm t1 t2))
+                      end ) (pgrm t1 t2))
 
 ;R de "rule" | "regra"
 (define-peg clausesR (and wordSeparator                          
@@ -60,7 +66,8 @@
                          (name t2 constante) wordSeparator
                          (name t3 inicializacao) wordSeparator
                          (name t4 procedure) wordSeparator
-                         ) (clauses t1 t2 t3 t4))
+                         (? (name t5 function)) wordSeparator
+                         ) (clauses t1 t2 t3 t4 t5))
 
 (define-peg procedure (or procSeq procedureUnit))
 
@@ -72,11 +79,30 @@
                       (name t3 (or bloco blocoPRC)) wordSeparator
                       "}" wordSeparator) (proc t1 t2 t3))
 
-(define-peg procSeq(and wordSeparator (name t1 procedureUnit) (? wordSeparator (name t2 procSeq))) (cond [t2 (procSeq t1 t2)] [else t1]))
+(define-peg procSeq(and wordSeparator (name t1 procedureUnit)
+                        (? wordSeparator (name t2 procSeq)))
+  (cond [t2 (procSeq t1 t2)] [else t1]))
+
+(define-peg function (or funSeq functionUnit))
+
+(define-peg functionUnit (and wordSeparator fun wordSeparator
+                      (name t1 ident)
+                      wordSeparator "(" wordSeparator
+                      (name t2 variableList) wordSeparator ")"
+                      wordSeparator "{" wordSeparator
+                      (name t3 (or bloco blocoPRC)) wordSeparator
+                      (name t4 returnR)
+                      "}" wordSeparator )
+  (fun t1 t2 t3 t4))
+
+(define-peg funSeq(and wordSeparator (name t1 functionUnit)
+                        (? wordSeparator (name t2 funSeq)))
+  (cond [t2 (funSeq t1 t2)] [else t1]))
 
 (define-peg blocoPRC (and (name t1 comando)) (blkP t1))
 
-
+;(define-peg blocoFUN (and (name t1 comandoF)) (blkFUN t1))
+#|
 (define (var->list a)
   (match a
     [#f (list)]
@@ -144,3 +170,4 @@
 
 
 
+|#
