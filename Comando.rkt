@@ -17,7 +17,7 @@
 (provide call)
 (provide peg-rule:functF)
 (provide peg-rule:returnR)
-;(provide peg-rule:blocoF)
+(provide peg-rule:blocoF)
 ;(provide peg-rule:comandoF)
 (provide cal)
 
@@ -32,7 +32,7 @@
 (struct idt (nome) #:transparent)
 (struct call (nome arg) #:transparent)
 (struct callF (nome arg) #:transparent)
-;(struct blkF (decSeq seq) #:transparent)
+(struct blkF (decSeq seq) #:transparent)
 (struct rtn (exp) #:transparent)
 
 
@@ -62,12 +62,12 @@
 (define-peg functF (and wordSeparator (name t1 ident) wordSeparator
                        "(" wordSeparator (name t2 expList)
                        wordSeparator ")" wordSeparator) (callF t1 t2))
-#|
+
 (define-peg blocoF (and wordSeparator (name t1 declaracao)
                        wordSeparator pointvirg wordSeparator
-                       (name t2 comandoF))
+                       (name t2 comando))
   (blkF t1 t2))
-
+#|
 (define-peg comandoF (or seqF choiceOp cmdUnitF))
 
 (define-peg seqF(and (name t1 cmdUnitF)
@@ -90,7 +90,7 @@
 (define-peg exit(and wordSeparator exitR"(" spaces (name t1 (or boolExp aritExp functF)) spaces ")") (exit t1))
 
 ;Agora com funct
-(define-peg cmdUnit (or atribuicao condicional loop print exit funct))
+(define-peg cmdUnit (or atribuicao condicional loop print exit returnR funct))
 
 ;(define-peg comando (and (name value (or seq choiceOp cmdUnit)) (drop (? (and wordSeparator pointvirg)))) value)
 (define-peg comando (or seq choiceOp cmdUnit))

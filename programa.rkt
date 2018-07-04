@@ -12,7 +12,7 @@
 ;(provide peg-rule:programa)
 
 (struct proc (idt args corpo) #:transparent)
-(struct fun (idt args corpo retorno) #:transparent)
+(struct fun (idt args corpo) #:transparent)
 (struct procSeq (proc seq) #:transparent)
 (struct funSeq (fun seq) #:transparent)
 (struct idt (nome) #:transparent)
@@ -20,6 +20,8 @@
 (struct clauses (vars consts inits procs funs) #:transparent)
 (struct blkP (cmds) #:transparent)
 (struct blkFUN (cmds) #:transparent)
+
+
 
 ;(define-peg processo (and proc wordSeparator (name t1 token) wordSeparator "{" wordSeparator (name t2 comando) wordSeparator "}") (proc t1 t2))
 
@@ -91,9 +93,8 @@
                       (name t2 variableList) wordSeparator ")"
                       wordSeparator "{" wordSeparator
                       (name t3 (or bloco blocoPRC)) wordSeparator
-                      (name t4 returnR)
                       "}" wordSeparator )
-  (fun t1 t2 t3 t4))
+  (fun t1 t2 t3))
 
 (define-peg funSeq(and wordSeparator (name t1 functionUnit)
                         (? wordSeparator (name t2 funSeq)))
@@ -101,7 +102,7 @@
 
 (define-peg blocoPRC (and (name t1 comando)) (blkP t1))
 
-;(define-peg blocoFUN (and (name t1 comandoF)) (blkFUN t1))
+(define-peg blocoFUN (and (name t1 comando)) (blkFUN t1))
 #|
 (define (var->list a)
   (match a
