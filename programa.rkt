@@ -103,7 +103,7 @@
 (define-peg blocoPRC (and (name t1 comando)) (blkP t1))
 
 (define-peg blocoFUN (and (name t1 comando)) (blkFUN t1))
-#|
+
 (define (var->list a)
   (match a
     [#f (list)]
@@ -135,33 +135,10 @@
 (struct for (ident rest) #:transparent)
 
 
-(define (constroiGlobais v c i)
-  (writeln (list v c i))
-  (match (list v c i)
-    [(list (list) (list a) (list (initCL a value))) 
-     (cns a value)]
-    [(list (list a) (list) (list (initCL a value)))
-     (ref a value)]
-    [(list (list-no-order a b ...) (? list? k) (list-no-order (initCL a value) c ...))
-     (dec (ref a value) (constroiGlobais b k c))]
-    [(list (? list? k) (list-no-order a b ...) (list-no-order (initCL a value) c ...))
-     (dec (cns a value) (constroiGlobais k b c))]))
-
-  
-
-(define (destroyClauses a)
-  (match a
-    [(clauses (variavelCL #f) (constanteCL #f) (initCL #f #f) p) (let ([procs (progConv p)]) (blk procs (cal (idt "main"))))]
-    [(clauses var const initCL procs)
-      (let ([decGlobais (constroiGlobais (var->list var) (const->list const) (init->list initCL))]
-            [semGlobais (destroyClauses (clauses (variavelCL #f) (constanteCL #f) (initCL #f #f) procs))])
-            (blk decGlobais semGlobais))]))
-
-
 
 (define (progConv p)
   (match p
-    [(pgrm name (? clauses? a)) (destroyClauses a)]
+    [(pgrm name (clauses (variavelCL i) (constanteCL #f) (initCL i v) procs funs)) (dec (ref (idt i) v) #f)]
     [(procSeq a b) (dec (progConv a) (progConv b))]
     [(proc ident (idt #f) bloco) (prc ident (comandoConv bloco))]
     [(proc ident args bloco) (prcFormals ident (progConv args) (comandoConv bloco))]
@@ -171,4 +148,3 @@
 
 
 
-|#
