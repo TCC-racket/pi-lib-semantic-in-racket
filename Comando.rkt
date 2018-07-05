@@ -18,8 +18,10 @@
 (provide peg-rule:functF)
 (provide peg-rule:returnR)
 (provide peg-rule:blocoF)
+(provide blkP)
 ;(provide peg-rule:comandoF)
 (provide cal)
+(struct blkP (cmds) #:transparent)
 
 (struct block (declarations commands) #:transparent)
 (struct comando (U seq init atrib print exit) #:transparent)
@@ -34,8 +36,8 @@
 (struct callF (nome arg) #:transparent)
 (struct blkF (decSeq seq) #:transparent)
 (struct rtn (exp) #:transparent)
-
-
+(struct blkComand(a) #:transparent) 
+ 
 ;Parte de programa / função -> call
 (define-peg ident (name nome (and  
                           (or (range #\a #\z) (range #\A #\Z))
@@ -165,13 +167,16 @@
 (provide comandoConv)
 (provide blk)
 (define  (transAtual a)
-  (match a
-    [(list b) (expConv b)]
-    [(list a b ...) (act (expConv a) (transAtual b))]))
 
+(display a)
+  
+  (cond [(list? a)
+         (cond [(empty? (cdr a))
+                (expConv (car a))]
+               [else (act (expConv (car a)) (transAtual (cdr a)))])]
+         [else (expConv a)]))
 
-
-
+(provide callF?)
 
 (define (comandoConv exp)
 	(match exp
@@ -185,4 +190,5 @@
 	[(atribution a b) (atribConv (atribution a b)) ]
 	[(blk a b) (blk (atribConv a) (comandoConv b))]
         [(call a #f) (cal a)]
-        [(call a b) (calAtuals a (transAtual b))] ))
+        [(call a b) (calAtuals a  (transAtual b))]
+        [(blkP a) (blkComand (comandoConv a))]))

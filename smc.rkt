@@ -10,6 +10,7 @@
 (require "BoolExp.rkt")
 (require "atribuicao.rkt")
 (require "ambiente.rkt")
+(require "programa.rkt")
 (provide executeSMC smc)
 (define (executeSMC bplc)
   (smcEval (smc (hash) '() (hash) (list bplc) '())))

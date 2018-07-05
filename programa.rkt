@@ -11,6 +11,7 @@
 
 ;(provide peg-rule:programa)
 
+
 (struct proc (idt args corpo) #:transparent)
 (struct fun (idt args corpo) #:transparent)
 (struct procSeq (proc seq) #:transparent)
@@ -18,7 +19,7 @@
 (struct idt (nome) #:transparent)
 (struct pgrm (ident clauses) #:transparent)
 (struct clauses (vars consts inits procs funs) #:transparent)
-(struct blkP (cmds) #:transparent)
+
 (struct blkFUN (cmds) #:transparent)
 
 
@@ -133,12 +134,13 @@
 
 (struct par (ident) #:transparent)
 (struct for (ident rest) #:transparent)
-
-
+(provide par)
+(provide for)
 
 (define (progConv p)
   (match p
-    [(pgrm name (clauses (variavelCL i) (constanteCL #f) (initCL i v) procs funs)) (dec (ref (idt i) v) #f)]
+    [(pgrm name (clauses (variavelCL i)  (constanteCL #f) (initCL i v) procs #f))
+                          (dec (ref (idt i) v) (progConv procs))]
     [(procSeq a b) (dec (progConv a) (progConv b))]
     [(proc ident (idt #f) bloco) (prc ident (comandoConv bloco))]
     [(proc ident args bloco) (prcFormals ident (progConv args) (comandoConv bloco))]
