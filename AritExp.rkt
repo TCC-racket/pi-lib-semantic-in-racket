@@ -40,7 +40,7 @@
 ;soma e subtração são operações definidas sobre grupos
 ;(define-peg groupOp (and spaces (name t1 fieldOp) (? (and spaces (name op (or #\+ #\-)) spaces (name t2 groupOp))))
 ;                  (if t2 (if (equal? op "+") (soma t1 t2) (norm (sub t1 t2))) t1 ))
-(define-peg divisoes (and (name s1 (or parenteses number variable functF)) (? (and spaces "/" spaces (name s2 divisoes)))) (if s2 (cons s1 s2) (cons s1 '())))
+(define-peg divisoes (and (name s1 (or parenteses number functF variable)) (? (and spaces "/" spaces (name s2 divisoes)))) (if s2 (cons s1 s2) (cons s1 '())))
 (define-peg produtos (and (name s1 divisoes) (? (and spaces "*" spaces (name s2 produtos)))) (if s2 (prod (normDiv s1) s2) (normDiv s1)))
 (define-peg subtracoes (and (name s1 produtos) (? (and spaces "-" spaces (name s2 subtracoes)))) (if s2 (cons s1 s2) (cons s1 '())))
 (define-peg somas (and (name s1 subtracoes) (? (and spaces "+" spaces (name s2 somas)))) (if s2 (soma (normSub s1) s2) (normSub s1)))

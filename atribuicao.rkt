@@ -39,7 +39,8 @@
 
 (define-peg variable (and
 		(or (range #\a #\z) (range #\A #\Z))
-		(* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9)))))
+		(* (or (range #\a #\z) (range #\A #\Z) (range #\0 #\9)))
+                (! "(")))
 
 (define-peg atribuicao (and (name t1 variable) spaces ":=" spaces (name t2 (or boolExp aritExp functF string ))) (atribution t1 t2))
 
