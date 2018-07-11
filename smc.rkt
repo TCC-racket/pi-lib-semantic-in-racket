@@ -128,14 +128,14 @@
 	      [(smc env (list a v ...) m (list 'cns (idt i) r ...) locali)
 	      	(let ([newEnv (constant env i a )]) (smc newEnv v m r locali))]
 
-	      [(smc env v m (list (calf a) r ...) locali)
-	      	(smc env (cons (lambda (x) (smc env (cons x v) m r locali)) v) m (append (list a 'cal) r) locali)]
-	      [(smc env v m (list (calAtualsf id atuals) r ...) locali)
-	      	(smc env (cons (lambda (x) (smc env (cons x v) m r locali)) v) m (append (list id atuals 'cal) r) locali)]
+	     ; [(smc env v m (list (calf a) r ...) locali)
+	      ;	(smc env (cons (lambda (x) (smc env (cons x v) m r locali)) v) m (append (list a 'cal) r) locali)]
+	      ;[(smc env v m (list (calAtualsf id atuals) r ...) locali)
+	      	;(smc env (cons (lambda (x) (smc env (cons x v) m r locali)) v) m (append (list id atuals 'cal) r) locali)]
 	      
-	      [(smc env v m (list (funFormals (idt i) formals block) r ...) locali)
-	      	(smc (constant env i (absFormals formals block)) v m r locali)]
-	      [(smc env v m (list (fun (idt i) block) r ...) locali) (smc (constant env i (abs block)) v m r locali)]
+	     ; [(smc env v m (list (funFormals (idt i) formals block) r ...) locali)
+	      ;	(smc (constant env i (absFormals formals block)) v m r locali)]
+	      ;[(smc env v m (list (fun (idt i) block) r ...) locali) (smc (constant env i (abs block)) v m r locali)]
 	      
 	      [(smc env a m (list (ret c) d ...) locali) (smc env a m (append (list c 'ret) d) locali)]
 	      [(smc env (list v a ... (? procedure? f) r ...) m (list 'ret r ...) locali)  (f v)]
