@@ -7,26 +7,22 @@
 
 (define teste1 (lambda() (executeSMC
                           (comandoConv
-                           (peg bloco
+                           (peg programa
 "
- var y = 6, x = 1;
- x := y+5;
- if(x == 42){
-  print(y)
- } else { var x = 3;
-  print(x);
-  print(y)}")))))
+ module Fact-Rec
+   var y
+   init y=1
+   proc fact(x) { 
+      if ~(x == 0)   
+      {
+		y := y*x ;
+		fact(x-1) 
+      }
+      else print(y) 
+   }
+end")(display 10)))))
 
-(define teste2 (lambda() (executeSMC
-                          (comandoConv
-                           (peg bloco
-"
-var y = 1, x = 19000;
-  while ~ (x == 0)
-    do { y := y * x ;
-         x := x - 1}; 
-print(y)")))))
 
 ;chamada dos testes
-(teste2)
+
 (teste1)
