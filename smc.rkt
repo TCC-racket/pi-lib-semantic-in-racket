@@ -137,7 +137,7 @@
 	      ;	(smc (constant env i (absFormals formals block)) v m r locali)]
 	      ;[(smc env v m (list (fun (idt i) block) r ...) locali) (smc (constant env i (abs block)) v m r locali)]
 	      
-	      [(smc env a m (list (ret c) d ...) locali) (smc env a m (append (list c 'ret) d) locali)]
+	     ; [(smc env a m (list (ret c) d ...) locali) (smc env a m (append (list c 'ret) d) locali)]
 	      [(smc env (list v a ... (? procedure? f) r ...) m (list 'ret r ...) locali)  (f v)]
 
 	      
