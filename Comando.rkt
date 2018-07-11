@@ -22,6 +22,7 @@
 ;(provide peg-rule:comandoF)
 (provide cal)
 (struct blkP (cmds) #:transparent)
+(provide calAtuals)
 
 (struct block (declarations commands) #:transparent)
 (struct comando (U seq init atrib print exit) #:transparent)
@@ -120,7 +121,11 @@
                    (? (and "else" wordSeparator (or (and "{" wordSeparator (name corpoElse (or bloco comando)) wordSeparator "}") (name corpoElse cmdUnit))))) ;or blocoF bloco comandoF comando
   (cond [corpoElse (ifElse condicao corpoIf corpoElse)] [else (ifP condicao corpoIf)]))
 
+(struct blkComandDec (a b) #:transparent)
 
+(provide blkComand)
+
+(provide blkComandDec)
 
 
 ;(define-peg ifElse (and wordSeparator
@@ -160,6 +165,7 @@
 (provide loop)
 
 (struct act (exp a) #:transparent)
+(provide act)
 
 (struct calAtuals (idt a) #:transparent)
 (struct cal (idt) #:transparent)
@@ -167,8 +173,6 @@
 (provide comandoConv)
 (provide blk)
 (define  (transAtual a)
-
-(display a)
   
   (cond [(list? a)
          (cond [(empty? (cdr a))
