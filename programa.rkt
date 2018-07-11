@@ -9,7 +9,7 @@
 (lazy-require ["AritExp.rkt" (peg-rule:aritExp)] )
 (lazy-require ["BoolExp.rkt" (peg-rule:boolExp)] )
 
-;(provide peg-rule:programa)
+(provide peg-rule:programa)
 
 
 (struct proc (idt args corpo) #:transparent)
@@ -131,11 +131,14 @@
 
 (struct prc (ident bloco) #:transparent)
 (struct prcFormals (ident args bloco) #:transparent)
-
+(provide prcFormals)
+(provide prc)
 (struct par (ident) #:transparent)
 (struct for (ident rest) #:transparent)
 (provide par)
 (provide for)
+(provide progConv)
+
 
 (define (progConv p)
   (match p
@@ -147,6 +150,5 @@
     [(? idt? x) (par x)]
     [(list a) (par a)] ; argumento
     [(list a b ...) (for (par a) (progConv b))])) ;argumentos
-
 
 
