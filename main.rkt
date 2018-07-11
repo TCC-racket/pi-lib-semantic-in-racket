@@ -6,7 +6,7 @@
 (require "smc.rkt")
 
 (define teste1 (lambda() (executeSMC
-                          (comandoConv
+                          (progConv
                            (peg programa
 "
  module Fact-Rec
@@ -20,7 +20,7 @@
       }
       else print(y) 
    }
-end")(display 10)))))
+end")))))
 
 
 ;chamada dos testes
