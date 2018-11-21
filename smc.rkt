@@ -4,20 +4,10 @@
 (struct absFormals (formals block) #:transparent)
 (struct abs (block) #:transparent)
 
-(require "idt.rkt")
-(require "AritExp.rkt")
-(require (rename-in "Comando.rkt" [if ifBPLC] [print printBPLC]))
-(require "BoolExp.rkt")
-(require "atribuicao.rkt")
-(require "ambiente.rkt")
-(require "programa.rkt")
 (provide executeSMC smc)
 (define (executeSMC bplc)
   (smcEval (smc (hash) '() (hash) (list bplc) '())))
   
-  
-  
-
 (define (casa formals atuals)
 	(match (cons formals atuals)
 		[(cons (par a) (list c)) (ref a c)   ]
@@ -25,9 +15,6 @@
 
 
 (define (smcEval smcP)
-;(writeln smcP)
-  ;(read)
-;  (sleep 1)
   (if
   	(and (empty? (smc-val smcP)) (empty? (smc-control smcP)))
 	smcP
