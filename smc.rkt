@@ -2,6 +2,11 @@
 
 (require "ambiente.rkt")
 
+(struct try/catch (t c) #:transparent)
+(struct throw (e) #:transparent)
+(struct try/catch/finally (t c f) #:transparent)
+
+
 (struct cont (env s c) #:transparent)
 
 (struct yield (expression function-name) #:transparent)
@@ -207,6 +212,9 @@
 						       v
 						       c) (idt "k")))))])
 		 (smc env2 v m (cons (ret e) c) locali))]
+
+	      [(smc env v m (list (try/catch e c) r ...) locali) (smc env v m (cons (try/catch/finally e c (nop)) r) locali)]
+		;;;Possivelmente essa ultima transição virará um throw
               [a (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a))]))))
 
 
