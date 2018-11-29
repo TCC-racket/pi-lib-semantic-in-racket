@@ -4,6 +4,8 @@
 
 (struct cont (env s c) #:transparent)
 
+(struct yield (expression function-name) #:transparent)
+
 (struct ret (a) #:transparent)
 (struct calf (a) #:transparent)
 (struct calAtualsf (a b) #:transparent)
@@ -185,13 +187,26 @@
               	(smc (constant env i (absFormals formals block)) v m r locali)]
               [(smc env v m (list (fun (idt i) block) r ...) locali) (smc (constant env i (abs block)) v m r locali)]
 	      
-               [(smc env a m (list (ret c) d ...) locali) (smc env a m (append (list c 'ret) d) locali)]
+              [(smc env a m (list (ret c) d ...) locali) (smc env a m (append (list c 'ret) d) locali)]
               [(smc env (list v a ... (cont e s c) r ...) m (list 'ret r ...) locali)
                (smc e (cons v s) m c locali)]
 
               [(smc env v m (list (call/cc f) c ...) locali)
                (smc env v m (cons (calf f (cont env v c)) c) locali) ]
               [(smc env v m (list (? cont? a) c ...) locali) (smc env (cons a v) m c locali)]
+
+	      ;;;Como fazer isso respeitando a tipagem??
+
+	      [(smc env v m (list (yield e (idt i)) c ...) locali)
+	       (let ([env2 (constant env i
+				     (call/cc
+				       (absFormals (par (idt "k"))
+						   (cal
+						     (cont
+						       env
+						       v
+						       c) (idt "k")))))])
+		 (smc env2 v m (cons (ret e) c) locali))]
               [a (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a))]))))
 
 
