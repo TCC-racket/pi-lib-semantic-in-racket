@@ -6,6 +6,9 @@
 (struct throw (e) #:transparent)
 (struct try/catch/finally (t c f) #:transparent)
 
+;continuation struct, receive environment, value stack and control stack
+;invocation of continuation put their fields in correct place, and the value
+;that are actual on invocation on top of value stack
 
 (struct cont (env s c) #:transparent)
 
@@ -61,6 +64,17 @@
 
 (struct seq (a b) #:transparent)
 
+;call/cc receive a 1-arity function, that will be
+;invoked now with the actual continuation.
+;is important because we can build apart the continuation
+;aspect from the process
+
+;in a future implementation of CPS(cyber-physical systems)
+;the concept of continuation can change to use continuos time
+;but actual code must not be changed because they use call/cc
+;to get continuations
+;in fact, constructs that use continuations must call call/cc
+;with a specialized function.
 
 (struct call/cc (a) #:transparent)
 
