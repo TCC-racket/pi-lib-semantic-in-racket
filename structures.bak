@@ -1,0 +1,81 @@
+#lang racket
+
+(struct try/catch (t c) #:transparent)
+(struct throw (e) #:transparent)
+(struct try/catch/finally (t c f) #:transparent)
+
+;continuation struct, receive environment, value stack and control stack
+;invocation of continuation put their fields in correct place, and the value
+;that are actual on invocation on top of value stack
+
+(struct cont (env s c) #:transparent)
+
+(struct yield (expression function-name) #:transparent)
+
+(struct ret (a) #:transparent)
+(struct calf (a) #:transparent)
+(struct calAtualsf (a b) #:transparent)
+(struct fun (a b) #:transparent)
+(struct funFormals (a b c) #:transparent)
+(struct nop () #:transparent)
+(struct if-struct (cond then else) #:transparent)
+(struct print (a) #:transparent)
+(struct exit (a) #:transparent)
+(struct act (a b) #:transparent)
+(struct calAtuals (a b) #:transparent)
+(struct cal (a) #:transparent)
+(struct prc (a b) #:transparent)
+(struct prcFormals (a b c) #:transparent)
+(struct cns (a b) #:transparent)
+(struct blkComand (a) #:transparent)
+(struct blkComandDec (a b) #:transparent)
+
+(struct idt (a) #:transparent)
+
+(struct assign (a b) #:transparent)
+
+(struct loop (a b) #:transparent)
+
+(struct choice (a b) #:transparent)
+
+(struct eq (a b) #:transparent)
+
+(struct neg (a) #:transparent)
+
+(struct ref (a b) #:transparent)
+(struct dec (a b) #:transparent)
+
+(struct par (a) #:transparent)
+(struct for (a b) #:transparent)
+
+(struct add (a b) #:transparent)
+(struct sub (a b) #:transparent)
+(struct mult (a b) #:transparent)
+(struct div (a b) #:transparent)
+
+(struct or (a b) #:transparent)
+(struct and-struct (a b) #:transparent)
+(struct ge (a b) #:transparent)
+(struct gt (a b) #:transparent)
+(struct lt (a b) #:transparent)
+(struct le (a b) #:transparent)
+
+(struct seq (a b) #:transparent)
+
+;call/cc receive a 1-arity function, that will be
+;invoked now with the actual continuation.
+;is important because we can build apart the continuation
+;aspect from the process
+
+;in a future implementation of CPS(cyber-physical systems)
+;the concept of continuation can change to use continuos time
+;but actual code must not be changed because they use call/cc
+;to get continuations
+;in fact, constructs that use continuations must call call/cc
+;with a specialized function.
+
+(struct call/cc (a) #:transparent)
+
+(struct smc (env val mem control loc) #:transparent)
+(struct absFormals (formals block) #:transparent)
+(struct abs (block) #:transparent)
