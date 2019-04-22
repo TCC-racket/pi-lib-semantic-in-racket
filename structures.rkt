@@ -25,7 +25,7 @@
 (struct nop () #:transparent)
 
 (struct if-struct (cond then else) #:transparent)
-(struct print (a) #:transparent)
+(struct print-struct (a) #:transparent)
 (struct exit (a) #:transparent)
 (struct act (a b) #:transparent)
 (struct calAtuals (a b) #:transparent)
@@ -81,7 +81,7 @@
 ;in fact, constructs that use continuations must call call/cc
 ;with a specialized function.
 
-(struct call/cc (a) #:transparent)
+(struct call/cc-struct (a) #:transparent)
 
 (struct absFormals (formals block) #:transparent)
 (struct abs (block) #:transparent)

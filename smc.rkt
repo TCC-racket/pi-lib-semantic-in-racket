@@ -60,8 +60,8 @@
               [(smc env (list (? boolean? a) b ...) c (list 'if c1 c2 d ...) locali)  (smc env b c (append (list (if a c1 c2)) d) locali) ]
 
               ;		Talvez criar mais um item semantico contendo os efeitos colaterais fosse legal, tornaria o smcEval 100% funcional, sem efeito colateral
-              [(smc env a b (list (? print? c) d ...) locali) (smc env a b (append (list (print-a c) 'print) d) locali)]
-              [(smc env (list a b ...) c (list 'print d ...) locali) (begin (display (format "~a\n" a)) (smc env b c d locali) )  ]
+              [(smc env a b (list (? print-struct? c) d ...) locali) (smc env a b (append (list (print-struct-a c) 'print-struct) d) locali)]
+              [(smc env (list a b ...) c (list 'print-struct d ...) locali) (begin (display (format "~a\n" a)) (smc env b c d locali) )  ]
 	      
               [(smc env a b (list (seq c d) e ...) locali) (smc env a b (append (list c d) e) locali) ]
 
@@ -134,7 +134,7 @@
               [(smc env (list v a ... (cont e s c) r ...) m (list 'ret r ...) locali)
                (smc e (cons v s) m c locali)]
 
-              [(smc env v m (list (call/cc f) c ...) locali)
+              [(smc env v m (list (call/cc-struct f) c ...) locali)
                (smc env v m (cons (calf f (cont env v c)) c) locali) ]
               [(smc env v m (list (? cont? a) c ...) locali) (smc env (cons a v) m c locali)]
 
@@ -142,7 +142,7 @@
 
 	      [(smc env v m (list (yield e (idt i)) c ...) locali)
 	       (let ([env2 (constant env i
-				     (call/cc
+				     (call/cc-struct
 				       (absFormals (par (idt "k"))
 						   (cal
 						     (cont
