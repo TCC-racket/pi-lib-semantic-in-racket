@@ -133,7 +133,7 @@
                (smc e (cons v s) m c locali)]
 
               [(smc env v m (list (call/cc-struct f) c ...) locali)
-               (smc env v m (cons (calf f (cont env v c)) c) locali) ]
+               (smc env v m (cons (calAtualsf f (cont env v c)) c) locali) ]
               [(smc env v m (list (? cont? a) c ...) locali) (smc env (cons a v) m c locali)]
 
 	      ;;;Como fazer isso respeitando a tipagem??
