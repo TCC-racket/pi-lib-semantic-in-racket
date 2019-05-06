@@ -16,8 +16,6 @@
     [(cons (for a b) (list c d ...)) (dec (ref a c) (casa b d))]))
 
 (define (smcEval smcP)
-  (display smcP)
-  (newline)
   (if
    (and (null? (smc-val smcP)) (null? (smc-control smcP)))
    smcP
@@ -55,7 +53,7 @@
               [(smc env (list (? boolean? a) c ...) d (list 'neg e ...) locali)  (smc env (cons (not a) c) d e locali) ]
 
               [(smc env a d (list (? nop? b) c ...) locali) (smc env a d c locali) ]
-	      
+	      [(smc env a d (list (? noDec? b) c ...) locali) (smc env a d c locali) ]
               [(smc env a d (list (? if-struct? b) c ...) locali) (smc env a d (append (list (if-struct-cond b) 'if (if-struct-then b) (if-struct-else b)) c) locali) ]
               [(smc env (list (? boolean? a) b ...) c (list 'if c1 c2 d ...) locali)  (smc env b c (append (list (if a c1 c2)) d) locali) ]
 

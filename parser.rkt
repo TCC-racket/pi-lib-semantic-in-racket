@@ -13,7 +13,8 @@
 
 (module+ test
   (require rackunit)
-  (parser "module ola
+  (require "smc.rkt")
+  (define p (parser "module ola
            var x,k;
            init x=0,k=false;
            fun f(cont)
@@ -28,7 +29,8 @@ end;
                 print(x);
                 k(x+1);
            };
-           ")
+           "))
+  (executeSMC p)
   );
 
 _ < [ \t\n]* ;
@@ -41,13 +43,13 @@ globalVariable <- v1:var _ v2:const _ v3:init -> (combine v1 v2 v3);
 command <- s:(simple-command _ (~';' _ simple-command _)*) ';'? -> (foldr seq (nop) s);
 simple-command <- assign / return / conditionals / print / proc-call;
 proc-call <- proc-call-with-parameters;
-proc-call-with-parameters <- v:identifier _ '(' _ a:(expression (~',' _ expression _)*) _ ')' -> (prc-formals v ;
+proc-call-with-parameters <- v:identifier _ '(' _ a:(expression (~',' _ expression _)*) _ ')' ;
 print <- 'print' _ '(' _ e:expression _ ')' -> (print-struct e);
 conditionals <- 'if' _ '(' _ v:bool-expression  _')' _ b:block -> (if-struct v b (nop));
 return <- 'return' _ e:expression -> (ret e);
 assign <- i:identifier _ '=' _ e:expression -> (assign i e);
 nop <- 'nop;' -> (nop);
-gen <- 'gen' / '';
+gen <- 'gen' / '' -> (noDec);
 fun <- fun-with-formals / fun-without-formals / no-fun ;
 fun-with-formals <- 'fun' _ v:identifier _ '(' _ l:formals _ ')' _ b:block -> (funFormals v l b);
 fun-without-formals <- 'fun' _ v:identifier _ '(' _ ')' _ b:block -> (fun v b);
@@ -55,7 +57,7 @@ no-fun <- '' -> (noDec);
 formals <- l:(identifier _ (~',' _ identifier _)*) -> (let ((r (map par l))) (foldr for (car r) (cdr r)));
 block <- '{' _ d:dec _ c:command _ '}' -> (blkComandDec d c);
 dec <- '' -> (noDec);
-proc <- 'proc' / '';
+proc <- 'proc' / '' -> (noDec);
 init <- 'init' _ l:(single-init (~',' _ single-init _)*) _ ~(';') / l:'' -> (if (list? l) l '());
 single-init <- identifier _ ~'=' _ expression;
 const <- 'const' _ l:(identifier _ (~',' _ identifier _)*) _ ~(';') / l:'' -> (if (list? l) l '());
