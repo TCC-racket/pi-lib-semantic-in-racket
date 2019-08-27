@@ -1,6 +1,6 @@
 #lang racket
 
-(provide clean identifier atrib reference constant listLoc? loc loc?)
+(provide clean identifier atrib reference constant listLoc?)
 
 (struct loc (adress) #:transparent)
 
