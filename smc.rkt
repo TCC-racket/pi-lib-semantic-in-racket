@@ -94,6 +94,8 @@
 (define (smcEval smcP)
   (display smcP)
   (newline)
+  (newline)
+  (newline)
   (if
    (and
     #|(null? (smc-val smcP))|#
@@ -181,7 +183,8 @@
               [(smc env v m (list (prcFormals (idt i) formals block) r ...) locali output)
                (smc (constant env i (absFormals formals block)) v m r locali output)]
               [(smc env v m (list (prc (idt i) block) r ...) locali output) (smc (constant env i (abs block)) v m r locali output)]
-              [(smc env v m (list (cal a) r ...) locali output) (smc env v m (append (list a 'cal) r) locali output)]
+              [(smc env v m (list (cal a) r ...) locali output)
+               (smc env v m (append (list a 'cal) r) locali output)]
               [(smc env v m (list (calAtuals id atuals) r ...) locali output) (smc env v m (append (list id atuals 'cal) r) locali output)]
               [(smc env (list atual (cont e s c) r ...) m (list 'cal r ...) locali output)
                (smc e (cons atual s) m c locali output)]
@@ -236,7 +239,7 @@
 
 (module+ test
   (require rackunit)
-  
+#|  
   (check-equal? (executeSMC (add 1 2))
                 (smc (hash) '(3) (hash) '() '() '()))
   (check-equal? (executeSMC (sub 1 2))
@@ -281,8 +284,39 @@
   (check-equal? (executeSMC (ref (idt "x") 4))
                 (smc (hash "x" (loc 1)) '() (hash (loc 1) 4) '() (list (loc 1)) '()))
 
-  (check-equal? (executeSMC (seq (ref (idt "x") 0) (assign (idt "x") 4)))
+  (check-equal? (executeSMC
+                 (seq
+                  (ref (idt "x") 0)
+                  (assign (idt "x") 4)))
                 (smc (hash "x" (loc 1)) '() (hash (loc 1) 4) '() (list (loc 1)) '()))
 
-  (check-equal? (executeSMC (seq (ref (idt "x") 0) (loop (lt (idt "x") 5) (blkCommand (seq (print (idt "x")) (assign (idt "x") (add (idt "x") 1)))))))
-                (smc (hash "x" (loc 1)) '() (hash (loc 1) 5) '() (list (loc 1)) '(4 3 2 1 0))))
+  (check-equal? (executeSMC
+                 (seq (ref (idt "x") 0)
+                      (loop
+                       (lt (idt "x") 5)
+                       (blkCommand
+                        (seq (print (idt "x"))
+                             (assign (idt "x") (add (idt "x") 1)))))))
+                (smc (hash "x" (loc 1)) '() (hash (loc 1) 5) '() (list (loc 1)) '(4 3 2 1 0)))
+
+  (check-equal?
+   (executeSMC
+    (prcFormals (idt "f") (par (idt "k"))
+                (blkCommand (ret 2))))
+   (smc (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() '#hash() '() '() '()))
+|#
+  (executeSMC
+   (blkCommandDec
+    (prcFormals
+     (idt "f")
+     (par (idt "k"))
+     (blkCommand (ret 2)))
+   (calAtualsf
+    (idt "f")
+    1))))
+
+#|
+                  (executeSMC
+    (blkCommandDec
+     (prc (idt "f") (blkCommand (ret 2)))
+     (calf (idt "f")))))|#
