@@ -239,7 +239,7 @@
 
 (module+ test
   (require rackunit)
-#|  
+
   (check-equal? (executeSMC (add 1 2))
                 (smc (hash) '(3) (hash) '() '() '()))
   (check-equal? (executeSMC (sub 1 2))
@@ -304,19 +304,40 @@
     (prcFormals (idt "f") (par (idt "k"))
                 (blkCommand (ret 2))))
    (smc (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() '#hash() '() '() '()))
+
+  (check-equal?
+   (executeSMC
+    (blkCommandDec
+     (prcFormals
+      (idt "f")
+      (par (idt "k"))
+      (blkCommand (print 2)))
+     (calAtuals
+      (idt "f")
+      1)))
+   (smc '#hash() '() (hash (loc 1) 1) '() '() '(2)))
+
+
+  (check-equal?
+   (executeSMC (funFormals
+      (idt "f")
+      (par (idt "k"))
+      (blkCommand (ret 2))))
+   (smc (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() '#hash() '() '() '()))
+#|
+  (check-equal?
+   (executeSMC
+    (blkCommandDec
+     (funFormals
+      (idt "f")
+      (par (idt "k"))
+      (blkCommand (ret 2)))
+     (print (calAtuals (idt "f") 1))))
+   (smc '#hash() '() (hash (loc 1) 1) '() '() '(2)))
 |#
   (executeSMC
    (blkCommandDec
-    (prcFormals
-     (idt "f")
-     (par (idt "k"))
-     (blkCommand (ret 2)))
-   (calAtualsf
-    (idt "f")
-    1))))
+    (fun (idt "f") (blkCommand (ret 2)))
+    (print (calf (idt "f")))))
 
-#|
-                  (executeSMC
-    (blkCommandDec
-     (prc (idt "f") (blkCommand (ret 2)))
-     (calf (idt "f")))))|#
+  )
