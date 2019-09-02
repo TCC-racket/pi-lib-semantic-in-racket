@@ -92,10 +92,12 @@
     [(cons (for a b) (list c d ...)) (dec (ref a c) (casa b d))]))
 
 (define (smcEval smcP)
+  #|
   (display smcP)
   (newline)
   (newline)
   (newline)
+|#
   (if
    (and
     #|(null? (smc-val smcP))|#
@@ -186,10 +188,12 @@
               [(smc env v m (list (cal a) r ...) locali output)
                (smc env v m (append (list a 'cal) r) locali output)]
               [(smc env v m (list (calAtuals id atuals) r ...) locali output) (smc env v m (append (list id atuals 'cal) r) locali output)]
-              [(smc env (list atual (cont e s c) r ...) m (list 'cal r ...) locali output)
-               (smc e (cons atual s) m c locali output)]
+              [(smc env (list (abs block) r1 ...) m (list 'cal r ...) locali output)
+               (smc env r1 m (cons block r) locali output)]
               [(smc env (list atuals ... (absFormals formals block) r1 ...) m (list 'cal r ...) locali output)
                (smc env r1 m (cons (blkCommandDec (casa formals atuals) block) r) locali output) ]
+              [(smc env (list atual (cont e v c) r1 ...) m (list 'cal r ...) locali output)
+               (smc e (cons atual v) m c locali output) ]
 		
               [(smc env (list (abs block) r1 ...) m (list 'cal r ...) locali output)
                (smc env r1 m (cons block r) locali output) ]
@@ -202,38 +206,38 @@
               [(smc env (list a v ...) m (list 'cns (idt i) r ...) locali output)
                (let ([newEnv (constant env i a )]) (smc newEnv v m r locali output))]
 
-               [(smc env v m (list (calf a) r ...) locali output)
-              	(smc env (cons (cont env v r) v) m (append (list a 'cal) r) locali output)]
+              [(smc env v m (list (calf a) r ...) locali output)
+               (smc env (cons (cont env v r) v) m (append (list a 'cal) r) locali output)]
               [(smc env v m (list (calAtualsf id atuals) r ...) locali output)
-              (smc env (cons (cont env v r) v) m (append (list id atuals 'cal) r) locali output)]
+               (smc env (cons (cont env v r) v) m (append (list id atuals 'cal) r) locali output)]
 	      
-               [(smc env v m (list (funFormals (idt i) formals block) r ...) locali output)
-              	(smc (constant env i (absFormals formals block)) v m r locali output)]
+              [(smc env v m (list (funFormals (idt i) formals block) r ...) locali output)
+               (smc (constant env i (absFormals formals block)) v m r locali output)]
               [(smc env v m (list (fun (idt i) block) r ...) locali output) (smc (constant env i (abs block)) v m r locali output)]
 	      
               [(smc env a m (list (ret c) d ...) locali output) (smc env a m (append (list c 'ret) d) locali output)]
-              [(smc env (list v a ... (cont e s c) r ...) m (list 'ret r ...) locali output)
+              [(smc env (list v a ... (cont e s c) r1 ...) m (list 'ret r ...) locali output)
                (smc e (cons v s) m c locali output)]
 
               [(smc env v m (list (call/cc f) c ...) locali output)
-               (smc env v m (cons (calf f (cont env v c)) c) locali output) ]
+               (smc env v m (cons (calAtualsf f (cont env v c)) c) locali output) ]
               [(smc env v m (list (? cont? a) c ...) locali output) (smc env (cons a v) m c locali output)]
 
-	      ;;;Como fazer isso respeitando a tipagem??
+              ;;;Como fazer isso respeitando a tipagem??
 
-	      [(smc env v m (list (yield e (idt i)) c ...) locali output)
-	       (let ([env2 (constant env i
-				     (call/cc
-				       (absFormals (par (idt "k"))
-						   (cal
-						     (cont
-						       env
-						       v
-						       c) (idt "k")))))])
-		 (smc env2 v m (cons (ret e) c) locali output))]
+              [(smc env v m (list (yield e (idt i)) c ...) locali output)
+               (let ([env2 (constant env i
+                                     (call/cc
+                                      (absFormals (par (idt "k"))
+                                                  (cal
+                                                   (cont
+                                                    env
+                                                    v
+                                                    c) (idt "k")))))])
+                 (smc env2 v m (cons (ret e) c) locali output))]
 
-	      [(smc env v m (list (try/catch e c) r ...) locali output) (smc env v m (cons (try/catch/finally e c (nop)) r) locali output)]
-		;;;Possivelmente essa ultima transição virará um throw
+              [(smc env v m (list (try/catch e c) r ...) locali output) (smc env v m (cons (try/catch/finally e c (nop)) r) locali output)]
+              ;;;Possivelmente essa ultima transição virará um throw
               [a (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a))]))))
 
 
@@ -317,14 +321,32 @@
       1)))
    (smc '#hash() '() (hash (loc 1) 1) '() '() '(2)))
 
+  ;(struct smc (env val mem control loc output) #:transparent)
+  ;(struct cont (env s c) #:transparent)
+  (check-equal?
+   (smcEval
+    (smc (hash) (list 2 (cont (hash) '() (list 'print))) (hash) (list 'ret) '() '()))
+   (smc (hash) '() (hash) '() '() (list 2)))
+
+  (check-equal?
+   (smcEval
+    (smc (hash) (list 2 3 4 5 (cont (hash) '() (list 'print))) (hash) (list 'ret) '() '()))
+   (smc (hash) '() (hash) '() '() (list 2)))
+  
+  (check-equal?
+   (smcEval
+    (smc (hash) (list 2 3 4 5 (cont (hash) '() (list 'print))) (hash) (list (ret 2)) '() '()))
+   (smc (hash) '() (hash) '() '() (list 2)))
+
+  
 
   (check-equal?
    (executeSMC (funFormals
-      (idt "f")
-      (par (idt "k"))
-      (blkCommand (ret 2))))
+                (idt "f")
+                (par (idt "k"))
+                (blkCommand (ret 2))))
    (smc (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() '#hash() '() '() '()))
-#|
+
   (check-equal?
    (executeSMC
     (blkCommandDec
@@ -332,12 +354,144 @@
       (idt "f")
       (par (idt "k"))
       (blkCommand (ret 2)))
-     (print (calAtuals (idt "f") 1))))
+     (nop)))
+   (smc '#hash() '() (hash) '() '() '()))
+
+  (check-equal?
+   (smcEval
+    (smc (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() (hash) (list (print 2)) '() '()))
+   (smc (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() (hash) '() '() (list 2)))
+  
+  (check-equal?
+   (smcEval
+    (smc (hash "f" (abs (blkCommand (ret 2)))) '() (hash) (list (calf (idt "f"))) '() '()))
+   (smc (hash "f" (abs (blkCommand (ret 2)))) '(2) (hash) '() '() '()))
+  
+  (check-equal?
+   (smcEval
+    (smc (hash "f" (abs (blkCommand (ret 2)))) '() (hash) (list (print (calf (idt "f")))) '() '()))
+   (smc (hash "f" (abs (blkCommand (ret 2)))) '() (hash) '() '() '(2)))
+
+  (check-equal?
+   (executeSMC
+    (blkCommandDec
+     (funFormals
+      (idt "f")
+      (par (idt "k"))
+      (blkCommand (ret 2)))
+     (print (calAtualsf (idt "f") 1))))
    (smc '#hash() '() (hash (loc 1) 1) '() '() '(2)))
-|#
-  (executeSMC
-   (blkCommandDec
-    (fun (idt "f") (blkCommand (ret 2)))
-    (print (calf (idt "f")))))
+
+  (check-equal?
+   (executeSMC
+    (calAtualsf (cont (hash "f" (loc 1) "x" (loc 2)) '(2) '()) 21))
+   (smc (hash "f" (loc 1) "x" (loc 2)) (list 21 2) (hash) '() '() '()))
+  
+  (check-equal?
+   (executeSMC
+    (blkCommandDec
+     (funFormals
+      (idt "f")
+      (par (idt "k"))
+      (blkCommand (calAtualsf (idt "k") 42)))
+     (calAtualsf (idt "f") (cont (hash 1 2 3 4) '(45) '()))))
+   (smc (hash 1 2 3 4) (list 42 45) (hash (loc 1) (cont '#hash((1 . 2) (3 . 4)) '(45) '())) '() '() '()))
+
+  (check-equal?
+   (executeSMC
+    (blkCommandDec
+     (dec
+      (ref (idt "outerK") #f)
+      (funFormals
+       (idt "f")
+       (par (idt "k"))
+       (blkCommand (seq
+                    (assign (idt "outerK")(idt "k"))
+                    (ret 0)))))
+     (blkCommandDec
+      (ref (idt "x") (call/cc (idt "f")))
+      (if-struct (lt (idt "x") 5)
+                 (seq
+                  (print (idt "x"))
+                  (calAtualsf (idt "outerK") (add 1 (idt "x"))))
+                 (nop)))))
+   (smc
+    '#hash()
+    '()
+    (hash
+     (loc 2)
+     (cont
+      (hash
+       "f"
+       (absFormals
+        (par (idt "k"))
+        (blkCommand (seq (assign (idt "outerK") (idt "k")) (ret 0))))
+       "outerK"
+       (loc 1))
+      (list
+       (hash
+        "f"
+        (absFormals
+         (par (idt "k"))
+         (blkCommand (seq (assign (idt "outerK") (idt "k")) (ret 0))))
+        "outerK"
+        (loc 1))
+       (list (loc 1))
+       '#hash()
+       '())
+      (list
+       'ref
+       (idt "x")
+       (if-struct
+        (lt (idt "x") 5)
+        (seq (print (idt "x")) (calAtualsf (idt "outerK") (add 1 (idt "x"))))
+        (nop))
+       'blk
+       'blk))
+     (loc 5)
+     2
+     (loc 3)
+     0
+     (loc 7)
+     4
+     (loc 8)
+     5
+     (loc 6)
+     3
+     (loc 4)
+     1
+     (loc 1)
+     (cont
+      (hash
+       "f"
+       (absFormals
+        (par (idt "k"))
+        (blkCommand (seq (assign (idt "outerK") (idt "k")) (ret 0))))
+       "outerK"
+       (loc 1))
+      (list
+       (hash
+        "f"
+        (absFormals
+         (par (idt "k"))
+         (blkCommand (seq (assign (idt "outerK") (idt "k")) (ret 0))))
+        "outerK"
+        (loc 1))
+       (list (loc 1))
+       '#hash()
+       '())
+      (list
+       'ref
+       (idt "x")
+       (if-struct
+        (lt (idt "x") 5)
+        (seq (print (idt "x")) (calAtualsf (idt "outerK") (add 1 (idt "x"))))
+        (nop))
+       'blk
+       'blk)))
+    '()
+    '()
+    '(4 3 2 1 0)))
+                 
 
   )
