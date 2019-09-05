@@ -9,14 +9,48 @@
 ;continuation struct, receive environment, value stack and control stack
 ;invocation of continuation put their fields in correct place, and the value
 ;that are actual on invocation on top of value stack
+;The memory is not here so when a continuation is invoked, the relation between
+;locations and values are not touched. The same is true for locations and output
 
 (struct cont (env s c) #:transparent)
 
+
+;Yet not implemented;
 (struct yield (expression function-name) #:transparent)
 
+;(ret a) is the return command. Only allowed inside functions
+;When a function is called, say from this code
+;
+;x := f();
+;
+;the continuation of f, in this case the environment, value stack and control stack equivalent to
+;lambda(y){
+;	x := y
+;}
+;
+;when return 5 for exemple in f will execute, the continuation are invoked using 5 as argument, so, the pi-automata
+;state after return is like
+;
+;x := 5;
 (struct ret (a) #:transparent)
+
+;calf will call a function f without parameters
+;will capture the continuation and put on stack value,
+;so, when return was evaluated, this continuation will be invoked
+;
+;
+;
 (struct calf (a) #:transparent)
+
+;
+;
+;Same as before, but now with some actuals, that are just a "list"
+; of expressions join by act struct
+;
+;
+
 (struct calAtualsf (a b) #:transparent)
+
 (struct fun (a b) #:transparent)
 (struct funFormals (a b c) #:transparent)
 (struct nop () #:transparent)
