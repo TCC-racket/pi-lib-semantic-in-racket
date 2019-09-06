@@ -226,6 +226,9 @@
                (smc env r1 m (cons block r) locali output)]
               [(smc env (list atuals ... (absFormals formals block) r1 ...) m (list 'cal r ...) locali output)
                (smc env r1 m (cons (blkCommandDec (casa formals atuals) block) r) locali output) ]
+	       ;The invocation of a continuation only means get some value(that can be a number, a boolean
+	       ;a abstraction(a function) or another continuation and put her on top of stack value inside cont
+	       ;but in particular make output and memory equal.
               [(smc env (list atual (cont e v c) r1 ...) m (list 'cal r ...) locali output)
                (smc e (cons atual v) m c locali output) ]
 		
@@ -249,16 +252,28 @@
                (smc (constant env i (absFormals formals block)) v m r locali output)]
               [(smc env v m (list (fun (idt i) block) r ...) locali output) (smc (constant env i (abs block)) v m r locali output)]
 	      
+	      ;
+	      ;As ret is only allowed inside a function(and this must be ensured by parser, because the assumption of
+	      ;this semantics is that ret has a continuation(put by a calf or calActualsf),representation of a call to
+	      ; a function, somewhere on stack value. 
               [(smc env a m (list (ret c) d ...) locali output) (smc env a m (append (list c 'ret) d) locali output)]
               [(smc env (list v a ... (cont e s c) r1 ...) m (list 'ret r ...) locali output)
                (smc e (cons v s) m c locali output)]
 
+		;
+		;call/cc is a special function, in terms of parser, and can be used directly by user or as low level
+		;primitive to implementation of coroutines(that will be merged on sunday(9/8/2019) and another high-level
+		;points. In fact, there's some points, i.e. function cal, return command and call/cc, that create or consume
+		;continuations and that must be changed when the pi-automata increase by for example put cyber-phisical primitives.
+		;
               [(smc env v m (list (call/cc f) c ...) locali output)
                (smc env v m (cons (calAtualsf f (cont env v c)) c) locali output) ]
               [(smc env v m (list (? cont? a) c ...) locali output) (smc env (cons a v) m c locali output)]
-
-              ;;;Como fazer isso respeitando a tipagem??
-
+		
+		;
+		;Not yet implemented
+		;Problaby will be just a smart use of coroutine. When I put this code, I think of doing as a standalone
+		;command, but using coroutines look better
               [(smc env v m (list (yield e (idt i)) c ...) locali output)
                (let ([env2 (constant env i
                                      (call/cc
@@ -270,13 +285,25 @@
                                                     c) (idt "k")))))])
                  (smc env2 v m (cons (ret e) c) locali output))]
 
+		;;
+		;;Will be merged as soon as possible. Exceptions are just out-going only continuations, but delimited continuations
+		;;is better to her. Maybe I just put amb and coroutines merged and add try/catch changed with delimited in the future.
               [(smc env v m (list (try/catch e c) r ...) locali output) (smc env v m (cons (try/catch/finally e c (nop)) r) locali output)]
               ;;;Possivelmente essa ultima transição virará um throw
               [a (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a))]))))
 
 
 (module+ test
+;;rackunit is a unit test suite of racket
   (require rackunit)
+;;check-equal? receive 2 arguments and raise a exception if (equal? a b) return #f
+
+;;
+;;
+;;The correct was only stop recursion of SMCEval with both control and value stack empty
+;;but to allow test of arithmetic expression, including the rules that look to cont as a value
+;;this rule was relaxed, only control must be empty
+;;
 
   (check-equal? (executeSMC (add 1 2))
                 (smc (hash) '(3) (hash) '() '() '()))
@@ -343,6 +370,16 @@
                 (blkCommand (ret 2))))
    (smc (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() '#hash() '() '() '()))
 
+;;Here we can see the code
+;;
+;;
+;;fun f(k)
+;;{
+;;print(2);
+;;}
+;;f(1);
+;;
+;;be called
   (check-equal?
    (executeSMC
     (blkCommandDec
@@ -372,7 +409,11 @@
     (smc (hash) (list 2 3 4 5 (cont (hash) '() (list 'print))) (hash) (list (ret 2)) '() '()))
    (smc (hash) '() (hash) '() '() (list 2)))
 
-  
+  ;
+  ;
+  ;
+  ;
+  ;
 
   (check-equal?
    (executeSMC (funFormals
@@ -431,6 +472,38 @@
      (calAtualsf (idt "f") (cont (hash 1 2 3 4) '(45) '()))))
    (smc (hash 1 2 3 4) (list 42 45) (hash (loc 1) (cont '#hash((1 . 2) (3 . 4)) '(45) '())) '() '() '()))
 
+;
+;;
+;
+;
+;outerK := #f;
+;fun f(k)
+;{
+;
+;outerK=k;
+;return 0;
+;
+;}
+;
+;x := call/cc(f);
+;if(x<5)
+;{
+;
+;print(x);
+;outerK(1+x);
+;
+;}
+;
+;
+;
+;There's a lot of locations on env because
+;instead of inside a assign, call/cc is inside a ref
+;so when outerK is called, a new location on x is created
+;
+;if was a assign, this don't happened.
+;
+;
+;
   (check-equal?
    (executeSMC
     (blkCommandDec
