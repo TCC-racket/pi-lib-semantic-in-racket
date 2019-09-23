@@ -1,8 +1,15 @@
 #lang racket
 
+(require racket/struct)
 (provide clean identifier atrib reference constant listLoc? loc loc?)
 
-(struct loc (adress) #:transparent)
+(define (write-loc location port mode)
+  (let ((write-fun (if mode write display)))
+    (write-fun "Loc(" port)
+    (write-fun (loc-adress location) port)
+    (write-fun ")" port)))
+
+(struct loc (adress) #:methods gen:custom-write [(define write-proc write-loc)])
 
 ; (-> any bool)
 (define (listLoc? l)

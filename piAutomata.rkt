@@ -1,5 +1,8 @@
 #lang racket
 
+
+(provide (all-defined-out))
+(require racket/struct)
 (require "ambiente.rkt")
 
 (struct try/catch (t c) #:transparent)
@@ -96,7 +99,14 @@
 (struct lt (a b) #:transparent)
 (struct le (a b) #:transparent)
 
-(struct seq (a b) #:transparent)
+(define (write-seq sequenc port mode)
+  (let ((write-fun (if mode write display)))
+    (write-fun "CSeq(" port)
+    (write-fun (seq-a sequenc) port)
+    (write-fun "," port)
+    (write-fun (seq-b sequenc) port)
+    (write-fun ")" port)))
+(struct seq (a b) #:methods gen:custom-write [(define write-proc write-seq)])
 
 ;call/cc receive a 1-arity function, that will be
 ;invoked now with the actual continuation.
