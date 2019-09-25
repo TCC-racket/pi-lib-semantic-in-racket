@@ -346,5 +346,62 @@ _𝛅(#CALL(I, u) :: C, V₁ :: V₂ :: ... :: Vᵤ :: V, E, S, L) = 𝛅(B :: #
 
 𝛅(#CALLF :: #PRINT :: [],Cont({"g" ↦ Abs(Id("k") :: [],Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, [], #PRINT :: []) :: Abs(Id("k") :: [],Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))::Cont({"g" ↦ Abs(Id("k"),Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, [], #PRINT :: []) :: [], {"g" ↦ Abs(Id("k"),Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, {}, []))
 
-**=== In this point, k will point to continuation and** **Block of g will be executed, but I don't really understand How the Ref on original pi-framework relates with new ref, DeRef, ValRef. A expression that before is just Ref(Id("x"),Num(3))   Create a location l and put x -> l on env and l -> Num(3) on store. How can I reproduce this behavior using the new primitives?**
+To preserve readbility, let's make gBody as Abs(Id("k"),Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))
+
+=
+
+𝛅(#CALLF :: #PRINT :: [],Cont({"g" ↦ gBody}, [], #PRINT :: []) :: gBody::Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
+
+=
+
+𝛅(Blk(ref(Id("k"), Cont({"g" ↦ gBody}, [], #PRINT :: [])), Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #PRINT :: [],Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
+
+=
+
+𝛅(ref(Id("k"), Cont({"g" ↦ gBody}, [], #PRINT :: [])) :: Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #PRINT :: [],  {"g" ↦ gBody} :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
+
+=
+
+𝛅(Cont({"g" ↦ gBody}, [], #PRINT :: []) :: #REF :: Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #PRINT :: [],Id("k") :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
+
+=
+
+𝛅( #REF :: Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #PRINT :: [],Cont({"g" ↦ gBody}, [], #PRINT :: []) :: Id("k") :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
+
+=
+
+𝛅( Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #PRINT :: [], Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"k"↦l1 ,"g" ↦ gBody}, {l1 ↦ Cont({"g" ↦ gBody}, [], #PRINT :: [])}, [l1]))
+
+=
+
+𝛅( EmptyDec :: CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #BLK :: #PRINT :: [], {"k"↦l1 ,"g" ↦ gBody} :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"k"↦l1 ,"g" ↦ gBody}, {l1 ↦ Cont({"g" ↦ gBody}, [], #PRINT :: [])}, [l1]))
+
+=
+
+𝛅( CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #BLK :: #PRINT :: [], Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"k"↦l1 ,"g" ↦ gBody}, {l1 ↦ Cont({"g" ↦ gBody}, [], #PRINT :: [])}, [l1]))
+
+=
+
+𝛅( Callf(Id("k"),Num(2)) :: CSeq(Print(Num(3)), Ret(Num(45))) :: #BLK :: #BLK :: #PRINT :: [], Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"k"↦l1 ,"g" ↦ gBody}, {l1 ↦ Cont({"g" ↦ gBody}, [], #PRINT :: [])}, [l1]))
+
+=
+
+𝛅( Id("k") :: Num(2) :: #CALLF :: CSeq(Print(Num(3)), Ret(Num(45))) :: #BLK :: #BLK :: #PRINT :: [], Cont({"k"↦l1 ,"g" ↦ gBody}, Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], CSeq(Print(Num(3)), Ret(Num(45))) :: #BLK :: #BLK :: #PRINT :: []) :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"k"↦l1 ,"g" ↦ gBody}, {l1 ↦ Cont({"g" ↦ gBody}, [], #PRINT :: [])}, [l1]))
+
+=
+
+𝛅( Num(2) :: #CALLF :: CSeq(Print(Num(3)), Ret(Num(45))) :: #BLK :: #BLK :: #PRINT :: [], Cont({"g" ↦ gBody}, [], #PRINT :: []) :: Cont({"k"↦l1 ,"g" ↦ gBody}, Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], CSeq(Print(Num(3)), Ret(Num(45))) :: #BLK :: #BLK :: #PRINT :: []) :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"k"↦l1 ,"g" ↦ gBody}, {l1 ↦ Cont({"g" ↦ gBody}, [], #PRINT :: [])}, [l1]))
+
+=
+
+<u>***𝛅( #CALLF :: CSeq(Print(Num(3)), Ret(Num(45))) :: #BLK :: #BLK :: #PRINT :: [], Num(2) :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: Cont({"k"↦l1 ,"g" ↦ gBody}, Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], CSeq(Print(Num(3)), Ret(Num(45))) :: #BLK :: #BLK :: #PRINT :: []) :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"k"↦l1 ,"g" ↦ gBody}, {l1 ↦ Cont({"g" ↦ gBody}, [], #PRINT :: [])}, [l1]))***</u>
+
+<u>***=***</u>
+
+<u>***𝛅(#PRINT :: [], Num(2) :: [], {"g" ↦ gBody}, {l1 ↦ Cont({"g" ↦ gBody}, [], #PRINT :: [])}, [l1])***</u>
+
+
+OUTPUT : <u>***2***</u>
+
+
 
