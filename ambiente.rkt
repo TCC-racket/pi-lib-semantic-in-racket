@@ -1,6 +1,7 @@
 #lang racket
 
 (require racket/struct)
+(require "pretty.rkt")
 (provide clean identifier atrib reference constant listLoc? loc loc?)
 
 (define (write-loc location port mode)
