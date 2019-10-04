@@ -354,19 +354,27 @@ To preserve readbility, let's make gBody as Abs(Id("k"),Blk(EmptyDec, CSeq(Callf
 
 =
 
-𝛅(Blk(ref(Id("k"), Cont({"g" ↦ gBody}, [], #PRINT :: [])), Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #PRINT :: [],Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
+𝛅(Blk(Bind(Id("k"),ref(Cont({"g" ↦ gBody}, [], #PRINT :: [])), Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))) :: #PRINT :: [],Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
 
 =
 
-𝛅(ref(Id("k"), Cont({"g" ↦ gBody}, [], #PRINT :: [])) :: Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #PRINT :: [],  {"g" ↦ gBody} :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
+𝛅(Bind(Id("k"), Ref(Cont({"g" ↦ gBody}, [], #PRINT :: [])) :: Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))))) :: #BLK :: #PRINT :: [],  {"g" ↦ gBody} :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
 
 =
 
-𝛅(Cont({"g" ↦ gBody}, [], #PRINT :: []) :: #REF :: Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #PRINT :: [],Id("k") :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
+𝛅(Ref(Cont({"g" ↦ gBody}, [], #PRINT :: [])) :: Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))))) :: #BIND :: #BLK :: #PRINT :: [],  Id("k") :: {"g" ↦ gBody} :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
 
 =
 
-𝛅( #REF :: Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #PRINT :: [],Cont({"g" ↦ gBody}, [], #PRINT :: []) :: Id("k") :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
+𝛅(Cont({"g" ↦ gBody}, [], #PRINT :: []) :: #REF :: #BIND :: Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #PRINT :: [],Id("k") :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
+
+=
+
+𝛅( #REF :: #BIND :: Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #PRINT :: [],Cont({"g" ↦ gBody}, [], #PRINT :: []) :: Id("k") :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
+
+=
+
+𝛅( l1 :: #BIND :: Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #PRINT :: [], Id("k") :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {l1 ↦ Cont({"g" ↦ gBody}, [], #PRINT :: [])}, []))
 
 =
 

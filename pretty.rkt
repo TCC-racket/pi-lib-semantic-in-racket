@@ -1,15 +1,13 @@
 #lang racket
 
-(provide register-struct write-loc)
-(define my-pi-equivalence (make-hash))
-
-(define (register-struct name pi-framework)
-   (hash-set! my-pi-equivalence name pi-framework))
-
+(provide my-struct)
+(define my-pi-equivalence (hash
+			    "loc" "Loc"
+			    "num" "Num"
+			    "piAutomata" ""))
 
 (define (struct->list s)
   (vector->list (struct->vector s)))
-
 
 (define (write-loc node port mode)
   (let* ((write-fun (if mode write display)))
@@ -31,14 +29,16 @@
 			     (write-loc element port mode))))
 		    (write-fun ")" port)))
       (if (list? node)
- 	     (begin
-		(write-loc (car node) port mode)
-		(for ((element (cdr node)))
-		     (write-fun " :: " port)
-		     (write-loc element port mode)))
+          (if (null? node)
+              (write-loc "[]" port mode)
+              (begin
+                (write-loc (car node) port mode)
+                (for ((element (cdr node)))
+                  (write-fun " :: " port)
+                  (write-loc element port mode))))
 	     (begin
 		      (write-fun node port))))))
-(struct loc (a b) #:transparent #:methods gen:custom-write [(define write-proc write-loc)])
-(register-struct "loc" "Stallman")
-(display (loc (list 1 2 3 4) (loc 1 2)))
-(newline)
+
+(define-syntax-rule (my-struct name args . rest)
+	(struct name args #:transparent #:methods gen:custom-write [(define write-proc write-loc)]))
+

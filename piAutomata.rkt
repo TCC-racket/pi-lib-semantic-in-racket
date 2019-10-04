@@ -2,62 +2,28 @@
 
 
 (provide (all-defined-out))
-(require racket/struct)
 (require "ambiente.rkt")
+;(require "pretty.rkt")
 
 (struct try/catch (t c) #:transparent)
 (struct throw (e) #:transparent)
 (struct try/catch/finally (t c f) #:transparent)
 
-;continuation struct, receive environment, value stack and control stack
-;invocation of continuation put their fields in correct place, and the value
-;that are actual on invocation on top of value stack
-;The memory is not here so when a continuation is invoked, the relation between
-;locations and values are not touched. The same is true for locations and output
-
 (struct cont (env s c) #:transparent)
 
 
-;Yet not implemented;
 (struct yield (expression function-name) #:transparent)
 
-;(ret a) is the return command. Only allowed inside functions
-;When a function is called, say from this code
-;
-;x := f();
-;
-;the continuation of f, in this case the environment, value stack and control stack equivalent to
-;lambda(y){
-;	x := y
-;}
-;
-;when return 5 for exemple in f will execute, the continuation are invoked using 5 as argument, so, the pi-automata
-;state after return is like
-;
-;x := 5;
 (struct ret (a) #:transparent)
 
-;calf will call a function f without parameters
-;will capture the continuation and put on stack value,
-;so, when return was evaluated, this continuation will be invoked
-;
-;
-;
 (struct calf (a) #:transparent)
-
-;
-;
-;Same as before, but now with some actuals, that are just a "list"
-; of expressions join by act struct
-;
-;
 
 (struct calAtualsf (a b) #:transparent)
 
 (struct fun (a b) #:transparent)
 (struct funFormals (a b c) #:transparent)
 (struct nop () #:transparent)
-(struct if-struct (cond then else) #:transparent)
+(struct if-my-struct (cond then else) #:transparent)
 (struct print (a) #:transparent)
 (struct exit (a) #:transparent)
 (struct act (a b) #:transparent)
@@ -81,7 +47,7 @@
 
 (struct neg (a) #:transparent)
 
-(struct ref (a b) #:transparent)
+(struct ref (a) #:transparent)
 (struct dec (a b) #:transparent)
 
 (struct par (a) #:transparent)
@@ -93,103 +59,82 @@
 (struct div (a b) #:transparent)
 
 (struct or (a b) #:transparent)
-(struct and-struct (a b) #:transparent)
+(struct and-my-struct (a b) #:transparent)
 (struct ge (a b) #:transparent)
 (struct gt (a b) #:transparent)
 (struct lt (a b) #:transparent)
 (struct le (a b) #:transparent)
 
-(define (write-seq sequenc port mode)
-  (let ((write-fun (if mode write display)))
-    (write-fun "CSeq(" port)
-    (write-fun (seq-a sequenc) port)
-    (write-fun "," port)
-    (write-fun (seq-b sequenc) port)
-    (write-fun ")" port)))
-(struct seq (a b) #:methods gen:custom-write [(define write-proc write-seq)])
-
-;call/cc receive a 1-arity function, that will be
-;invoked now with the actual continuation.
-;is important because we can build apart the continuation
-;aspect from the process
-
-;in a future implementation of CPS(cyber-physical systems)
-;the concept of continuation can change to use continuos time
-;but actual code must not be changed because they use call/cc
-;to get continuations
-;in fact, constructs that use continuations must call call/cc
-;with a specialized function.
+(struct seq (a b) #:transparent)
 
 (struct call/cc (a) #:transparent)
 
-(struct smc (env val mem control loc output) #:transparent)
+(struct piAutomata (env val mem control loc output) #:transparent)
 (struct absFormals (formals block) #:transparent)
 (struct abs (block) #:transparent)
+(struct bind (a b) #:transparent)
 
-(provide executeSMC smc)
+(provide executeSMC piAutomata)
 (define (executeSMC bplc)
-  (smcEval (smc (hash) '() (hash) (list bplc) '() '())))
+  (piAutomataEval (piAutomata (hash) '() (hash) (list bplc) '() '()) #t))
   
 (define (casa formals atuals)
   (match (cons formals atuals)
-    [(cons (par a) (list c)) (ref a c)   ]
-    [(cons (for a b) (list c d ...)) (dec (ref a c) (casa b d))]))
+    [(cons (par a) (list c)) (bind a (ref c))   ]
+    [(cons (for a b) (list c d ...)) (dec (bind a (ref c)) (casa b d))]))
 
-(define (smcEval smcP)
-  #|
-  (display smcP)
-  (newline)
-  (newline)
-  (newline)
-|#
+(define (piAutomataEval piAutomataP [debug #f])
   (if
    (and
-    #|(null? (smc-val smcP))|#
-    (null? (smc-control smcP)))
-   smcP
-   (smcEval (match smcP 
-              [(smc env d e (list (add a b) c ...) locali output) (smc env d e (append (list a b 'add) c) locali output)]
-              [(smc env d e (list (sub a b) c ...) locali output) (smc env d e (append (list a b 'sub) c) locali output)]
-              [(smc env d e (list (mult a b) c ...) locali output) (smc env d e (append (list a b 'mult) c) locali output)]
-              [(smc env d e (list (div a b) c ...) locali output) (smc env d e (append (list a b 'div) c) locali output)]
+    #|(null? (piAutomata-val piAutomataP))|#
+    (null? (piAutomata-control piAutomataP)))
+   piAutomataP
+   (piAutomataEval (match piAutomataP
+              [(piAutomata env d e (list (bind a b) c ...) locali output) (piAutomata env (cons a d) e (append (list b 'bind) c) locali output)]
+              [(piAutomata env (list (loc l) (idt x) d ...) e (list 'bind c ...) locali output)
+               (piAutomata (hash-set env x (loc l)) d e c locali output)]
+              [(piAutomata env d e (list (add a b) c ...) locali output) (piAutomata env d e (append (list a b 'add) c) locali output)]
+              [(piAutomata env d e (list (sub a b) c ...) locali output) (piAutomata env d e (append (list a b 'sub) c) locali output)]
+              [(piAutomata env d e (list (mult a b) c ...) locali output) (piAutomata env d e (append (list a b 'mult) c) locali output)]
+              [(piAutomata env d e (list (div a b) c ...) locali output) (piAutomata env d e (append (list a b 'div) c) locali output)]
               
-              [(smc env d e (list (? number? a) b ...) locali output) (smc env (cons a d) e b locali output)]
-              [(smc env (list (? number? a) (? number? b) c ...) d (list 'add e ...) locali output) (smc env (cons (+ a b) c) d e locali output)]
-              [(smc env (list (? number? a) (? number? b) c ...) d (list 'sub e ...) locali output) (smc env (cons (- b a) c) d e locali output)]
-              [(smc env (list (? number? a) (? number? b) c ...) d (list 'mult e ...) locali output) (smc env (cons (* a b) c) d e locali output)]
-              [(smc env (list (? number? a) (? number? b) c ...) d (list 'div e ...) locali output) (smc env (cons (/ b a) c) d e locali output)]
+              [(piAutomata env d e (list (? number? a) b ...) locali output) (piAutomata env (cons a d) e b locali output)]
+              [(piAutomata env (list (? number? a) (? number? b) c ...) d (list 'add e ...) locali output) (piAutomata env (cons (+ a b) c) d e locali output)]
+              [(piAutomata env (list (? number? a) (? number? b) c ...) d (list 'sub e ...) locali output) (piAutomata env (cons (- b a) c) d e locali output)]
+              [(piAutomata env (list (? number? a) (? number? b) c ...) d (list 'mult e ...) locali output) (piAutomata env (cons (* a b) c) d e locali output)]
+              [(piAutomata env (list (? number? a) (? number? b) c ...) d (list 'div e ...) locali output) (piAutomata env (cons (/ b a) c) d e locali output)]
               
-              [(smc env d e (list (? boolean? a) b ...) locali output) (smc env (cons a d) e b  locali output)]
-              [(smc env d e (list (? or? a) c ...) locali output) (smc env d e (append (list (or-a a)  (or-b a) 'or) c) locali output) ]
-              [(smc env d e (list (? and-struct? a) c ...) locali output) (smc env d e (append (list (and-struct-a a) (and-struct-b a) 'and) c) locali output) ]
-              [(smc env d e (list (ge a b) c ...) locali output) (smc env d e (append (list a b 'ge) c) locali output) ]
-              [(smc env d e (list (gt a b) c ...) locali output) (smc env d e (append (list a b 'gt) c) locali output) ]
-              [(smc env d e (list (lt a b) c ...) locali output) (smc env d e (append (list a b 'lt) c) locali output) ]
-              [(smc env d e (list (neg a) c ...) locali output) (smc env d e (append (list a 'neg) c) locali output) ]
-              [(smc env d e (list (eq a b) c ...) locali output) (smc env d e (append (list a b 'eq) c) locali output) ]
-              [(smc env d e (list (le a b) c ...) locali output) (smc env d e (append (list a b 'le) c) locali output) ]
+              [(piAutomata env d e (list (? boolean? a) b ...) locali output) (piAutomata env (cons a d) e b  locali output)]
+              [(piAutomata env d e (list (? or? a) c ...) locali output) (piAutomata env d e (append (list (or-a a)  (or-b a) 'or) c) locali output) ]
+              [(piAutomata env d e (list (? and-my-struct? a) c ...) locali output) (piAutomata env d e (append (list (and-my-struct-a a) (and-my-struct-b a) 'and) c) locali output) ]
+              [(piAutomata env d e (list (ge a b) c ...) locali output) (piAutomata env d e (append (list a b 'ge) c) locali output) ]
+              [(piAutomata env d e (list (gt a b) c ...) locali output) (piAutomata env d e (append (list a b 'gt) c) locali output) ]
+              [(piAutomata env d e (list (lt a b) c ...) locali output) (piAutomata env d e (append (list a b 'lt) c) locali output) ]
+              [(piAutomata env d e (list (neg a) c ...) locali output) (piAutomata env d e (append (list a 'neg) c) locali output) ]
+              [(piAutomata env d e (list (eq a b) c ...) locali output) (piAutomata env d e (append (list a b 'eq) c) locali output) ]
+              [(piAutomata env d e (list (le a b) c ...) locali output) (piAutomata env d e (append (list a b 'le) c) locali output) ]
 
 
-              [(smc env (list (? boolean? a) (? boolean? b) c ...) d (list 'or e ...) locali output)  (smc env (cons (if a #t b) c) d e locali output) ]
-              [(smc env (list (? boolean? a) (? boolean? b) c ...) d (list 'and e ...) locali output)  (smc env (cons (if a b #f) c) d e locali output) ]
-              [(smc env (list (? number? a) (? number? b) c ...) d (list 'ge e ...) locali output)  (smc env (cons (>= b a) c) d e locali output) ]
-              [(smc env (list (? number? a) (? number? b) c ...) d (list 'gt e ...) locali output)  (smc env (cons (> b a) c) d e locali output) ]
+              [(piAutomata env (list (? boolean? a) (? boolean? b) c ...) d (list 'or e ...) locali output)  (piAutomata env (cons (if a #t b) c) d e locali output) ]
+              [(piAutomata env (list (? boolean? a) (? boolean? b) c ...) d (list 'and e ...) locali output)  (piAutomata env (cons (if a b #f) c) d e locali output) ]
+              [(piAutomata env (list (? number? a) (? number? b) c ...) d (list 'ge e ...) locali output)  (piAutomata env (cons (>= b a) c) d e locali output) ]
+              [(piAutomata env (list (? number? a) (? number? b) c ...) d (list 'gt e ...) locali output)  (piAutomata env (cons (> b a) c) d e locali output) ]
 
-              [(smc env (list (? number? a) (? number? b) c ...) d (list 'lt e ...) locali output)  (smc env (cons (< b a) c) d e locali output) ]
-              [(smc env (list (? number? a) (? number? b) c ...) d (list 'eq e ...) locali output)  (smc env (cons (= a b) c) d e locali output) ]
-              [(smc env (list (? number? a) (? number? b) c ...) d (list 'le e ...) locali output)  (smc env (cons (<= b a) c) d e locali output) ]
-              [(smc env (list (? boolean? a) c ...) d (list 'neg e ...) locali output)  (smc env (cons (not a) c) d e locali output) ]
+              [(piAutomata env (list (? number? a) (? number? b) c ...) d (list 'lt e ...) locali output)  (piAutomata env (cons (< b a) c) d e locali output) ]
+              [(piAutomata env (list (? number? a) (? number? b) c ...) d (list 'eq e ...) locali output)  (piAutomata env (cons (= a b) c) d e locali output) ]
+              [(piAutomata env (list (? number? a) (? number? b) c ...) d (list 'le e ...) locali output)  (piAutomata env (cons (<= b a) c) d e locali output) ]
+              [(piAutomata env (list (? boolean? a) c ...) d (list 'neg e ...) locali output)  (piAutomata env (cons (not a) c) d e locali output) ]
 
-              [(smc env a d (list (? nop? b) c ...) locali output) (smc env a d c locali output) ]
+              [(piAutomata env a d (list (? nop? b) c ...) locali output) (piAutomata env a d c locali output) ]
 	      
-              [(smc env a d (list (? if-struct? b) c ...) locali output) (smc env a d (append (list (if-struct-cond b) 'if (if-struct-then b) (if-struct-else b)) c) locali output) ]
-              [(smc env (list (? boolean? a) b ...) c (list 'if c1 c2 d ...) locali output)  (smc env b c (append (list (if a c1 c2)) d) locali output) ]
+              [(piAutomata env a d (list (? if-my-struct? b) c ...) locali output) (piAutomata env a d (append (list (if-my-struct-cond b) 'if (if-my-struct-then b) (if-my-struct-else b)) c) locali output) ]
+              [(piAutomata env (list (? boolean? a) b ...) c (list 'if c1 c2 d ...) locali output)  (piAutomata env b c (append (list (if a c1 c2)) d) locali output) ]
 
-              ;		Talvez criar mais um item semantico contendo os efeitos colaterais fosse legal, tornaria o smcEval 100% funcional, sem efeito colateral
-              [(smc env a b (list (? print? c) d ...) locali output) (smc env a b (append (list (print-a c) 'print) d) locali output)]
-              [(smc env (list a b ...) c (list 'print d ...) locali output) (smc env b c d locali (cons a output) )  ]
+              ;		Talvez criar mais um item semantico contendo os efeitos colaterais fosse legal, tornaria o piAutomataEval 100% funcional, sem efeito colateral
+              [(piAutomata env a b (list (? print? c) d ...) locali output) (piAutomata env a b (append (list (print-a c) 'print) d) locali output)]
+              [(piAutomata env (list a b ...) c (list 'print d ...) locali output) (piAutomata env b c d locali (cons a output) )  ]
 	      
-              [(smc env a b (list (seq c d) e ...) locali output) (smc env a b (append (list c d) e) locali output) ]
+              [(piAutomata env a b (list (seq c d) e ...) locali output) (piAutomata env a b (append (list c d) e) locali output) ]
 
 
               ;		Poderia mudar isso para uso do operador 'amb', de escolha não-deterministica
@@ -197,78 +142,78 @@
               ;		de alguma condição sendo testada. Se for uma modal(LTL(linear temporal logic)) pode dar certo
               ;		Obviamente precisaria ser decidivel(não é, então assim, o que eu faço?), mas não sei como fazer com os loops infinitos
               ;		decidiveis
-              [(smc env a b (list (choice c d) e ...) locali output)  (smc env a b (append (list (if (equal? 0 (random 2)) c d )) e ) locali output)]
+              [(piAutomata env a b (list (choice c d) e ...) locali output)  (piAutomata env a b (append (list (if (equal? 0 (random 2)) c d )) e ) locali output)]
 
-              [(smc env a d (list (loop b e) c ...) locali output) (smc env a d (append (list b 'loop b e) c) locali output) ]
+              [(piAutomata env a d (list (loop b e) c ...) locali output) (piAutomata env a d (append (list b 'loop b e) c) locali output) ]
 
-              [(smc env (list (? boolean? a) b ...) c (list 'loop c1 c2 d ...) locali output)  (smc env b c (append (if a (list c2 (loop c1 c2)) '()) d ) locali output) ]
+              [(piAutomata env (list (? boolean? a) b ...) c (list 'loop c1 c2 d ...) locali output)  (piAutomata env b c (append (if a (list c2 (loop c1 c2)) '()) d ) locali output) ]
               ;;TODO : verify types in atrib	
-              [(smc env a b (list (assign c d) e ...) locali output) (smc env a b (append (list d 'assign c) e) locali output)]
-              [(smc env (list a b ...) c (list 'assign (idt d) e ...) locali output) (let ([newMemory (atrib env c d a)]) (smc env b newMemory e locali output))]
+              [(piAutomata env a b (list (assign c d) e ...) locali output) (piAutomata env a b (append (list d 'assign c) e) locali output)]
+              [(piAutomata env (list a b ...) c (list 'assign (idt d) e ...) locali output) (let ([newMemory (atrib env c d a)]) (piAutomata env b newMemory e locali output))]
 	      
-              [(smc env a b (list (idt c) d ...) locali output) (let ([v (identifier env b c)]) (smc env (cons v a) b d locali output))]
+              [(piAutomata env a b (list (idt c) d ...) locali output) (let ([v (identifier env b c)]) (piAutomata env (cons v a) b d locali output))]
 
-              [(smc env a b (list (? exit? c) d ...) locali output) (smc env a b (append (list (exit-a c) 'exit) d  ) locali output) ]
-              [(smc env (list a b ...) c (list 'exit d ...) locali output)  (exit a)  ]
+              [(piAutomata env a b (list (? exit? c) d ...) locali output) (piAutomata env a b (append (list (exit-a c) 'exit) d  ) locali output) ]
+              [(piAutomata env (list a b ...) c (list 'exit d ...) locali output)  (exit a)  ]
 
 
 
 
               ;		Salvo o ambiente, as localizações atuais e reinicio as localicações
-              [(smc env a b (list (blkCommandDec c d) e ...) locali output)
-               (smc env (append (list env locali) a) b (append (list c d 'blk) e)  '() output) ]
-              [(smc env a b (list (blkCommand c) e ...) locali output)
-               (smc env (append (list env locali) a) b (append (list c 'blk) e)  '() output) ]
-              [(smc env (list (? hash? a) (? listLoc? e) b ...) c (list 'blk d ...) locali output)
-               (smc a b c d e output)]
+              [(piAutomata env a b (list (blkCommandDec c d) e ...) locali output)
+               (piAutomata env (append (list env locali) a) b (append (list c d 'blk) e)  '() output) ]
+              [(piAutomata env a b (list (blkCommand c) e ...) locali output)
+               (piAutomata env (append (list env locali) a) b (append (list c 'blk) e)  '() output) ]
+              [(piAutomata env (list (? hash? a) (? listLoc? e) b ...) c (list 'blk d ...) locali output)
+               (piAutomata a b c d e output)]
 
 
-              [(smc env a m (list (dec b c) d ...) locali output) (smc env a m (append (list b c) d) locali output)]
-              [(smc env v m (list (ref a b) r ...) locali output) (smc env v m (append (list b 'ref a) r) locali output)]
-              [(smc env v m (list (cns a b) r ...) locali output) (smc env v m (append (list b 'cns a) r) locali output)]
-              [(smc env v m (list (prcFormals (idt i) formals block) r ...) locali output)
-               (smc (constant env i (absFormals formals block)) v m r locali output)]
-              [(smc env v m (list (prc (idt i) block) r ...) locali output) (smc (constant env i (abs block)) v m r locali output)]
-              [(smc env v m (list (cal a) r ...) locali output)
-               (smc env v m (append (list a 'cal) r) locali output)]
-              [(smc env v m (list (calAtuals id atuals) r ...) locali output) (smc env v m (append (list id atuals 'cal) r) locali output)]
-              [(smc env (list (abs block) r1 ...) m (list 'cal r ...) locali output)
-               (smc env r1 m (cons block r) locali output)]
-              [(smc env (list atuals ... (absFormals formals block) r1 ...) m (list 'cal r ...) locali output)
-               (smc env r1 m (cons (blkCommandDec (casa formals atuals) block) r) locali output) ]
+              [(piAutomata env a m (list (dec b c) d ...) locali output) (piAutomata env a m (append (list b c) d) locali output)]
+              [(piAutomata env v m (list (ref a) r ...) locali output) (piAutomata env v m (append (list a 'ref) r) locali output)]
+              [(piAutomata env v m (list (cns a b) r ...) locali output) (piAutomata env v m (append (list b 'cns a) r) locali output)]
+              [(piAutomata env v m (list (prcFormals (idt i) formals block) r ...) locali output)
+               (piAutomata (constant env i (absFormals formals block)) v m r locali output)]
+              [(piAutomata env v m (list (prc (idt i) block) r ...) locali output) (piAutomata (constant env i (abs block)) v m r locali output)]
+              [(piAutomata env v m (list (cal a) r ...) locali output)
+               (piAutomata env v m (append (list a 'cal) r) locali output)]
+              [(piAutomata env v m (list (calAtuals id atuals) r ...) locali output) (piAutomata env v m (append (list id atuals 'cal) r) locali output)]
+              [(piAutomata env (list (abs block) r1 ...) m (list 'cal r ...) locali output)
+               (piAutomata env r1 m (cons block r) locali output)]
+              [(piAutomata env (list atuals ... (absFormals formals block) r1 ...) m (list 'cal r ...) locali output)
+               (piAutomata env r1 m (cons (blkCommandDec (casa formals atuals) block) r) locali output) ]
 	       ;The invocation of a continuation only means get some value(that can be a number, a boolean
 	       ;a abstraction(a function) or another continuation and put her on top of stack value inside cont
 	       ;but in particular make output and memory equal.
-              [(smc env (list atual (cont e v c) r1 ...) m (list 'cal r ...) locali output)
-               (smc e (cons atual v) m c locali output) ]
+              [(piAutomata env (list atual (cont e v c) r1 ...) m (list 'cal r ...) locali output)
+               (piAutomata e (cons atual v) m c locali output) ]
 		
-              [(smc env (list (abs block) r1 ...) m (list 'cal r ...) locali output)
-               (smc env r1 m (cons block r) locali output) ]
+              [(piAutomata env (list (abs block) r1 ...) m (list 'cal r ...) locali output)
+               (piAutomata env r1 m (cons block r) locali output) ]
 		
-              [(smc env v m (list (act e actuals) r ...) locali output) (smc env v m (append (list actuals e) r) locali output)]
+              [(piAutomata env v m (list (act e actuals) r ...) locali output) (piAutomata env v m (append (list actuals e) r) locali output)]
 	      
-              [(smc env (list a v ...) m (list 'ref (idt i) r ...) locali output)
-               (let-values ([(newMem newEnv) (reference env m i a)])
-                 (smc newEnv v newMem r (cons (hash-ref newEnv i) locali) output))]
-              [(smc env (list a v ...) m (list 'cns (idt i) r ...) locali output)
-               (let ([newEnv (constant env i a )]) (smc newEnv v m r locali output))]
+              [(piAutomata env (list a v ...) m (list 'ref r ...) locali output)
+               (let-values ([(newMem l) (reference m a)])
+                 (piAutomata env (cons l v) newMem r (cons l locali) output))]
+              [(piAutomata env (list a v ...) m (list 'cns (idt i) r ...) locali output)
+               (let ([newEnv (constant env i a )]) (piAutomata newEnv v m r locali output))]
 
-              [(smc env v m (list (calf a) r ...) locali output)
-               (smc env (cons (cont env v r) v) m (append (list a 'cal) r) locali output)]
-              [(smc env v m (list (calAtualsf id atuals) r ...) locali output)
-               (smc env (cons (cont env v r) v) m (append (list id atuals 'cal) r) locali output)]
+              [(piAutomata env v m (list (calf a) r ...) locali output)
+               (piAutomata env (cons (cont env v r) v) m (append (list a 'cal) r) locali output)]
+              [(piAutomata env v m (list (calAtualsf id atuals) r ...) locali output)
+               (piAutomata env (cons (cont env v r) v) m (append (list id atuals 'cal) r) locali output)]
 	      
-              [(smc env v m (list (funFormals (idt i) formals block) r ...) locali output)
-               (smc (constant env i (absFormals formals block)) v m r locali output)]
-              [(smc env v m (list (fun (idt i) block) r ...) locali output) (smc (constant env i (abs block)) v m r locali output)]
+              [(piAutomata env v m (list (funFormals (idt i) formals block) r ...) locali output)
+               (piAutomata (constant env i (absFormals formals block)) v m r locali output)]
+              [(piAutomata env v m (list (fun (idt i) block) r ...) locali output) (piAutomata (constant env i (abs block)) v m r locali output)]
 	      
 	      ;
 	      ;As ret is only allowed inside a function(and this must be ensured by parser, because the assumption of
 	      ;this semantics is that ret has a continuation(put by a calf or calActualsf),representation of a call to
 	      ; a function, somewhere on stack value. 
-              [(smc env a m (list (ret c) d ...) locali output) (smc env a m (append (list c 'ret) d) locali output)]
-              [(smc env (list v a ... (cont e s c) r1 ...) m (list 'ret r ...) locali output)
-               (smc e (cons v s) m c locali output)]
+              [(piAutomata env a m (list (ret c) d ...) locali output) (piAutomata env a m (append (list c 'ret) d) locali output)]
+              [(piAutomata env (list v a ... (cont e s c) r1 ...) m (list 'ret r ...) locali output)
+               (piAutomata e (cons v s) m c locali output)]
 
 		;
 		;call/cc is a special function, in terms of parser, and can be used directly by user or as low level
@@ -276,15 +221,15 @@
 		;points. In fact, there's some points, i.e. function cal, return command and call/cc, that create or consume
 		;continuations and that must be changed when the pi-automata increase by for example put cyber-phisical primitives.
 		;
-              [(smc env v m (list (call/cc f) c ...) locali output)
-               (smc env v m (cons (calAtualsf f (cont env v c)) c) locali output) ]
-              [(smc env v m (list (? cont? a) c ...) locali output) (smc env (cons a v) m c locali output)]
+              [(piAutomata env v m (list (call/cc f) c ...) locali output)
+               (piAutomata env v m (cons (calAtualsf f (cont env v c)) c) locali output) ]
+              [(piAutomata env v m (list (? cont? a) c ...) locali output) (piAutomata env (cons a v) m c locali output)]
 		
 		;
 		;Not yet implemented
 		;Problaby will be just a smart use of coroutine. When I put this code, I think of doing as a standalone
 		;command, but using coroutines look better
-              [(smc env v m (list (yield e (idt i)) c ...) locali output)
+              [(piAutomata env v m (list (yield e (idt i)) c ...) locali output)
                (let ([env2 (constant env i
                                      (call/cc
                                       (absFormals (par (idt "k"))
@@ -293,14 +238,17 @@
                                                     env
                                                     v
                                                     c) (idt "k")))))])
-                 (smc env2 v m (cons (ret e) c) locali output))]
+                 (piAutomata env2 v m (cons (ret e) c) locali output))]
 
 		;;
 		;;Will be merged as soon as possible. Exceptions are just out-going only continuations, but delimited continuations
 		;;is better to her. Maybe I just put amb and coroutines merged and add try/catch changed with delimited in the future.
-              [(smc env v m (list (try/catch e c) r ...) locali output) (smc env v m (cons (try/catch/finally e c (nop)) r) locali output)]
+              [(piAutomata env v m (list (try/catch e c) r ...) locali output) (piAutomata env v m (cons (try/catch/finally e c (nop)) r) locali output)]
               ;;;Possivelmente essa ultima transição virará um throw
-              [a (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a))]))))
+              [a (begin
+                   (display a)
+                   (newline)
+                   (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a)))]) debug)))
 
 
 (module+ test
@@ -316,69 +264,69 @@
 ;;
 
   (check-equal? (executeSMC (add 1 2))
-                (smc (hash) '(3) (hash) '() '() '()))
+                (piAutomata (hash) '(3) (hash) '() '() '()))
   (check-equal? (executeSMC (sub 1 2))
-                (smc (hash) '(-1) (hash) '() '() '()))
+                (piAutomata (hash) '(-1) (hash) '() '() '()))
   (check-equal? (executeSMC (mult 1 2))
-                (smc (hash) '(2) (hash) '() '() '()))
+                (piAutomata (hash) '(2) (hash) '() '() '()))
   (check-equal? (executeSMC (div 1 2))
-                (smc (hash) (list (/ 1 2)) (hash) '() '() '()))
+                (piAutomata (hash) (list (/ 1 2)) (hash) '() '() '()))
   (check-equal? (executeSMC 2)
-                (smc (hash) (list 2) (hash) '() '() '()))
+                (piAutomata (hash) (list 2) (hash) '() '() '()))
 
 
   (check-equal? (executeSMC #t)
-                (smc (hash) (list #t) (hash) '() '() '()))
+                (piAutomata (hash) (list #t) (hash) '() '() '()))
   (check-equal? (executeSMC (or #t #f))
-                (smc (hash) (list #t) (hash) '() '() '()))
-  (check-equal? (executeSMC (and-struct #t #f))
-                (smc (hash) (list #f) (hash) '() '() '()))
+                (piAutomata (hash) (list #t) (hash) '() '() '()))
+  (check-equal? (executeSMC (and-my-struct #t #f))
+                (piAutomata (hash) (list #f) (hash) '() '() '()))
   (check-equal? (executeSMC (ge 42 67))
-                (smc (hash) (list #f) (hash) '() '() '()))
+                (piAutomata (hash) (list #f) (hash) '() '() '()))
   (check-equal? (executeSMC (gt 42 67))
-                (smc (hash) (list #f) (hash) '() '() '()))
+                (piAutomata (hash) (list #f) (hash) '() '() '()))
   (check-equal? (executeSMC (eq 42 67))
-                (smc (hash) (list #f) (hash) '() '() '()))
+                (piAutomata (hash) (list #f) (hash) '() '() '()))
   (check-equal? (executeSMC (lt 42 67))
-                (smc (hash) (list #t) (hash) '() '() '()))
+                (piAutomata (hash) (list #t) (hash) '() '() '()))
   (check-equal? (executeSMC (le 42 67))
-                (smc (hash) (list #t) (hash) '() '() '()))
+                (piAutomata (hash) (list #t) (hash) '() '() '()))
   (check-equal? (executeSMC (neg #t))
-                (smc (hash) (list #f) (hash) '() '() '()))
+                (piAutomata (hash) (list #f) (hash) '() '() '()))
   (check-equal? (executeSMC (nop))
-                (smc (hash) (list) (hash) '() '() '()))
+                (piAutomata (hash) (list) (hash) '() '() '()))
 
 
 
-  (check-equal? (executeSMC (if-struct (lt 4 5) (add 1 2) (sub 1 2)))
-                (smc (hash) (list 3) (hash) '() '() '()))
+  (check-equal? (executeSMC (if-my-struct (lt 4 5) (add 1 2) (sub 1 2)))
+                (piAutomata (hash) (list 3) (hash) '() '() '()))
   (check-equal? (executeSMC (print 4))
-                (smc (hash) (list) (hash) '() '() '(4)))
+                (piAutomata (hash) (list) (hash) '() '() '(4)))
   (check-equal? (executeSMC (seq (print 3) (print 2)))
-                (smc (hash) (list) (hash) '()'() '(2 3)))
-  (check-equal? (executeSMC (ref (idt "x") 4))
-                (smc (hash "x" (loc 1)) '() (hash (loc 1) 4) '() (list (loc 1)) '()))
+                (piAutomata (hash) (list) (hash) '()'() '(2 3)))
+  (check-equal? (executeSMC (bind (idt "x") (ref 4)))
+                (piAutomata (hash "x" (loc 1)) '() (hash (loc 1) 4) '() (list (loc 1)) '()))
 
   (check-equal? (executeSMC
                  (seq
-                  (ref (idt "x") 0)
+                  (bind (idt "x") (ref 0))
                   (assign (idt "x") 4)))
-                (smc (hash "x" (loc 1)) '() (hash (loc 1) 4) '() (list (loc 1)) '()))
+                (piAutomata (hash "x" (loc 1)) '() (hash (loc 1) 4) '() (list (loc 1)) '()))
 
   (check-equal? (executeSMC
-                 (seq (ref (idt "x") 0)
+                 (seq (bind (idt "x") (ref 0))
                       (loop
                        (lt (idt "x") 5)
                        (blkCommand
                         (seq (print (idt "x"))
                              (assign (idt "x") (add (idt "x") 1)))))))
-                (smc (hash "x" (loc 1)) '() (hash (loc 1) 5) '() (list (loc 1)) '(4 3 2 1 0)))
+                (piAutomata (hash "x" (loc 1)) '() (hash (loc 1) 5) '() (list (loc 1)) '(4 3 2 1 0)))
 
   (check-equal?
    (executeSMC
     (prcFormals (idt "f") (par (idt "k"))
                 (blkCommand (ret 2))))
-   (smc (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() '#hash() '() '() '()))
+   (piAutomata (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() '#hash() '() '() '()))
 
 ;;Here we can see the code
 ;;
@@ -400,24 +348,24 @@
      (calAtuals
       (idt "f")
       1)))
-   (smc '#hash() '() (hash (loc 1) 1) '() '() '(2)))
+   (piAutomata '#hash() '() (hash (loc 1) 1) '() '() '(2)))
 
-  ;(struct smc (env val mem control loc output) #:transparent)
-  ;(struct cont (env s c) #:transparent)
+  ;(my-struct piAutomata (env val mem control loc output) #:transparent)
+  ;(my-struct cont (env s c) #:transparent)
   (check-equal?
-   (smcEval
-    (smc (hash) (list 2 (cont (hash) '() (list 'print))) (hash) (list 'ret) '() '()))
-   (smc (hash) '() (hash) '() '() (list 2)))
+   (piAutomataEval
+    (piAutomata (hash) (list 2 (cont (hash) '() (list 'print))) (hash) (list 'ret) '() '()))
+   (piAutomata (hash) '() (hash) '() '() (list 2)))
 
   (check-equal?
-   (smcEval
-    (smc (hash) (list 2 3 4 5 (cont (hash) '() (list 'print))) (hash) (list 'ret) '() '()))
-   (smc (hash) '() (hash) '() '() (list 2)))
+   (piAutomataEval
+    (piAutomata (hash) (list 2 3 4 5 (cont (hash) '() (list 'print))) (hash) (list 'ret) '() '()))
+   (piAutomata (hash) '() (hash) '() '() (list 2)))
   
   (check-equal?
-   (smcEval
-    (smc (hash) (list 2 3 4 5 (cont (hash) '() (list 'print))) (hash) (list (ret 2)) '() '()))
-   (smc (hash) '() (hash) '() '() (list 2)))
+   (piAutomataEval
+    (piAutomata (hash) (list 2 3 4 5 (cont (hash) '() (list 'print))) (hash) (list (ret 2)) '() '()))
+   (piAutomata (hash) '() (hash) '() '() (list 2)))
 
   ;
   ;
@@ -430,7 +378,7 @@
                 (idt "f")
                 (par (idt "k"))
                 (blkCommand (ret 2))))
-   (smc (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() '#hash() '() '() '()))
+   (piAutomata (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() '#hash() '() '() '()))
 
   (check-equal?
    (executeSMC
@@ -440,22 +388,22 @@
       (par (idt "k"))
       (blkCommand (ret 2)))
      (nop)))
-   (smc '#hash() '() (hash) '() '() '()))
+   (piAutomata '#hash() '() (hash) '() '() '()))
 
   (check-equal?
-   (smcEval
-    (smc (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() (hash) (list (print 2)) '() '()))
-   (smc (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() (hash) '() '() (list 2)))
+   (piAutomataEval
+    (piAutomata (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() (hash) (list (print 2)) '() '()))
+   (piAutomata (hash "f" (absFormals (par (idt "k")) (blkCommand (ret 2)))) '() (hash) '() '() (list 2)))
   
   (check-equal?
-   (smcEval
-    (smc (hash "f" (abs (blkCommand (ret 2)))) '() (hash) (list (calf (idt "f"))) '() '()))
-   (smc (hash "f" (abs (blkCommand (ret 2)))) '(2) (hash) '() '() '()))
+   (piAutomataEval
+    (piAutomata (hash "f" (abs (blkCommand (ret 2)))) '() (hash) (list (calf (idt "f"))) '() '()))
+   (piAutomata (hash "f" (abs (blkCommand (ret 2)))) '(2) (hash) '() '() '()))
   
   (check-equal?
-   (smcEval
-    (smc (hash "f" (abs (blkCommand (ret 2)))) '() (hash) (list (print (calf (idt "f")))) '() '()))
-   (smc (hash "f" (abs (blkCommand (ret 2)))) '() (hash) '() '() '(2)))
+   (piAutomataEval
+    (piAutomata (hash "f" (abs (blkCommand (ret 2)))) '() (hash) (list (print (calf (idt "f")))) '() '()))
+   (piAutomata (hash "f" (abs (blkCommand (ret 2)))) '() (hash) '() '() '(2)))
 
   (check-equal?
    (executeSMC
@@ -465,12 +413,12 @@
       (par (idt "k"))
       (blkCommand (ret 2)))
      (print (calAtualsf (idt "f") 1))))
-   (smc '#hash() '() (hash (loc 1) 1) '() '() '(2)))
+   (piAutomata '#hash() '() (hash (loc 1) 1) '() '() '(2)))
 
   (check-equal?
    (executeSMC
     (calAtualsf (cont (hash "f" (loc 1) "x" (loc 2)) '(2) '()) 21))
-   (smc (hash "f" (loc 1) "x" (loc 2)) (list 21 2) (hash) '() '() '()))
+   (piAutomata (hash "f" (loc 1) "x" (loc 2)) (list 21 2) (hash) '() '() '()))
   
   (check-equal?
    (executeSMC
@@ -480,7 +428,7 @@
       (par (idt "k"))
       (blkCommand (calAtualsf (idt "k") 42)))
      (calAtualsf (idt "f") (cont (hash 1 2 3 4) '(45) '()))))
-   (smc (hash 1 2 3 4) (list 42 45) (hash (loc 1) (cont '#hash((1 . 2) (3 . 4)) '(45) '())) '() '() '()))
+   (piAutomata (hash 1 2 3 4) (list 42 45) (hash (loc 1) (cont '#hash((1 . 2) (3 . 4)) '(45) '())) '() '() '()))
 
 ;
 ;;
@@ -518,7 +466,7 @@
    (executeSMC
     (blkCommandDec
      (dec
-      (ref (idt "outerK") #f)
+      (bind (idt "outerK") (ref #f))
       (funFormals
        (idt "f")
        (par (idt "k"))
@@ -526,89 +474,105 @@
                     (assign (idt "outerK")(idt "k"))
                     (ret 0)))))
      (blkCommandDec
-      (ref (idt "x") (call/cc (idt "f")))
-      (if-struct (lt (idt "x") 5)
+      (bind (idt "x") (ref (call/cc (idt "f"))))
+      (if-my-struct (lt (idt "x") 5)
                  (seq
                   (print (idt "x"))
                   (calAtualsf (idt "outerK") (add 1 (idt "x"))))
                  (nop)))))
-   (smc
+   (piAutomata
+ '#hash()
+ '()
+ (hash
+  (loc 2)
+  (cont
+   (hash "f" (absFormals (par (idt "k")) (blkCommand (seq (assign (idt "outerK") (idt "k")) (ret 0)))) "outerK" (loc 1))
+   (list
+    (idt "x")
+    (hash "f" (absFormals (par (idt "k")) (blkCommand (seq (assign (idt "outerK") (idt "k")) (ret 0)))) "outerK" (loc 1))
+    (list (loc 1))
     '#hash()
-    '()
-    (hash
-     (loc 2)
-     (cont
-      (hash
-       "f"
-       (absFormals
-        (par (idt "k"))
-        (blkCommand (seq (assign (idt "outerK") (idt "k")) (ret 0))))
-       "outerK"
-       (loc 1))
-      (list
-       (hash
-        "f"
-        (absFormals
-         (par (idt "k"))
-         (blkCommand (seq (assign (idt "outerK") (idt "k")) (ret 0))))
-        "outerK"
-        (loc 1))
-       (list (loc 1))
-       '#hash()
-       '())
-      (list
-       'ref
-       (idt "x")
-       (if-struct
-        (lt (idt "x") 5)
-        (seq (print (idt "x")) (calAtualsf (idt "outerK") (add 1 (idt "x"))))
-        (nop))
-       'blk
-       'blk))
-     (loc 5)
-     2
-     (loc 3)
-     0
-     (loc 7)
-     4
-     (loc 8)
-     5
-     (loc 6)
-     3
-     (loc 4)
-     1
-     (loc 1)
-     (cont
-      (hash
-       "f"
-       (absFormals
-        (par (idt "k"))
-        (blkCommand (seq (assign (idt "outerK") (idt "k")) (ret 0))))
-       "outerK"
-       (loc 1))
-      (list
-       (hash
-        "f"
-        (absFormals
-         (par (idt "k"))
-         (blkCommand (seq (assign (idt "outerK") (idt "k")) (ret 0))))
-        "outerK"
-        (loc 1))
-       (list (loc 1))
-       '#hash()
-       '())
-      (list
-       'ref
-       (idt "x")
-       (if-struct
-        (lt (idt "x") 5)
-        (seq (print (idt "x")) (calAtualsf (idt "outerK") (add 1 (idt "x"))))
-        (nop))
-       'blk
-       'blk)))
-    '()
-    '()
-    '(4 3 2 1 0)))
-                 
+    '())
+   (list
+    'ref
+    'bind
+    (if-my-struct (lt (idt "x") 5) (seq (print (idt "x")) (calAtualsf (idt "outerK") (add 1 (idt "x")))) (nop))
+    'blk
+    'blk))
+  (loc 5)
+  2
+  (loc 3)
+  0
+  (loc 7)
+  4
+  (loc 8)
+  5
+  (loc 6)
+  3
+  (loc 4)
+  1
+  (loc 1)
+  (cont
+   (hash "f" (absFormals (par (idt "k")) (blkCommand (seq (assign (idt "outerK") (idt "k")) (ret 0)))) "outerK" (loc 1))
+   (list
+    (idt "x")
+    (hash "f" (absFormals (par (idt "k")) (blkCommand (seq (assign (idt "outerK") (idt "k")) (ret 0)))) "outerK" (loc 1))
+    (list (loc 1))
+    '#hash()
+    '())
+   (list
+    'ref
+    'bind
+    (if-my-struct (lt (idt "x") 5) (seq (print (idt "x")) (calAtualsf (idt "outerK") (add 1 (idt "x")))) (nop))
+    'blk
+    'blk)))
+ '()
+ '()
+ '(4 3 2 1 0)))
 
-  )
+
+;   (executeSMC
+;    (blkCommandDec
+;     (dec
+;      (bind (idt "resource") (ref 0))
+;      (dec
+;       (funFormals
+;        (idt "produtor")
+;        (par (idt "k1"))
+;        (blkCommandDec
+;         (bind (idt "co") (ref 5))
+;         (seq
+;          (loop (gt (idt "co") 0)
+;                (seq
+;                 (assign (idt "co") (sub (idt "co") 1))
+;                 (seq
+;                  (assign (idt "resource") 20)
+;                  (assign (idt "k1") (call/cc (idt "k1"))))))
+;          (seq
+;           (assign (idt "resource") 0)
+;           (assign (idt "k1") (call/cc (idt "k1")))))))
+;       (funFormals
+;        (idt "consumidor")
+;        (par (idt "k2"))
+;        (blkCommandDec
+;         (bind (idt "i") (ref 0))
+;         (seq
+;                     (if-my-struct (lt (idt "resource") 1)
+;                                    (assign (idt "k2") (call/cc (idt "k2")))
+;                                    (nop))
+;                     (loop
+;                      (gt (idt "resource") 0)
+;                      (seq
+;                       (print (idt "resource"))
+;                       (seq
+;                        (assign (idt "resource") (sub (idt "resource") 1))
+;                        (if-my-struct
+;                         (eq (idt "resource") 0)
+;                            (assign (idt "k2") (call/cc (idt "k2")))
+;                            (nop))))))))))
+;     (calAtualsf (idt "consumidor") (idt "produtor"))))
+
+
+
+
+   )

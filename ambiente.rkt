@@ -1,16 +1,10 @@
 #lang racket
 
-(require racket/struct)
-(require "pretty.rkt")
+;(require racket/struct)
+;(require "pretty.rkt")
 (provide clean identifier atrib reference constant listLoc? loc loc?)
 
-(define (write-loc location port mode)
-  (let ((write-fun (if mode write display)))
-    (write-fun "Loc(" port)
-    (write-fun (loc-adress location) port)
-    (write-fun ")" port)))
-
-(struct loc (adress) #:methods gen:custom-write [(define write-proc write-loc)])
+(struct loc (adress) #:transparent)
 
 ; (-> any bool)
 (define (listLoc? l)
@@ -33,9 +27,11 @@
 
 
 ; (-> env (hash loc (U bool number)) string (U bool number))
-(define (reference env memory ident value)
+(define (reference memory value)
 	(let ([newLoc (add1 (hash-count memory))]) 
-		(values (hash-set memory (loc newLoc) value) (hash-set env ident (loc newLoc)))))
+		(values
+                 (hash-set memory (loc newLoc) value)
+                 (loc newLoc))))
 
 
 ; (-> env string (U bool number))
