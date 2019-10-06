@@ -246,9 +246,13 @@
               [(piAutomata env v m (list (try/catch e c) r ...) locali output) (piAutomata env v m (cons (try/catch/finally e c (nop)) r) locali output)]
               ;;;Possivelmente essa ultima transição virará um throw
               [a (begin
-                   (display a)
-                   (newline)
-                   (raise (format "Desculpe, feature não implementada. O elemento é ~a\n" a)))]) debug)))
+		   (display "Começo da pilha de controle")
+		   (newline)
+		   (display (piAutomata-env a))
+		   (newline)
+		   (newline)
+		   (newline)
+                   (raise (format "Desculpe, feature não implementada.\n")))]) debug)))
 
 
 (module+ test
@@ -531,46 +535,46 @@
  '(4 3 2 1 0)))
 
 
-;   (executeSMC
-;    (blkCommandDec
-;     (dec
-;      (bind (idt "resource") (ref 0))
-;      (dec
-;       (funFormals
-;        (idt "produtor")
-;        (par (idt "k1"))
-;        (blkCommandDec
-;         (bind (idt "co") (ref 5))
-;         (seq
-;          (loop (gt (idt "co") 0)
-;                (seq
-;                 (assign (idt "co") (sub (idt "co") 1))
-;                 (seq
-;                  (assign (idt "resource") 20)
-;                  (assign (idt "k1") (call/cc (idt "k1"))))))
-;          (seq
-;           (assign (idt "resource") 0)
-;           (assign (idt "k1") (call/cc (idt "k1")))))))
-;       (funFormals
-;        (idt "consumidor")
-;        (par (idt "k2"))
-;        (blkCommandDec
-;         (bind (idt "i") (ref 0))
-;         (seq
-;                     (if-my-struct (lt (idt "resource") 1)
-;                                    (assign (idt "k2") (call/cc (idt "k2")))
-;                                    (nop))
-;                     (loop
-;                      (gt (idt "resource") 0)
-;                      (seq
-;                       (print (idt "resource"))
-;                       (seq
-;                        (assign (idt "resource") (sub (idt "resource") 1))
-;                        (if-my-struct
-;                         (eq (idt "resource") 0)
-;                            (assign (idt "k2") (call/cc (idt "k2")))
-;                            (nop))))))))))
-;     (calAtualsf (idt "consumidor") (idt "produtor"))))
+   (executeSMC
+    (blkCommandDec
+     (dec
+      (bind (idt "resource") (ref 0))
+      (dec
+       (funFormals
+        (idt "produtor")
+        (par (idt "k1"))
+        (blkCommandDec
+         (bind (idt "co") (ref 5))
+         (seq
+          (loop (gt (idt "co") 0)
+                (seq
+                 (assign (idt "co") (sub (idt "co") 1))
+                 (seq
+                  (assign (idt "resource") 20)
+                  (assign (idt "k1") (call/cc (idt "k1"))))))
+          (seq
+           (assign (idt "resource") 0)
+           (assign (idt "k1") (call/cc (idt "k1")))))))
+       (funFormals
+        (idt "consumidor")
+        (par (idt "k2"))
+        (blkCommandDec
+         (bind (idt "i") (ref 0))
+         (seq
+                     (if-my-struct (lt (idt "resource") 1)
+                                    (assign (idt "k2") (call/cc (idt "k2")))
+                                    (nop))
+                     (loop
+                      (gt (idt "resource") 0)
+                      (seq
+                       (print (idt "resource"))
+                       (seq
+                        (assign (idt "resource") (sub (idt "resource") 1))
+                        (if-my-struct
+                         (eq (idt "resource") 0)
+                            (assign (idt "k2") (call/cc (idt "k2")))
+                            (nop))))))))))
+     (calAtualsf (idt "consumidor") (idt "produtor"))))
 
 
 
