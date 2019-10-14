@@ -4,6 +4,14 @@
 (define my-pi-equivalence (hash
 			    "piAutomata" "δ"))
 
+(define pick-fields (hash))
+
+(define (filter-fields struct-name full-attr)
+  ((hash-ref pick-fields struct-name (lambda() (lambda (x) x))) full-attr))
+
+(define (my-pretty-print-name str)
+  (hash-ref my-pi-equivalence str str))
+
 (define (struct->list s)
   (vector->list (struct->vector s)))
 
@@ -18,16 +26,7 @@
 (define (pretty-print-struct-name s)
   (hash-ref my-pi-equivalence s (capitalize-first-letter s)))
 
-(define (on-depth str depth)
-  (string-append
-	  (let loop ((depth depth)
-		     (acc ""))
-	    (if (equal? depth 0)
-	      acc
-	      (loop (- depth 1) (string-append acc " "))))
-	  (format "~a" str)))
-
-(define (write-loc node port mode [depth 0])
+(define (write-loc node port mode)
   (let* ((write-fun (if mode write display)))
     (if (struct? node)
       (let* ((struct-decompose (struct->list node))
@@ -36,31 +35,30 @@
 	     (pretty-print-name (pretty-print-struct-name struct-name))
 	     (atributes (cdr struct-decompose)))
 	      (begin
-		    (write-fun (on-depth pretty-print-name depth) port)
-		    (write-fun (on-depth "(" depth) port)
+		    (write-fun pretty-print-name port)
+		    (write-fun "(" port)
 		    (newline)
 		    (if (empty? atributes)
 		      (void)
 		      (begin
-			(write-loc (car atributes) port mode (+ 1 depth))
+			(write-loc (car atributes) port mode)
 			(for ((element (cdr atributes)))
-			     (write-loc element port mode (+ 1 depth)))))
-		    (write-fun (on-depth ")" depth) port)))
+			     (write-loc element port mode ))))
+		    (write-fun ")" port)))
       (if (list? node)
           (if (null? node)
-              (write-loc "[]" port mode depth)
+              (write-loc "[]" port mode)
               (begin
-		(write-loc "[" port mode depth)
-                (write-loc (car node) port mode (+ 1 depth))
+		(write-loc "[" port mode)
+                (write-loc (car node) port mode)
                 (for ((element (cdr node)))
-                  (write-loc element port mode (+ 1 depth)))
-		(write-loc "]" port mode depth)))
+                  (write-loc element port mode))
+		(write-loc "]" port mode)))
 	     (begin
-		      (write-fun (on-depth node depth) port))))))
+		      (write-fun node port))))))
 
 (define-syntax-rule (my-struct name args . rest)
 	(struct name args #:transparent #:methods gen:custom-write [(define write-proc write-loc)]))
-
 
 (module+ test
 	 (my-struct loc (a))

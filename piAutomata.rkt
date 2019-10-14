@@ -84,12 +84,21 @@
     [(cons (for a b) (list c d ...)) (dec (bind a (ref c)) (casa b d))]))
 
 (define (piAutomataEval piAutomataP [debug #f])
+  #|
+  (when (and debug (not (null? (piAutomata-control piAutomataP))))
+    (display (car (piAutomata-control piAutomataP)))
+    (newline)
+    (newline)
+    (read-line))
+|#
   (if
    (and
     #|(null? (piAutomata-val piAutomataP))|#
     (null? (piAutomata-control piAutomataP)))
    piAutomataP
    (piAutomataEval (match piAutomataP
+              [(piAutomata env d e (list (abs b) c ...) locali output) (piAutomata env (cons (abs b) d) e c locali output)]
+              [(piAutomata env d e (list (absFormals a b) c ...) locali output) (piAutomata env (cons (absFormals a b) d) e c locali output)]
               [(piAutomata env d e (list (bind a b) c ...) locali output) (piAutomata env (cons a d) e (append (list b 'bind) c) locali output)]
               [(piAutomata env (list (loc l) (idt x) d ...) e (list 'bind c ...) locali output)
                (piAutomata (hash-set env x (loc l)) d e c locali output)]
@@ -248,7 +257,7 @@
               [a (begin
 		   (display "Começo da pilha de controle")
 		   (newline)
-		   (display (piAutomata-env a))
+		   (display (piAutomata-control a))
 		   (newline)
 		   (newline)
 		   (newline)
@@ -266,7 +275,7 @@
 ;;but to allow test of arithmetic expression, including the rules that look to cont as a value
 ;;this rule was relaxed, only control must be empty
 ;;
-
+  
   (check-equal? (executeSMC (add 1 2))
                 (piAutomata (hash) '(3) (hash) '() '() '()))
   (check-equal? (executeSMC (sub 1 2))
@@ -535,6 +544,7 @@
  '(4 3 2 1 0)))
 
 
+  (check-equal?
    (executeSMC
     (blkCommandDec
      (dec
@@ -550,11 +560,11 @@
                 (seq
                  (assign (idt "co") (sub (idt "co") 1))
                  (seq
-                  (assign (idt "resource") 20)
+                  (assign (idt "resource") 2)
                   (assign (idt "k1") (call/cc (idt "k1"))))))
           (seq
            (assign (idt "resource") 0)
-           (assign (idt "k1") (call/cc (idt "k1")))))))
+           (ret 0)))))
        (funFormals
         (idt "consumidor")
         (par (idt "k2"))
@@ -564,6 +574,7 @@
                      (if-my-struct (lt (idt "resource") 1)
                                     (assign (idt "k2") (call/cc (idt "k2")))
                                     (nop))
+                     (seq
                      (loop
                       (gt (idt "resource") 0)
                       (seq
@@ -573,8 +584,420 @@
                         (if-my-struct
                          (eq (idt "resource") 0)
                             (assign (idt "k2") (call/cc (idt "k2")))
-                            (nop))))))))))
-     (calAtualsf (idt "consumidor") (idt "produtor"))))
+                            (nop)))))
+                     (ret 0)))))))
+     (print (calAtualsf (idt "consumidor") (idt "produtor")))))
+   (piAutomata
+ '#hash()
+ '()
+ (hash
+  (loc 2)
+  (cont
+   (hash
+    "co"
+    (loc 5)
+    "consumidor"
+    (absFormals
+     (par (idt "k2"))
+     (blkCommandDec
+      (bind (idt "i") (ref 0))
+      (seq
+       (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+       (seq
+        (loop
+         (gt (idt "resource") 0)
+         (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+        (ret 0)))))
+    "i"
+    (loc 3)
+    "k1"
+    (loc 4)
+    "k2"
+    (loc 2)
+    "produtor"
+    (absFormals
+     (par (idt "k1"))
+     (blkCommandDec
+      (bind (idt "co") (ref 5))
+      (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+    "resource"
+    (loc 1))
+   (list
+    (hash
+     "consumidor"
+     (absFormals
+      (par (idt "k2"))
+      (blkCommandDec
+       (bind (idt "i") (ref 0))
+       (seq
+        (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+        (seq
+         (loop
+          (gt (idt "resource") 0)
+          (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+         (ret 0)))))
+     "i"
+     (loc 3)
+     "k1"
+     (loc 4)
+     "k2"
+     (loc 2)
+     "produtor"
+     (absFormals
+      (par (idt "k1"))
+      (blkCommandDec
+       (bind (idt "co") (ref 5))
+       (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+     "resource"
+     (loc 1))
+    (list (loc 4))
+    (hash
+     "consumidor"
+     (absFormals
+      (par (idt "k2"))
+      (blkCommandDec
+       (bind (idt "i") (ref 0))
+       (seq
+        (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+        (seq
+         (loop
+          (gt (idt "resource") 0)
+          (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+         (ret 0)))))
+     "i"
+     (loc 3)
+     "k2"
+     (loc 2)
+     "produtor"
+     (absFormals
+      (par (idt "k1"))
+      (blkCommandDec
+       (bind (idt "co") (ref 5))
+       (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+     "resource"
+     (loc 1))
+    (list (loc 3))
+    (cont
+     (hash
+      "consumidor"
+      (absFormals
+       (par (idt "k2"))
+       (blkCommandDec
+        (bind (idt "i") (ref 0))
+        (seq
+         (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+         (seq
+          (loop
+           (gt (idt "resource") 0)
+           (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+          (ret 0)))))
+      "i"
+      (loc 3)
+      "k2"
+      (loc 2)
+      "produtor"
+      (absFormals
+       (par (idt "k1"))
+       (blkCommandDec
+        (bind (idt "co") (ref 5))
+        (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+      "resource"
+      (loc 1))
+     (list
+      (hash
+       "consumidor"
+       (absFormals
+        (par (idt "k2"))
+        (blkCommandDec
+         (bind (idt "i") (ref 0))
+         (seq
+          (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+          (seq
+           (loop
+            (gt (idt "resource") 0)
+            (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+           (ret 0)))))
+       "k2"
+       (loc 2)
+       "produtor"
+       (absFormals
+        (par (idt "k1"))
+        (blkCommandDec
+         (bind (idt "co") (ref 5))
+         (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+       "resource"
+       (loc 1))
+      (list (loc 2))
+      (hash
+       "consumidor"
+       (absFormals
+        (par (idt "k2"))
+        (blkCommandDec
+         (bind (idt "i") (ref 0))
+         (seq
+          (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+          (seq
+           (loop
+            (gt (idt "resource") 0)
+            (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+           (ret 0)))))
+       "produtor"
+       (absFormals
+        (par (idt "k1"))
+        (blkCommandDec
+         (bind (idt "co") (ref 5))
+         (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+       "resource"
+       (loc 1))
+      (list (loc 1))
+      (cont
+       (hash
+        "consumidor"
+        (absFormals
+         (par (idt "k2"))
+         (blkCommandDec
+          (bind (idt "i") (ref 0))
+          (seq
+           (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+           (seq
+            (loop
+             (gt (idt "resource") 0)
+             (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+            (ret 0)))))
+        "produtor"
+        (absFormals
+         (par (idt "k1"))
+         (blkCommandDec
+          (bind (idt "co") (ref 5))
+          (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+        "resource"
+        (loc 1))
+       '(#hash() ())
+       '(print blk))
+      '#hash()
+      '())
+     (list
+      'assign
+      (idt "k2")
+      (seq
+       (loop
+        (gt (idt "resource") 0)
+        (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+       (ret 0))
+      'blk
+      'blk
+      'print
+      'blk))
+    (hash
+     "consumidor"
+     (absFormals
+      (par (idt "k2"))
+      (blkCommandDec
+       (bind (idt "i") (ref 0))
+       (seq
+        (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+        (seq
+         (loop
+          (gt (idt "resource") 0)
+          (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+         (ret 0)))))
+     "k2"
+     (loc 2)
+     "produtor"
+     (absFormals
+      (par (idt "k1"))
+      (blkCommandDec
+       (bind (idt "co") (ref 5))
+       (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+     "resource"
+     (loc 1))
+    (list (loc 2))
+    (hash
+     "consumidor"
+     (absFormals
+      (par (idt "k2"))
+      (blkCommandDec
+       (bind (idt "i") (ref 0))
+       (seq
+        (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+        (seq
+         (loop
+          (gt (idt "resource") 0)
+          (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+         (ret 0)))))
+     "produtor"
+     (absFormals
+      (par (idt "k1"))
+      (blkCommandDec
+       (bind (idt "co") (ref 5))
+       (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+     "resource"
+     (loc 1))
+    (list (loc 1))
+    (cont
+     (hash
+      "consumidor"
+      (absFormals
+       (par (idt "k2"))
+       (blkCommandDec
+        (bind (idt "i") (ref 0))
+        (seq
+         (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+         (seq
+          (loop
+           (gt (idt "resource") 0)
+           (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+          (ret 0)))))
+      "produtor"
+      (absFormals
+       (par (idt "k1"))
+       (blkCommandDec
+        (bind (idt "co") (ref 5))
+        (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+      "resource"
+      (loc 1))
+     '(#hash() ())
+     '(print blk))
+    '#hash()
+    '())
+   (list
+    'assign
+    (idt "k1")
+    (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1"))))))
+    (seq (assign (idt "resource") 0) (ret 0))
+    'blk
+    'blk
+    'assign
+    (idt "k2")
+    (seq
+     (loop
+      (gt (idt "resource") 0)
+      (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+     (ret 0))
+    'blk
+    'blk
+    'print
+    'blk))
+  (loc 5)
+  0
+  (loc 3)
+  0
+  (loc 4)
+  (cont
+   (hash
+    "consumidor"
+    (absFormals
+     (par (idt "k2"))
+     (blkCommandDec
+      (bind (idt "i") (ref 0))
+      (seq
+       (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+       (seq
+        (loop
+         (gt (idt "resource") 0)
+         (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+        (ret 0)))))
+    "i"
+    (loc 3)
+    "k2"
+    (loc 2)
+    "produtor"
+    (absFormals
+     (par (idt "k1"))
+     (blkCommandDec
+      (bind (idt "co") (ref 5))
+      (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+    "resource"
+    (loc 1))
+   (list
+    (hash
+     "consumidor"
+     (absFormals
+      (par (idt "k2"))
+      (blkCommandDec
+       (bind (idt "i") (ref 0))
+       (seq
+        (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+        (seq
+         (loop
+          (gt (idt "resource") 0)
+          (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+         (ret 0)))))
+     "k2"
+     (loc 2)
+     "produtor"
+     (absFormals
+      (par (idt "k1"))
+      (blkCommandDec
+       (bind (idt "co") (ref 5))
+       (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+     "resource"
+     (loc 1))
+    (list (loc 2))
+    (hash
+     "consumidor"
+     (absFormals
+      (par (idt "k2"))
+      (blkCommandDec
+       (bind (idt "i") (ref 0))
+       (seq
+        (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+        (seq
+         (loop
+          (gt (idt "resource") 0)
+          (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+         (ret 0)))))
+     "produtor"
+     (absFormals
+      (par (idt "k1"))
+      (blkCommandDec
+       (bind (idt "co") (ref 5))
+       (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+     "resource"
+     (loc 1))
+    (list (loc 1))
+    (cont
+     (hash
+      "consumidor"
+      (absFormals
+       (par (idt "k2"))
+       (blkCommandDec
+        (bind (idt "i") (ref 0))
+        (seq
+         (if-my-struct (lt (idt "resource") 1) (assign (idt "k2") (call/cc (idt "k2"))) (nop))
+         (seq
+          (loop
+           (gt (idt "resource") 0)
+           (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+          (ret 0)))))
+      "produtor"
+      (absFormals
+       (par (idt "k1"))
+       (blkCommandDec
+        (bind (idt "co") (ref 5))
+        (seq (loop (gt (idt "co") 0) (seq (assign (idt "co") (sub (idt "co") 1)) (seq (assign (idt "resource") 2) (assign (idt "k1") (call/cc (idt "k1")))))) (seq (assign (idt "resource") 0) (ret 0)))))
+      "resource"
+      (loc 1))
+     '(#hash() ())
+     '(print blk))
+    '#hash()
+    '())
+   (list
+    'assign
+    (idt "k2")
+    (loop
+     (gt (idt "resource") 0)
+     (seq (print (idt "resource")) (seq (assign (idt "resource") (sub (idt "resource") 1)) (if-my-struct (eq (idt "resource") 0) (assign (idt "k2") (call/cc (idt "k2"))) (nop)))))
+    (ret 0)
+    'blk
+    'blk
+    'print
+    'blk))
+  (loc 1)
+  0)
+ '()
+ '()
+ '(0 1 2 1 2 1 2 1 2 1 2)))
 
 
 

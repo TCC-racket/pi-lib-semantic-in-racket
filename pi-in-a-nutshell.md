@@ -170,17 +170,17 @@ _𝛅(#COND :: C, false :: Cond(X, M₁, M₂) :: V, E, S) = 𝛅(M₂ :: C, V, 
 
 _𝛅(CSeq(M₁, M₂) :: C, V, E, S) = 𝛅(M₁ :: M₂ :: C, V, E, S)_.
 
-𝛅(Cont(Env,Val,Con) :: C, V, E, S) = 𝛅(C,Cont(Env,Val,Con)::V, E, S)
+𝛅(Cont(Env,Val,Con) :: C, V, E, S) = 𝛅(C,Cont(Env,Val,Con)::V, E, S)       (1)
 
-𝛅(Call/cc(Func) :: C, V, E, S) = 𝛅(Callf(Func, Cont(E,V,C)) :: C,V, E, S)
+𝛅(Call/cc(Func) :: C, V, E, S) = 𝛅(Callf(Func, Cont(E,V,C)) :: C,V, E, S)     (2)
 
-𝛅( #CALLF :: C, Actual :: Cont(Env,Val,Con) :: V, E, S) = 𝛅(Con,Actual::Val, Env, S)
+𝛅( #CALLF :: C, Actual :: Cont(Env,Val,Con) :: V, E, S) = 𝛅(Con,Actual::Val, Env, S)   (3)
 
-𝛅(Callf(Func, Actuals) :: C, V, E, S) = 𝛅(Func :: Actuals :: #CALLF :: C, Cont(E,V,C) :: V, E, S)
+𝛅(Callf(Func, Actuals) :: C, V, E, S) = 𝛅(Func :: Actuals :: #CALLF :: C, Cont(E,V,C) :: V, E, S)    (4)
 
-𝛅(Ret(Exp) :: C, V, E, S) = 𝛅(Exp :: #RET :: C, V, E, S)
+𝛅(Ret(Exp) :: C, V, E, S) = 𝛅(Exp :: #RET :: C, V, E, S)     (5)
 
-𝛅(#RET :: C, Value :: ... :: Cont(Env,Val,Con) :: V, E, S) = 𝛅(Con, Value::Val, Env, S)
+𝛅(#RET :: C, Value :: ... :: Cont(Env,Val,Con) :: V, E, S) = 𝛅(Con, Value::Val, Env, S)    (6)
 
 
 
@@ -330,11 +330,11 @@ _𝛅(#CALL(I, u) :: C, V₁ :: V₂ :: ... :: Vᵤ :: V, E, S, L) = 𝛅(B :: #
 
 𝛅(Call/cc(Id("g")) :: #PRINT :: [], [], {"g" ↦ Abs(Id("k"),Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, {}, [])
 
-=
+= using rule 2
 
 𝛅(Callf(Id("g"), Cont({"g" ↦ Abs(Id("k"),Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, [], #PRINT :: []))::#PRINT :: [], [], {"g" ↦ Abs(Id("k"),Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, {}, [])
 
-=
+= using rule 4
 
 𝛅(Id("g") :: Cont({"g" ↦ Abs(Id("k") :: [],Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, [], #PRINT :: []) :: #CALLF :: #PRINT :: [],Cont({"g" ↦ Abs(Id("k"),Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, [], #PRINT :: []) :: [], {"g" ↦ Abs(Id("k"),Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, {}, []))
 
@@ -342,13 +342,13 @@ _𝛅(#CALL(I, u) :: C, V₁ :: V₂ :: ... :: Vᵤ :: V, E, S, L) = 𝛅(B :: #
 
 𝛅(Cont({"g" ↦ Abs(Id("k") :: [],Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, [], #PRINT :: []) :: #CALLF :: #PRINT :: [],Abs(Id("k") :: [],Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))::Cont({"g" ↦ Abs(Id("k"),Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, [], #PRINT :: []) :: [], {"g" ↦ Abs(Id("k"),Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, {}, []))
 
-=
+= using rule 1
 
 𝛅(#CALLF :: #PRINT :: [],Cont({"g" ↦ Abs(Id("k") :: [],Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, [], #PRINT :: []) :: Abs(Id("k") :: [],Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))::Cont({"g" ↦ Abs(Id("k"),Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, [], #PRINT :: []) :: [], {"g" ↦ Abs(Id("k"),Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))}, {}, []))
 
 To preserve readbility, let's make gBody as Abs(Id("k"),Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45))))))
 
-=
+= 
 
 𝛅(#CALLF :: #PRINT :: [],Cont({"g" ↦ gBody}, [], #PRINT :: []) :: gBody::Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
 
@@ -368,7 +368,7 @@ To preserve readbility, let's make gBody as Abs(Id("k"),Blk(EmptyDec, CSeq(Callf
 
 𝛅(Cont({"g" ↦ gBody}, [], #PRINT :: []) :: #REF :: #BIND :: Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #PRINT :: [],Id("k") :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
 
-=
+= using rule 1
 
 𝛅( #REF :: #BIND :: Blk(EmptyDec, CSeq(Callf(Id("k"),Num(2)), CSeq(Print(Num(3)), Ret(Num(45)))))) :: #BLK :: #PRINT :: [],Cont({"g" ↦ gBody}, [], #PRINT :: []) :: Id("k") :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"g" ↦ gBody}, {}, []))
 
@@ -404,7 +404,7 @@ To preserve readbility, let's make gBody as Abs(Id("k"),Blk(EmptyDec, CSeq(Callf
 
 <u>***𝛅( #CALLF :: CSeq(Print(Num(3)), Ret(Num(45))) :: #BLK :: #BLK :: #PRINT :: [], Num(2) :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: Cont({"k"↦l1 ,"g" ↦ gBody}, Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], CSeq(Print(Num(3)), Ret(Num(45))) :: #BLK :: #BLK :: #PRINT :: []) :: Cont({"g" ↦ gBody}, [], #PRINT :: []) :: [], {"k"↦l1 ,"g" ↦ gBody}, {l1 ↦ Cont({"g" ↦ gBody}, [], #PRINT :: [])}, [l1]))***</u>
 
-<u>***=***</u>
+<u>***=***</u> using rule 3
 
 <u>***𝛅(#PRINT :: [], Num(2) :: [], {"g" ↦ gBody}, {l1 ↦ Cont({"g" ↦ gBody}, [], #PRINT :: [])}, [l1])***</u>
 
