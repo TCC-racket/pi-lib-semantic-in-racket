@@ -61,6 +61,8 @@
 	(struct name args #:transparent #:methods gen:custom-write [(define write-proc write-loc)]))
 
 (module+ test
+  ;write test creating string-ports
+  ;we can use display with a port
 	 (my-struct loc (a))
 	 (display (loc 12))
 	 (display (loc (loc 12)))
