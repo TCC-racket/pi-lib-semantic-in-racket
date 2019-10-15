@@ -3,100 +3,100 @@
 
 (provide (all-defined-out))
 (require "ambiente.rkt")
-;(require "pretty.rkt")
+(require "pretty.rkt")
 
-(struct try/catch (t c) #:transparent)
-(struct throw (e) #:transparent)
-(struct try/catch/finally (t c f) #:transparent)
+(my-struct try/catch (t c) #:transparent)
+(my-struct throw (e) #:transparent)
+(my-struct try/catch/finally (t c f) #:transparent)
 
-(struct cont (env s c) #:transparent)
+(my-struct cont (env s c) #:transparent)
 
 
-(struct yield (expression function-name) #:transparent)
+(my-struct yield (expression function-name) #:transparent)
 
-(struct ret (a) #:transparent)
+(my-struct ret (a) #:transparent)
 
-(struct calf (a) #:transparent)
+(my-struct calf (a) #:transparent)
 
-(struct calAtualsf (a b) #:transparent)
+(my-struct calAtualsf (a b) #:transparent)
 
-(struct fun (a b) #:transparent)
-(struct funFormals (a b c) #:transparent)
-(struct nop () #:transparent)
-(struct if-my-struct (cond then else) #:transparent)
-(struct print (a) #:transparent)
-(struct exit (a) #:transparent)
-(struct act (a b) #:transparent)
-(struct calAtuals (a b) #:transparent)
-(struct cal (a) #:transparent)
-(struct prc (a b) #:transparent)
-(struct prcFormals (a b c) #:transparent)
-(struct cns (a b) #:transparent)
-(struct blkCommand (a) #:transparent)
-(struct blkCommandDec (a b) #:transparent)
+(my-struct fun (a b) #:transparent)
+(my-struct funFormals (a b c) #:transparent)
+(my-struct nop () #:transparent)
+(my-struct if-my-struct (cond then else) #:transparent)
+(my-struct print (a) #:transparent)
+(my-struct exit (a) #:transparent)
+(my-struct act (a b) #:transparent)
+(my-struct calAtuals (a b) #:transparent)
+(my-struct cal (a) #:transparent)
+(my-struct prc (a b) #:transparent)
+(my-struct prcFormals (a b c) #:transparent)
+(my-struct cns (a b) #:transparent)
+(my-struct blkCommand (a) #:transparent)
+(my-struct blkCommandDec (a b) #:transparent)
 
-(struct idt (a) #:transparent)
+(my-struct idt (a) #:transparent)
 
-(struct assign (a b) #:transparent)
+(my-struct assign (a b) #:transparent)
 
-(struct loop (a b) #:transparent)
+(my-struct loop (a b) #:transparent)
 
-(struct choice (a b) #:transparent)
+(my-struct choice (a b) #:transparent)
 
-(struct eq (a b) #:transparent)
+(my-struct eq (a b) #:transparent)
 
-(struct neg (a) #:transparent)
+(my-struct neg (a) #:transparent)
 
-(struct ref (a) #:transparent)
-(struct dec (a b) #:transparent)
+(my-struct ref (a) #:transparent)
+(my-struct dec (a b) #:transparent)
 
-(struct par (a) #:transparent)
-(struct for (a b) #:transparent)
+(my-struct par (a) #:transparent)
+(my-struct for (a b) #:transparent)
 
-(struct add (a b) #:transparent)
-(struct sub (a b) #:transparent)
-(struct mult (a b) #:transparent)
-(struct div (a b) #:transparent)
+(my-struct add (a b) #:transparent)
+(my-struct sub (a b) #:transparent)
+(my-struct mult (a b) #:transparent)
+(my-struct div (a b) #:transparent)
 
-(struct or (a b) #:transparent)
-(struct and-my-struct (a b) #:transparent)
-(struct ge (a b) #:transparent)
-(struct gt (a b) #:transparent)
-(struct lt (a b) #:transparent)
-(struct le (a b) #:transparent)
+(my-struct or (a b) #:transparent)
+(my-struct and-my-struct (a b) #:transparent)
+(my-struct ge (a b) #:transparent)
+(my-struct gt (a b) #:transparent)
+(my-struct lt (a b) #:transparent)
+(my-struct le (a b) #:transparent)
 
-(struct seq (a b) #:transparent)
+(my-struct seq (a b) #:transparent)
 
-(struct call/cc (a) #:transparent)
+(my-struct call/cc (a) #:transparent)
 
-(struct piAutomata (env val mem control loc output) #:transparent)
-(struct absFormals (formals block) #:transparent)
-(struct abs (block) #:transparent)
-(struct bind (a b) #:transparent)
+(my-struct piAutomata (env val mem control loc output) #:transparent)
+(my-struct absFormals (formals block) #:transparent)
+(my-struct abs (block) #:transparent)
+(my-struct bind (a b) #:transparent)
 
 (provide executeSMC piAutomata)
 (define (executeSMC bplc)
-  (piAutomataEval (piAutomata (hash) '() (hash) (list bplc) '() '()) #t))
+  (piAutomataEval (piAutomata (hash) '() (hash) (list bplc) '() '())))
   
 (define (casa formals atuals)
   (match (cons formals atuals)
     [(cons (par a) (list c)) (bind a (ref c))   ]
     [(cons (for a b) (list c d ...)) (dec (bind a (ref c)) (casa b d))]))
 
-(define (piAutomataEval piAutomataP [debug #f])
-  #|
-  (when (and debug (not (null? (piAutomata-control piAutomataP))))
-    (display (car (piAutomata-control piAutomataP)))
-    (newline)
-    (newline)
-    (read-line))
-|#
+(define (piAutomataEval piAutomataP)
+  
+  (display piAutomataP)
+  (newline)
+
   (if
    (and
     #|(null? (piAutomata-val piAutomataP))|#
     (null? (piAutomata-control piAutomataP)))
    piAutomataP
-   (piAutomataEval (match piAutomataP
+   (begin
+     (display "=")
+     (newline)
+     (piAutomataEval (match piAutomataP
               [(piAutomata env d e (list (abs b) c ...) locali output) (piAutomata env (cons (abs b) d) e c locali output)]
               [(piAutomata env d e (list (absFormals a b) c ...) locali output) (piAutomata env (cons (absFormals a b) d) e c locali output)]
               [(piAutomata env d e (list (bind a b) c ...) locali output) (piAutomata env (cons a d) e (append (list b 'bind) c) locali output)]
@@ -255,13 +255,7 @@
               [(piAutomata env v m (list (try/catch e c) r ...) locali output) (piAutomata env v m (cons (try/catch/finally e c (nop)) r) locali output)]
               ;;;Possivelmente essa ultima transição virará um throw
               [a (begin
-		   (display "Começo da pilha de controle")
-		   (newline)
-		   (display (piAutomata-control a))
-		   (newline)
-		   (newline)
-		   (newline)
-                   (raise (format "Desculpe, feature não implementada.\n")))]) debug)))
+                   (raise (format "Desculpe, feature não implementada.\n")))])))))
 
 
 (module+ test
@@ -363,8 +357,8 @@
       1)))
    (piAutomata '#hash() '() (hash (loc 1) 1) '() '() '(2)))
 
-  ;(my-struct piAutomata (env val mem control loc output) #:transparent)
-  ;(my-struct cont (env s c) #:transparent)
+  ;(my-my-struct piAutomata (env val mem control loc output) #:transparent)
+  ;(my-my-struct cont (env s c) #:transparent)
   (check-equal?
    (piAutomataEval
     (piAutomata (hash) (list 2 (cont (hash) '() (list 'print))) (hash) (list 'ret) '() '()))

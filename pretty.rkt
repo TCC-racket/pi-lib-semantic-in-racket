@@ -4,7 +4,9 @@
 (define my-pi-equivalence (hash
 			    "piAutomata" "δ"))
 
-(define pick-fields (hash))
+(define pick-fields (hash "piAutomata" (lambda (l) (match l
+                                                     [(list env val mem control loc output)
+                                                      (list control val env mem loc)]))))
 
 (define (filter-fields struct-name full-attr)
   ((hash-ref pick-fields struct-name (lambda() (lambda (x) x))) full-attr))
@@ -33,37 +35,62 @@
 	     (struct-full-name (symbol->string (car struct-decompose)))
 	     (struct-name (string-replace struct-full-name "struct:" ""))
 	     (pretty-print-name (pretty-print-struct-name struct-name))
-	     (atributes (cdr struct-decompose)))
+	     (atributes (filter-fields struct-name (cdr struct-decompose))))
 	      (begin
 		    (write-fun pretty-print-name port)
 		    (write-fun "(" port)
-		    (newline)
 		    (if (empty? atributes)
 		      (void)
 		      (begin
 			(write-loc (car atributes) port mode)
 			(for ((element (cdr atributes)))
+                             (write-loc "," port mode)
 			     (write-loc element port mode ))))
 		    (write-fun ")" port)))
       (if (list? node)
           (if (null? node)
               (write-loc "[]" port mode)
               (begin
-		(write-loc "[" port mode)
                 (write-loc (car node) port mode)
-                (for ((element (cdr node)))
-                  (write-loc element port mode))
-		(write-loc "]" port mode)))
-	     (begin
-		      (write-fun node port))))))
+                (write-loc "::" port mode)
+                (write-loc (cdr node) port mode)))
+          (if (number? node)
+              (write-loc (format "Num(~a)" node) port mode)
+              (if (hash? node)
+                  (begin
+                    (write-loc "{" port mode)
+                    (for ((k (in-hash-keys node)))
+                      (write-loc k port mode)
+                      (write-loc "->" port mode)
+                      (write-loc (hash-ref node k) port mode)
+                      (write-loc " " port mode))
+                    (write-loc "}" port mode))
+                  (if (symbol? node)
+                      (begin
+                        (write-loc "#" port mode)
+                        (write-loc (symbol->string node) port mode))
+                      (begin
+                        (write-fun node port)))))))))
 
 (define-syntax-rule (my-struct name args . rest)
 	(struct name args #:transparent #:methods gen:custom-write [(define write-proc write-loc)]))
 
 (module+ test
-  ;write test creating string-ports
-  ;we can use display with a port
-	 (my-struct loc (a))
-	 (display (loc 12))
-	 (display (loc (loc 12)))
-	 (display (loc (loc (loc 12)))))
+  (require rackunit)
+
+  (my-struct loc (a))
+  (my-struct dub (a b))
+  (my-struct piAutomata (env val mem control loc output))
+  (my-struct idt (a))
+  (define (test-function structure expected)
+    (define strPort (open-output-string))
+    (display structure strPort)
+    (check-equal? expected (get-output-string strPort)))
+
+  (test-function (loc 12) "Loc(Num(12))")
+  (test-function (loc (list 1 2 3)) "Loc(Num(1)::Num(2)::Num(3)::[])")
+  (test-function (dub 1 2) "Dub(Num(1),Num(2))")
+  (test-function
+   (piAutomata (hash (idt "x") (loc 2)) (list) (hash (loc 2) 2) (list) (list) (list))
+   "δ([],[],{Idt(x)->Loc(Num(2)) },{Loc(Num(2))->Num(2) },[])")
+  (test-function (loc 'hi) "Loc(#hi)"))
