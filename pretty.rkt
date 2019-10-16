@@ -61,7 +61,7 @@
                     (write-loc "{" port mode)
                     (for ((k (in-hash-keys node)))
                       (write-loc k port mode)
-                      (write-loc "->" port mode)
+                      (write-loc "↦" port mode)
                       (write-loc (hash-ref node k) port mode)
                       (write-loc " " port mode))
                     (write-loc "}" port mode))
